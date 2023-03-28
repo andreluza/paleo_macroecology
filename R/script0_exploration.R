@@ -9,7 +9,7 @@ library(ggplot2); library(rasterVis); library(rgdal);library(viridis)
 # ======================================================
 #  Brazil data
 tab_data_BR <- readOGR(here("data", "GeoSBG", "ocorrencia_fossilifera"),
-         layer = "ocorrencia_fossilifera")
+                       layer = "ocorrencia_fossilifera")
 # (tab_data_BR@coords)
 
 
@@ -43,8 +43,8 @@ crs(grd_raster) <-crs(southAme)
 
 # rasterize to count the number of points per cell
 overlap_grid_dois <- rasterize((tab_data_BR@coords),
-                                 grd_raster,
-                                 fun="count")
+                               grd_raster,
+                               fun="count")
 #clamp
 #overlap_grid_dois<-clamp(overlap_grid_dois, 
 #                           lower=0,
@@ -73,9 +73,9 @@ plot1 <- gplot(overlap_grid_dois) +
 
 # add south america map
 plot1 <- plot1 + geom_polygon(data=southAme, 
-                                    aes(x=long, y=lat, group=group),
-                                    size = 0.1, fill="gray60", 
-                                    colour="gray75",alpha=0.1) + 
+                              aes(x=long, y=lat, group=group),
+                              size = 0.1, fill="gray60", 
+                              colour="gray75",alpha=0.1) + 
   xlab("Longitude") + ylab("Latitude")
 
 
