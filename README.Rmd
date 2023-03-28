@@ -1,5 +1,5 @@
 ---
-title: "Extinction and origination dynamics in Tr-J"
+title: "Extinction and origination dynamics in Triassic-Jurassic"
 author: "ALLuza, MG Bender, CS Dambros, L Kerber - Departamento de Ecologia e Evolução, Universidade Federal de Santa Maria"
 date: "2023-03-23"
 output: github_document
@@ -34,7 +34,7 @@ We used the Paleo Database (REF) as the main source of paleontological data for 
 
 ## State-space models
 
-State-space models are hierarchical models that enable the estimation of biological parameters describing dynamic properties of ecological systems (Kéry & Royle 2007, Ecology). They are called 'first-order Markovian models' because they use information from previous time and/or neighbor sites to project biological parameters in the next time. Thus, they are useful to estimating parameters involved with inference in paleontology, such as extinction (*epslon*), origination (*gamma*), and turnover rates (Bambach et al. 2004, Benton 1995). In state-space models, the true state of a system (e.g. the realized occurrence of the fossil genera *g* at the time interval *t*) is denoted by the latent, stochastic variable *z~[t,g]*.  The *z~[t,g]* is the realization of a Bernoulli process ('dbern') dependent on the variable *muZ~[t,g]*, which is the expected probability of occupancy of interval *t* by the genus *g*. In its turn, the *muZ~[t,g]* depends on both the realized occurrence of genus *g* in the previous time *t-1*, ie. *z~[t-1,g]* (whose first time gives the initial conditions for the dynamics develop) and the estimated probability of extinction (*epslon*~t = 1 - *phi*~t) and origination (*gamma*) in the next interval if the previous interval *t-1* is either occupied or not by the genus *g*. The model design looks like:
+State-space models are hierarchical models that enable the estimation of biological parameters describing dynamic properties of ecological systems (Kéry & Royle 2007, Ecology). They are called 'first-order Markovian models' because they use information from previous time and/or neighbor sites to project biological parameters in the next time. Thus, they are useful to estimating parameters involved with inference in paleontology, such as extinction (*epslon*), origination (*gamma*), and turnover rates (Bambach et al. 2004, Benton 1995). In state-space models, the true state of a system (e.g. the realized occurrence of the fossil genera *g* at the time interval *t*) is denoted by the latent, stochastic variable *z~[t,g]*.  The *z~[t,g]* is the realization of a Bernoulli process ('dbern') dependent on the variable *muZ~[t,g]*, which is the expected probability of occupancy of interval *t* by the genus *g*. In its turn, the *muZ~[t,g]* depends on both the realized occurrence of genus *g* in the previous time *t-1*, ie. *z~[t-1,g]* (whose first time gives the initial conditions for the dynamics develop) and the estimated probability of extinction (*epslon~t* = 1 - *phi~t*) and origination (*gamma~t*) in the next interval if the previous interval *t-1* is either occupied or not by the genus *g*. The model design looks like:
 
 
 ```{r comment='', echo = F}
@@ -48,13 +48,13 @@ The input data consist of detections and non-detections (coded as 1 and 0, respe
 ## Derived parameters
 Using the state-space model structure we were able to estimate parameters often used to make inference in paleontology, namely 'extinction probability', 'origination probability', 'proportional change', and 'equilibrium occupancy'. The first ones depict the probability of genus extinction and origination from t to t+1 (i.e., between each pair of adjacent time intervals). There were 16 probability estimates from Olenekian (early Triassic) to Tithonian (late Jurassic), as there is no transition from Olenekian to previous time (Changhsingiano, late Permian). We choose not to include Permian data in our state-space model because it would include a large taxonomic heterogeneity in our data, as the Permian-Triassic boundary (~252 Ma) was characterized by the most massive extinction on Earth's history (Benton 1995).
 
-The proportional change (Bambach et al. 2004) depicts the difference in the number of taxa in the end relative to the beginning of a given period, as follows:
+The proportional change (PCh) (Bambach et al. 2004) depicts the difference in the number of taxa in the end relative to the beginning of a given period, as follows:
 
-*PC[t]* = sum (z[t-1,]) - sum(z[t,]))/sum(z[t-1,])
+*PCh[t]* = sum (z[t-1,]) - sum(z[t,]))/sum(z[t-1,])
 
 Finally, the equilibrium occupancy showing the trend of a genus *g* to either decline or increase over time was estimated as follows:
 
-*psi.eq[g]* = mean(gamma[t:T,g])/(mean(gamma[t:T,g])+mean(1-epslon[t:T,g]))
+*psi.eq[g]* = mean(gamma[t:T,g])/(mean(gamma[t:T,g])+mean(1-phi[t:T,g]))
 
 
 
@@ -62,12 +62,12 @@ Finally, the equilibrium occupancy showing the trend of a genus *g* to either de
 
 We estimated the state-space model parameters using Bayesian inference. Bayesian inference is a statistical method that applies the Bayes Theorem to update prior information about parameter values with observed data to then estimate the posterior probability of parameters. The prior information, generally represented by statistical distributions, are updated by their integration with data and likelihood estimation across independent Monte Carlo Markov Chains (MCMC). Variation in parameter estimates across posterior distribution draws represents an appropriate measure of parameter uncertainty (Kruschke & Liddell, 2018). In this sense, the Credible Intervals (CI), built using the quantiles of the posterior distribution draws of each parameter, depict the interval where most posterior distribution draws are and, therefore, delimit the area in which we have large certainty of finding the true parameter value (Kruschke & Liddell, 2018) [COPY OF MY JBI PAPER].
 
-The priors for *phi[t,g]*, *gamma[t,g]*, *psi[t=1,g]*, and *p[g]* were all assumed to come from a uniform distribution ranging from 0 to 1 (*phi[t,g]*, *gamma[t,g]*, *psi[t=1,g]*, *p[g]* ~ U(0,1)).
+The priors for all model parameters were assumed to come from an Uniform distribution ranging from 0 to 1 (*phi~[t,g]*, *gamma~[t,g]*, *psi~[t=1,g]*, *p~[g]* ~ U(0,1)).
 
 Our state-space model was run using three independent MCMC (using the Gibbs Sampling algorithm implemented in JAGS; Plummer, 2003), with 15,000 iterations and a warm up period of 7,000 iterations each chain. We retained 1000 post-warm up draws of each chain, resulting in 3000 posterior distribution draws of each model parameter which were used to make statistical inference and test our hypotheses.
 
 # Results
-The analyzed dataset comprises 1139 genera observed at 17 time intervals and 1769 geological formations. Thus, if all intervals and geological formations were sampled we would have 30.073 possible observations in this dataset, per taxon/genus. However, the dataset is quite sparse, with many missing observations, and had only 7.1 % (n=2.149 observations) out of the possible observations per taxon. 
+The analyzed dataset comprises 1139 genera observed at 17 time intervals and 1769 geological formations. Thus, if all intervals and geological formations were sampled we would have 30.073 possible observations per taxon/genus with this dataset. However, the dataset is quite sparse, with many missing observations, and had only 7.1 % (n=2.149 observations) out of the possible observations per taxon. 
 
 
 

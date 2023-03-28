@@ -1,4 +1,4 @@
-Extinction and origination dynamics in Tr-J
+Extinction and origination dynamics in Triassic-Jurassic
 ================
 ALLuza, MG Bender, CS Dambros, L Kerber - Departamento de Ecologia e
 Evolução, Universidade Federal de Santa Maria
@@ -113,9 +113,9 @@ interval *t* by the genus *g*. In its turn, the *muZ\~\[t,g\]* depends
 on both the realized occurrence of genus *g* in the previous time *t-1*,
 ie. *z\~\[t-1,g\]* (whose first time gives the initial conditions for
 the dynamics develop) and the estimated probability of extinction
-(*epslon*\~t = 1 - *phi*\~t) and origination (*gamma*) in the next
-interval if the previous interval *t-1* is either occupied or not by the
-genus *g*. The model design looks like:
+(*epslon\~t* = 1 - *phi<sub>t*) and origination (*gamma</sub>t*) in the
+next interval if the previous interval *t-1* is either occupied or not
+by the genus *g*. The model design looks like:
 
 
         model {
@@ -137,7 +137,7 @@ genus *g*. The model design looks like:
               ## colonization (origination)
               gamma [t,g] ~ dunif (0,1)
               ## extinction
-              epslon [t,g]~ dunif (0,1)
+              phi [t,g]~ dunif (0,1)
             
             }
            
@@ -161,8 +161,8 @@ genus *g*. The model design looks like:
                 
                   # model likelihood
                   ### modeling dynamics conditional on previous time realized occurrence z
-                  muZ[t,g] <- z[t-1,g] * (1-epslon[t,g]) + ### if occupied, p of not getting extinct
-                              (1-z[t-1,g]) * gamma[t,g] ###  if not occupied, p of getting colonized
+                  muZ[t,g] <- z[t-1,g] * (1-phi[t,g]) + ### if occupied, p of not getting extinct in the next time
+                              (1-z[t-1,g]) * gamma[t,g] ###  if not occupied, p of getting colonized in the next time
                             
                 z[t,g] ~ dbern(muZ[t,g])
         
@@ -205,7 +205,7 @@ genus *g*. The model design looks like:
         
         # average extinction and origination
         for (g in 1:ngenus) {
-          avepslon[g] <- mean(epslon[2:nint,g])
+          avphi[g] <- mean(phi[2:nint,g])
           avgamma[g]<- mean(gamma[2:nint,g])
         }
           
@@ -219,7 +219,7 @@ genus *g*. The model design looks like:
         # equilibrium occupancy (which genus decline or increase over time)
         for (g in 1:ngenus) {
         
-            psi.eq[g] <- mean(gamma[2:nint,g])/(mean(gamma[2:nint,g])+mean(epslon[2:nint,g])) # Equilibrium occupancy
+            psi.eq[g] <- mean(gamma[2:nint,g])/(mean(gamma[2:nint,g])+mean(1-phi[2:nint,g])) # Equilibrium occupancy
         
         }
         
@@ -242,29 +242,82 @@ depends on *muY<sub>\[g,t,k\]*, i.e. the probability of detecting a
 genus conditional on its realized occurrence (i.e., *z</sub>\[t,g\] x
 p<sub>\[g\]*). In this model, *p</sub>\[g\]* only varies across *g* to
 *G* genera. We estimated genus detection probability across geological
-formations as each one of them might represent differential physical
-processes causing sedimentation/erosion, transport, deformation, and
-lost of paleontological/taphonomic information.
+formations as each one of them represent a fieldwork effort to obtain
+fossil data, and might represent differential physical processes causing
+sedimentation/erosion, transport, deformation, and lost of
+paleontological/taphonomic information/affect fosssil preservation. The
+input data consist of detections and non-detections (coded as 1 and 0,
+respectively) of each genus in each geological formation and interval. A
+genus was ‘detected’ if it appeared at least once in a geological
+formation and interval, and it was ‘not-detected’ if it not appeared in
+formations and intervals with at least one detected genus. Missing
+observations (coded as ‘NA’) comprise intervals and formations with no
+detected genus, and were removed from the state-space model.
+Nonetheless, the model estimated data for these missing observations
+using the existing data and the prior information (see below “Modeling
+approach”).
 
 ## Derived parameters
 
-Using that state-space model structure we were able to estimate
+Using the state-space model structure we were able to estimate
 parameters often used to make inference in paleontology, namely
 ‘extinction probability’, ‘origination probability’, ‘proportional
 change’, and ‘equilibrium occupancy’. The first ones depict the
 probability of genus extinction and origination from t to t+1 (i.e.,
-between each pair of adjacent time intervals). Thus, there are 16
-probability estimates from Olenekian (early Triassic) to Tithonian (late
-Jurassic), as there is not transition from Olenekian to previous time
+between each pair of adjacent time intervals). There were 16 probability
+estimates from Olenekian (early Triassic) to Tithonian (late Jurassic),
+as there is no transition from Olenekian to previous time
 (Changhsingiano, late Permian). We choose not to include Permian data in
 our state-space model because it would include a large taxonomic
 heterogeneity in our data, as the Permian-Triassic boundary (\~252 Ma)
 was characterized by the most massive extinction on Earth’s history
 (Benton 1995).
 
+The proportional change (PCh) (Bambach et al. 2004) depicts the
+difference in the number of taxa in the end relative to the beginning of
+a given period, as follows:
+
+*PCh\[t\]* = sum (z\[t-1,\]) - sum(z\[t,\]))/sum(z\[t-1,\])
+
+Finally, the equilibrium occupancy showing the trend of a genus *g* to
+either decline or increase over time was estimated as follows:
+
+*psi.eq\[g\]* =
+mean(gamma\[t:T,g\])/(mean(gamma\[t:T,g\])+mean(1-phi\[t:T,g\]))
+
+## Modeling approach
+
+We estimated the state-space model parameters using Bayesian inference.
+Bayesian inference is a statistical method that applies the Bayes
+Theorem to update prior information about parameter values with observed
+data to then estimate the posterior probability of parameters. The prior
+information, generally represented by statistical distributions, are
+updated by their integration with data and likelihood estimation across
+independent Monte Carlo Markov Chains (MCMC). Variation in parameter
+estimates across posterior distribution draws represents an appropriate
+measure of parameter uncertainty (Kruschke & Liddell, 2018). In this
+sense, the Credible Intervals (CI), built using the quantiles of the
+posterior distribution draws of each parameter, depict the interval
+where most posterior distribution draws are and, therefore, delimit the
+area in which we have large certainty of finding the true parameter
+value (Kruschke & Liddell, 2018) \[COPY OF MY JBI PAPER\].
+
+The priors for all model parameters were assumed to come from an Uniform
+distribution ranging from 0 to 1 (*phi<sub>\[t,g\]*,
+*gamma</sub>\[t,g\]*, *psi<sub>\[t=1,g\]*, *p</sub>\[g\]* \~ U(0,1)).
+
+Our state-space model was run using three independent MCMC (using the
+Gibbs Sampling algorithm implemented in JAGS; Plummer, 2003), with
+15,000 iterations and a warm up period of 7,000 iterations each chain.
+We retained 1000 post-warm up draws of each chain, resulting in 3000
+posterior distribution draws of each model parameter which were used to
+make statistical inference and test our hypotheses.
+
 # Results
 
 The analyzed dataset comprises 1139 genera observed at 17 time intervals
-and 1770 geological formations. Thus, 3.009^{4} observations are
-possible in this data, from which 7.2% were realized – showing the
-scarcity of data.
+and 1769 geological formations. Thus, if all intervals and geological
+formations were sampled we would have 30.073 possible observations per
+taxon/genus with this dataset. However, the dataset is quite sparse,
+with many missing observations, and had only 7.1 % (n=2.149
+observations) out of the possible observations per taxon.
