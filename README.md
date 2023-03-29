@@ -102,20 +102,25 @@ systems (Kéry & Royle 2007, Ecology). They are called ‘first-order
 Markovian models’ because they use information from previous time and/or
 neighbor sites to project biological parameters in the next time. Thus,
 they are useful to estimating parameters involved with inference in
-paleontology, such as extinction (*epslon*), origination (*gamma*), and
-turnover rates (Bambach et al. 2004, Benton 1995). In state-space
-models, the true state of a system (e.g. the realized occurrence of the
-fossil genera *g* at the time interval *t*) is denoted by the latent,
-stochastic variable *z<sub>\[t,g\]*. The *z</sub>\[t,g\]* is the
-realization of a Bernoulli process (‘dbern’) dependent on the variable
-*muZ\~\[t,g\]*, which is the expected probability of occupancy of
-interval *t* by the genus *g*. In its turn, the *muZ\~\[t,g\]* depends
-on both the realized occurrence of genus *g* in the previous time *t-1*,
-ie. *z\~\[t-1,g\]* (whose first time gives the initial conditions for
-the dynamics develop) and the estimated probability of extinction
-(*epslon\~t* = 1 - *phi<sub>t*) and origination (*gamma</sub>t*) in the
-next interval if the previous interval *t-1* is either occupied or not
-by the genus *g*. The model design looks like:
+paleontology, such as genus extinction (*epslon*), origination
+(*gamma*), and turnover rates (Bambach et al. 2004, Benton 1995). In
+state-space models, the true state of a system (e.g. the realized
+occurrence of the fossil genera *g* at the time interval *t*) is denoted
+by the latent, stochastic variable *z<sub>\[t,g\]*. The *z</sub>\[t,g\]*
+is the realization of a Bernoulli process (‘dbern’) dependent on the
+variable *muZ\~\[t,g\]*, which is the expected probability of occupancy
+of interval *t* by the genus *g*. In its turn, the *muZ\~\[t,g\]*
+depends on both the realized occurrence of genus *g* in the previous
+time *t-1*, ie. *z\~\[t-1,g\]* (whose first time gives the initial
+conditions for the dynamics develop) and the estimated probability of
+genus extinction (*epslon\~t* = 1 - *phi<sub>t*) and origination
+(*gamma</sub>t*) in the next interval if the previous interval *t-1* is
+either occupied or not by the genus *g*. We nonetheless acknowledge that
+origination rates actually can be both origination *per se* –when a new
+genus arise– and colonization –when an existing genus appear in an
+interval. However, at the millennial timescale colonization rates are
+expected to be low and perhaps constant over time (REF). The model
+design looks like:
 
 
         model {
@@ -290,17 +295,17 @@ mean(gamma\[t:T,g\])/(mean(gamma\[t:T,g\])+mean(1-phi\[t:T,g\]))
 We estimated the state-space model parameters using Bayesian inference.
 Bayesian inference is a statistical method that applies the Bayes
 Theorem to update prior information about parameter values with observed
-data to then estimate the posterior probability of parameters. The prior
-information, generally represented by statistical distributions, are
-updated by their integration with data and likelihood estimation across
-independent Monte Carlo Markov Chains (MCMC). Variation in parameter
-estimates across posterior distribution draws represents an appropriate
-measure of parameter uncertainty (Kruschke & Liddell, 2018). In this
-sense, the Credible Intervals (CI), built using the quantiles of the
-posterior distribution draws of each parameter, depict the interval
-where most posterior distribution draws are and, therefore, delimit the
-area in which we have large certainty of finding the true parameter
-value (Kruschke & Liddell, 2018) \[COPY OF MY JBI PAPER\].
+data to then estimate the posterior parameter probability. The prior
+information, generally represented by statistical distributions (such as
+the Uniform one), are updated by their integration with data and
+likelihood estimation across independent Monte Carlo Markov Chains
+(MCMC). Variation in parameter estimates across posterior distribution
+samples represents an appropriate measure of parameter uncertainty
+(Kruschke & Liddell, 2018). The Credible Intervals (CI), built using the
+quantiles of the posterior distribution samples of each parameter,
+depict the interval where most posterior distribution samples are and,
+therefore, delimit the area in which we have large certainty of finding
+the true parameter value (Kruschke & Liddell, 2018).
 
 The priors for all model parameters were assumed to come from an Uniform
 distribution ranging from 0 to 1 (*phi<sub>\[t,g\]*,
@@ -309,9 +314,9 @@ distribution ranging from 0 to 1 (*phi<sub>\[t,g\]*,
 Our state-space model was run using three independent MCMC (using the
 Gibbs Sampling algorithm implemented in JAGS; Plummer, 2003), with
 15,000 iterations and a warm up period of 7,000 iterations each chain.
-We retained 1000 post-warm up draws of each chain, resulting in 3000
-posterior distribution draws of each model parameter which were used to
-make statistical inference and test our hypotheses.
+We retained 1000 post-warm up samples of each chain, resulting in 3000
+posterior distribution samples of each model parameter which were used
+to make statistical inference and test our hypotheses.
 
 # Results
 
