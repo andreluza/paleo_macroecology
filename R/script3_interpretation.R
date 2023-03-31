@@ -8,18 +8,6 @@ require(reshape)
 load (here ("output","samples_paleo.RData"))
 load (here ("output","table_data_array.RData"))
 
-# naive occupancy
-naive_occupancy <- lapply (unique(table_data_long_df$taxon), function (i) 
-  
-      reshape::cast(data = table_data_long_df[which(table_data_long_df$taxon == i),],
-                      formula = form~int,
-                      margins = "taxon",
-                      value = "det",
-                      fun.aggregate = max,
-                      fill=NA))
-
-apply (naive_occupancy[[1]], 2, max)
-
 # observed number of genus per formation and interval 
 par(mar=rep(5,4))
 hist(as.numeric(as.matrix(test[,-1])),
@@ -58,6 +46,11 @@ ggplot (df_per, aes (x=interval,
   annotate (geom="text", x=3,y=0.3,label ="Triassic")+ 
   annotate (geom="text", x=12,y=0.3,label ="Jurassic")
 
+ggsave (here ("output", "prop_change.png"),
+        dpi=300,
+        units="cm",
+        height=15,
+        width=20)
 
 # genus number
 df_genus <- data.frame (ngenus = samples_paleo$mean$Ngen,
@@ -81,14 +74,22 @@ ggplot (df_genus, aes (x=interval,y=ngenus,group= 1)) +
              linetype="dashed", 
              color = "red", 
              size=1)+
-  annotate (geom="text", x=3,y=460,label ="Triassic")+ 
-  annotate (geom="text", x=12,y=460,label ="Jurassic")
+  annotate (geom="text", x=3,y=650,label ="Triassic")+ 
+  annotate (geom="text", x=12,y=650,label ="Jurassic")
+
+
+ggsave (here ("output", "exp_Ngenera.png"),
+        dpi=300,
+        units="cm",
+        height=15,
+        width=20)
+
 
 # extinction
-df_pars <- data.frame (epslon=rowMeans(samples_paleo$mean$epslon[-1,],na.rm=T),
+df_pars <- data.frame (epslon=1-rowMeans(samples_paleo$mean$phi[-1,],na.rm=T),
                        gamma=rowMeans(samples_paleo$mean$gamma[-1,],na.rm=T),
                        CI.gamma = t(apply (samples_paleo$sims.list$gamma[,-1,],2, quantile,probs=c(0.05,0.95))),
-                       CI.epslon = t(apply (samples_paleo$sims.list$epslon[,-1,],2, quantile,probs=c(0.05,0.95))),
+                       CI.epslon = 1-t(apply (samples_paleo$sims.list$phi[,-1,],2, quantile,probs=c(0.05,0.95))),
                        interval=c(triassic,jurassic)[-1])
 df_pars$interval <- factor (df_pars$interval,
                             levels = c(triassic,jurassic)[-1])
@@ -118,10 +119,15 @@ ggplot(melt (df_pars, id.vars=c("interval","CI.gamma.5.","CI.gamma.95.","CI.epsl
   annotate (geom="text", x=0.6,y=0.495,size=3,
             label =triassic[1], angle=90) 
   
-  
+ggsave (here ("output", "dyn_par.png"),
+        dpi=300,
+        units="cm",
+        height=15,
+        width=20)
+
 
 # genus
-dat_genus <- data.frame (genus = dimnames(table_data_array)[[3]],
+dat_genus <- data.frame (genus = genus_data[sel_genus],
                          psi.eq = samples_paleo$mean$psi.eq,
                          CI = t(apply (samples_paleo$sims.list$psi.eq,2, quantile,probs=c(0.05,0.95))))
 
@@ -134,6 +140,10 @@ ggplot (dat_genus, aes (x=reorder(genus, psi.eq),
              linetype="dashed", 
              color = "red", 
              size=1)+
-  theme(axis.text.x = element_text(angle=90,size=8))+
+  theme(axis.text.x = element_text(angle=90,size=1))+
   geom_pointrange(aes(ymin=CI.5., ymax=CI.95.),alpha=0.1)
-
+ggsave (here ("output", "psi_eq.png"),
+        dpi=300,
+        units="cm",
+        height=15,
+        width=20)

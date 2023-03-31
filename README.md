@@ -326,3 +326,19 @@ formations were sampled we would have 30.073 possible observations per
 taxon/genus with this dataset. However, the dataset is quite sparse,
 with many missing observations, and had only 7.1 % (n=2.149
 observations) out of the possible observations per taxon.
+
+Extinction and origination rates
+
+<img src="output/dyn_par.png" width="100%" height="80%" style="display: block; margin: auto;" />
+
+Expected number of genera
+
+<img src="output/exp_Ngenera.png" width="100%" height="80%" style="display: block; margin: auto;" />
+
+Proportion of change
+
+<img src="output/prop_change.png" width="100%" height="80%" style="display: block; margin: auto;" />
+
+Equilibrium occupancy
+
+<img src="output/psi_eq.png" width="100%" height="80%" style="display: block; margin: auto;" />

@@ -69,5 +69,30 @@ Our state-space model was run using three independent MCMC (using the Gibbs Samp
 The analyzed dataset comprises 1139 genera observed at 17 time intervals and 1769 geological formations. Thus, if all intervals and geological formations were sampled we would have 30.073 possible observations per taxon/genus with this dataset. However, the dataset is quite sparse, with many missing observations, and had only 7.1 % (n=2.149 observations) out of the possible observations per taxon. 
 
 
+Extinction and origination rates
 
+```{r echo=FALSE, out.width = "100%",out.height = "80%", fig.align = "center"}
+knitr::include_graphics("output/dyn_par.png")
+```
+
+
+Expected number of genera
+
+```{r echo=FALSE, out.width = "100%",out.height = "80%", fig.align = "center"}
+knitr::include_graphics("output/exp_Ngenera.png")
+```
+
+
+Proportion of change
+
+```{r echo=FALSE, out.width = "100%",out.height = "80%", fig.align = "center"}
+knitr::include_graphics("output/prop_change.png")
+```
+
+
+Equilibrium occupancy
+
+```{r echo=FALSE, out.width = "100%",out.height = "80%", fig.align = "center"}
+knitr::include_graphics("output/psi_eq.png")
+```
 

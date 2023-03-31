@@ -152,8 +152,8 @@ params <- c(
 ## MCMC settings
 ######################
 ## short form
-na <- 6000; nb <- 7000; ni <- 15000; nc <- 3; nt <- 8
-#na <- 50; nb <- 60; ni <- 100; nc <- 3; nt <- 1
+#na <- 6000; nb <- 7000; ni <- 15000; nc <- 3; nt <- 8
+na <- 500; nb <- 1000; ni <- 2000; nc <- 3; nt <- 1
 
 # MCMC runs
 samples_paleo <- jags (data = jags.data, 
