@@ -1,10 +1,6 @@
 # =====================================================
 # load packages
-require(here);require(rgeos);require(rgdal);require(sp);require(raster); require(openxlsx)
-# data processing
-library(ggplot2); library(rasterVis); library(rgdal);library(viridis)
-
-
+source("R/packages.R")
 
 # ======================================================
 #  Brazil data

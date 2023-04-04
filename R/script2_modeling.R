@@ -110,15 +110,21 @@ cat("
     
     }
     
+    # relative extinction rate (μ/λ; Rabosky 2018) of each time
+    
+    
+    # net diversification rate (r= μ - λ; Rabosky 2018) of each time
+    
+    
+    
     
     }## end of the model
     
     ",fill = TRUE)
 sink()
 
-
-# require packs
-require(here); require(jagsUI)
+# load packages
+source("R/packages.R")
 
 # load data
 load(here ("output","table_data_array.RData"))

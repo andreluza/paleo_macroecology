@@ -5,13 +5,9 @@
 # ======================================================
 
 # =====================================================
-# load packages
-require(here);require(rgeos);require(rgdal);require(sp);require(raster); require(openxlsx)
-# data processing & plot
-library(ggplot2); library(rasterVis); library(viridis); require(dplyr); require(magick); require(reshape)
 
-# paleomaps
-library(mapast)
+# load packages
+source("R/packages.R")
 
 # =====================================================
 # load data
@@ -46,6 +42,7 @@ coll_occ <- merge (pbdb_data_occ,pbdb_data_collections, by="collection_no", all=
 # aggregate taxa
 coll_occ_taxa <- merge (coll_occ,pbdb_data_taxa, by="accepted_name", all=T)
 
+
 # list of intervals of interest
 triassic <- c("Olenekian", "Anisian", "Ladinian", "Carnian", "Norian", "Rhaetian") # Triassic
 # triassic %in% coll_occ_taxa$early_interval.x
@@ -61,7 +58,7 @@ coll_occ_taxa_jur_tri <- coll_occ_taxa_jur_tri[which(coll_occ_taxa_jur_tri$taxon
                               c("genus", "species")),]
 # collapsing species
 coll_occ_taxa_jur_tri$genus <- sapply (strsplit(coll_occ_taxa_jur_tri$accepted_name, " "), "[",1)
-  
+
 # formations (replicates)
 all_formations <- unique(coll_occ_taxa_jur_tri$formation.x)[order(unique(coll_occ_taxa_jur_tri$formation.x))]
 coll_occ_taxa_jur_tri$formation.x <- as.factor (coll_occ_taxa_jur_tri$formation.x)
@@ -180,6 +177,7 @@ image_write(animation, here ("output","animation_data.gif"))
 # organize a table for each genus in the data
 genus_data <- unique(coll_occ_taxa_jur_tri$genus)
 
+
 # the basic table summarizing all detections across intervals and formations
 table_data_basis <- (cast (formula = formation.x ~ early_interval.y,
                      data = coll_occ_taxa_jur_tri,
@@ -206,6 +204,8 @@ hist(as.numeric(data.matrix(table_data_basis[-1,-1]))[is.na(as.numeric(data.matr
 
 # since 1 to 1775 detections
 range(as.numeric(data.matrix(table_data_basis[-1,-1]))[is.na(as.numeric(data.matrix(table_data_basis[-1,-1])))!=T])
+
+
 
 # table 
 table_data <- lapply (genus_data, function (i) {
@@ -292,6 +292,7 @@ table_data <- lapply (genus_data, function (i) {
 })
 
 
+
 # matching with basis table
 # if no taxa was detected in any time, set NA
 # if at least one taxa was detected in a time, set zero
@@ -370,6 +371,13 @@ sel_genus <- unlist(lapply (
 )
 ) >=5
 barplot(table(sel_genus))
+
+
+
+# table  for naive occupancy
+table_naive <- table_data [which(sel_genus==T)]
+save (table_naive,  file = here ("output", "table_naive.RData"))
+
 
 # filter
 table_data_long <- table_data_long [which(sel_genus==T)]
