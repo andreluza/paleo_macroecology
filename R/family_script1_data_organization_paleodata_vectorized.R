@@ -58,16 +58,26 @@ coll_occ_taxa_jur_tri <- coll_occ_taxa [which(coll_occ_taxa$early_interval.x %in
                                                 c(triassic, jurassic)),]
 
 # level of genus to lower levels
-coll_occ_taxa_jur_tri <- coll_occ_taxa_jur_tri[which(coll_occ_taxa_jur_tri$taxon_rank %in% 
-                              c("genus", "species")),]
+#coll_occ_taxa_jur_tri <- coll_occ_taxa_jur_tri[which(coll_occ_taxa_jur_tri$taxon_rank %in% 
+#                              c("genus", "species")),]
 # collapsing species
-coll_occ_taxa_jur_tri$genus <- sapply (strsplit(coll_occ_taxa_jur_tri$accepted_name, " "), "[",1)
+# coll_occ_taxa_jur_tri$genus <- sapply (strsplit(coll_occ_taxa_jur_tri$accepted_name, " "), "[",1)
 
 # get the taxonomic classification of taxa
 # https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c
 require(rgbif)
 unique_accepted_names <- unique (coll_occ_taxa_jur_tri$accepted_name)
 test_lookup<-lapply (unique_accepted_names, name_lookup)
+save (test_lookup,file = here ("output", "lookup_families.RData"))
+load(here ("output", "lookup_families.RData"))
+
+
+unique(coll_occ_taxa_jur_tri$taxon_rank)
+
+
+unique_accepted_names[2]
+unique(test_lookup[[2]]$data$family)
+
 
 
 # formations (replicates)
