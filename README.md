@@ -2,7 +2,7 @@ Extinction and origination dynamics in Triassic-Jurassic
 ================
 ALLuza, MG Bender, CS Dambros, L Kerber - Departamento de Ecologia e
 Evolução, Universidade Federal de Santa Maria
-2023-03-23
+2023-04-04
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <!-- badges: start -->
@@ -10,7 +10,7 @@ Evolução, Universidade Federal de Santa Maria
 
 # 1. Introduction
 
-#### A bit about diversification and the fossil record
+#### A small introduction about diversification and the fossil record
 
 Extinctions are large depressions on Earth biodiversity history (Benton
 1995). The diversity of all organisms on Earth, with an likely origin
@@ -48,7 +48,7 @@ rates or high extinction/low speciation rates.
 #### The drivers of distribution
 
 Understanding what drives shifts in temporal and spatial distribution of
-genera is one of the major goals in biology, disregarding whether the
+taxa is one of the major goals in biology, disregarding whether the
 studied genera are extinct or extant. In the case of extinct genera, the
 abiotic environment and its variation over millennia years might affect
 extinction and origination rates (e.g., Fritz et al. 2013), while
@@ -327,9 +327,10 @@ probability to find the genera showing consistent trend in the
 *psi.eq\[g\]* over time intervals. The posterior exceedance probability
 of *psi.eq* of each genus refers to the proportion of posterior
 probability samples higher or lower than *psi.eq*=0.5, the zone of no
-change in occupancy. Here, we considered that a genus presenting a
-posterior exceedance probability \> 0.8 showed a consistent trend of
-either increasing or decreasing occupancy over time.
+change in occupancy. Here, applied a posterior exceedance probability of
+0.8 to declare a consistent trend, meaning that there is at least 80%
+change of a genus to present an increasing or decreasing trend in
+occupancy over time.
 
 ## Modeling approach
 
@@ -472,10 +473,10 @@ genera had the trend to decline in occupancy over time (i.e. *psi.eq \<
 0.5*), and only 6% (n=71) had the trend to increase in occupancy over
 time (Fig. 8). However, posterior exceedance probability showed that
 only the decreasing occupancy trend was consistent across taxa, with 210
-out of 1139 genera presenting a decreasing trend and none presenting an
-increasing trend (Fig. 9). The three genera with most negative *psi.eq*
-were: the shellfish *Buchia* and *Myophoria*, and the ammonite
-*Leiophyllites* (Fig. 9).
+(18%) out of 1139 genera presenting a decreasing trend and none
+presenting an increasing trend (Fig. 9). The three genera with most
+negative *psi.eq* were: the shellfish *Buchia* and *Myophoria*, and the
+ammonite *Leiophyllites* (Fig. 9).
 
 <img src="output/psi_eq.png" width="100%" height="80%" style="display: block; margin: auto;" />
 *Fig. 8. Histogram of equilibrium occupancy across genera. Plotted
@@ -500,12 +501,12 @@ occupancy.*
 We found that the depression in the number of genera found in Tr-J
 boundary was a byproduct of high extinction rates during the Rhaetian
 and the intervals preceding it (Norian and Carnian), when extinction
-rates surpassed the origination rates (as shown by the relative
-extinction rates, *RER\[t\]*.
+rates far surpassed the origination rates (as shown by the relative
+extinction rates, *RER\[t\]*).
 
-Psi.eq showed the taxa with higher turnover rates over time. An amount
-of 18% (n=210 out of 1139) of the studied genera showed a consistent
-trend of declines over time, which can be useful as index fossils to
+Psi.eq showed the genera undergoing high turnover rates over time. A
+total of 18% (n=210 out of 1139) of the studied genera showed a
+consistent declining trend over time, which can be as index fossils to
 characterizing different ecological communities and dating rocks.
 
 #### This paper was produced using the following software and associated packages:
