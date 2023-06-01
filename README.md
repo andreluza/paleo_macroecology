@@ -2,7 +2,7 @@ Extinction and origination dynamics in Triassic-Jurassic
 ================
 ALLuza, MG Bender, CS Dambros, L Kerber - Departamento de Ecologia e
 Evolução, Universidade Federal de Santa Maria
-2023-04-04
+2023-04-10
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <!-- badges: start -->
@@ -18,29 +18,28 @@ during the Precambrian period (4560 to 570 Ma), has increased rapidly
 and substantially after the Vendian and Early Cambrian (600 Ma) (Benton
 1995). Since then, periods of diversification (i.e. the balance of
 extinctions and speciations/originations) were marked by periods of high
-rates of origination interrupted/interpassed by periods of biodiversity
+rates of origination interrupted/inter passed by periods of biodiversity
 crisis/depression, called ‘mass extinctions’ (Benton 1995). The fossil
 record supports five mass extinction events, known as the ‘big five’:
-end Permian, late Ordovician, late Devonian, Triassic-Jurassic boundary,
+late Ordovician, late Devonian, end Permian, Triassic-Jurassic boundary,
 and Cretaceous-Paleogene boundary – that vanished from Earth a
 considerable proportion of biodiversity, while speciation and radiation
 to vacant niches occurred for remaining genera from there on (Benton
-1995, May 1997, Reeves et al. 2020).
-
-The Triassic-Jurassic extinction (Rhaetian-Hettangian intervals) played
-an important role in the diversification rates of archosaurs, therapsid
-reptiles, ammonites, among others (Allen et al. 2018), yet recent
-research cast doubt on their existence (Bambach et al. 2004). The
-statistical support for this extinction event (and its place as one of
-the ‘big five’ extinctions) is limited due to the generally small sample
-size at the Rhaetian-Hettangian intervals. Existing evidence suggests
-that the lower number of genera at this period can be a byproduct of
-high extinction rates (e.g., Wignall & Atkinson 2020; Olsen et al. 2022)
-–which seemed to exert an impressive effect on marine organisms (Benton
-1995)– as well the low origination/speciation rates and nearly constant
-extinction rates compared to previous time (Bamchach et al. 2004). Thus,
-models that account for both uneven sampling size across periods and the
-state of genera occurrence at previous time could provide a more robust
+1995, May 1997, Reeves et al. 2020). The Triassic-Jurassic extinction
+(Rhaetian-Hettangian intervals) played an important role in the
+diversification rates of archosaurs, therapsid reptiles, ammonites,
+among others (Allen et al. 2018), yet recent research cast doubt on
+their existence (Bambach et al. 2004). The statistical support for this
+extinction event (and its place as one of the ‘big five’ extinctions) is
+limited due to the generally small sample size at the
+Rhaetian-Hettangian intervals. Existing evidence suggests that the lower
+number of genera at this period can be a byproduct of high extinction
+rates (e.g., Wignall & Atkinson 2020; Olsen et al. 2022) –which seemed
+to exert an impressive effect on marine organisms (Benton 1995)– as well
+the low origination/speciation rates and nearly constant extinction
+rates compared to previous time (Bamchach et al. 2004). Thus, models
+that account for both uneven sampling size across periods and the state
+of genera occurrence at previous time could provide a more robust
 inference on/shed light on the processes that caused the
 Triassic-Jurassic extinction, whether low speciation/low extinction
 rates or high extinction/low speciation rates.
@@ -68,20 +67,22 @@ ecological (neontological) perspectives).
 
 #### Major aim
 
-Here we used \~2 million fossil observations comprising 1139 genera and
-1770 geologic formations, collected across the entire Triassic-Jurassic
-periods, to estimate pairwise rates of extinction and origination across
-17 time intervals of the Triassic and Jurassic periods (Olenekian (early
-Triassic) to Tithonian (late Jurassic)). We emphasized i) temporal
-variation on these rates, ii) the proportional change in number of genus
-from the beggining of each interval to its end (Bambach et al., 2004),
-and iii) the expected number of genera across these intervals. As the
-limit between the Rhaetian (age) and Hettangian (age) marked the
-Triassic-Jurassic extinction event and the split between these periods,
-we expected to find i) higher rates of extinction and lower rates of
-origination, ii) high change in the number of genus from the beggining
-to the end of these periods, and iii) a lower expected number of genera
-at Rhaetian-Hettangian intervals when compared to other intervals in the
+Here we used \~2 million fossil observations comprising 1139 genera, 717
+families, and 1770 geologic formations collected across the entire
+Triassic-Jurassic periods and available at the Paleobiology Database to
+estimate the rates of extinction and origination across the 17 time
+intervals of the Triassic and Jurassic periods (Olenekian (early
+Triassic) to Tithonian (late Jurassic)). At high and low taxonomic
+levels (family and genus) we emphasized i) temporal variation on these
+rates, ii) the proportional change in number of genus from the beginning
+of each interval to its end (Bambach et al., 2004), and iii) the
+expected number of genera across these intervals. As the limit between
+the Rhaetian (age) and Hettangian (age) marked the Triassic-Jurassic
+extinction event and the split between these periods, we expected to
+find i) higher rates of extinction and lower rates of origination, ii)
+high change in the number of genus from the beginning to the end of
+these periods, and iii) a lower expected number of genera at
+Rhaetian-Hettangian intervals when compared to other intervals in the
 data. We summarized the trends in genus occurrence over time using
 classic paleontological indicators, such as the proportion of change
 (gains or losses) (Bambach et al. 2004), relative extinction rate
@@ -96,13 +97,26 @@ both disciplines, namely extinction and origination probabilities (Kéry
 
 # Methods
 
-We used the Paleo Database (REF) as the main source of paleontological
-data for the Triassic-Jurassic period. We used information at the genus
-level, as genera give a closer view of species-level behavior through
-time, despite comprising less complete data than one at a higher
-taxonomic level because of the vagaries of preservation, collection, and
-study (Benton 1995). Nonetheless, we accounted for such sampling biases
-in our models.
+We used the Paleobiology Database (REF) as the main source of
+paleontological data for the Triassic-Jurassic period. We used
+information at the genus level, as genera give a closer view of
+species-level behavior through time, despite comprising less complete
+data than one at a higher taxonomic level because of the vagaries of
+preservation, collection, and study (Benton 1995). Nonetheless, we
+accounted for such sampling biases in our models. We ran parallel
+analyses at the level of genus and family, to check whether there are
+similarities in the rates of extinction and origination of high and low
+taxonomic levels. Out of the 8770 genera and 1961 families in the
+complete dataset, we used in the analysis 1139 genera and 717 families
+with detection/non-detection data in five or more geological formations.
+We excluded taxa with too sparse data to enable a better model
+performance in terms of minimizing uncertainty in parameters’ estimation
+and avoid convergence issues in the state-space model.
+
+<img src="animation_data.gif" width="100%" height="80%" style="display: block; margin: auto;" />
+*Animation: data distribution over space and time. The ages might not be
+completely correct because I averaged the ages of all records within a
+given geological interval.*
 
 ## State-space models
 
@@ -150,8 +164,9 @@ perhaps constant over time (REF). The model design looks like:
             
               ## colonization (origination)
               gamma [t,g] ~ dunif (0,1)
-              ## extinction
-              phi [t,g]~ dunif (0,1)
+              
+              ## persistence probability
+              phi [t,g] ~ dunif (0,1)
             
             }
            
@@ -175,8 +190,8 @@ perhaps constant over time (REF). The model design looks like:
                 
                   # model likelihood
                   ### modeling dynamics conditional on previous time realized occurrence z
-                  muZ[t,g] <- z[t-1,g] * (1-phi[t,g]) + ### if occupied, p of not getting extinct in the next time
-                              (1-z[t-1,g]) * gamma[t,g] ###  if not occupied, p of getting colonized in the next time
+                  muZ[t,g] <- z[t-1,g] * phi[t,g] + ### if occupied, p of not getting extinct/persist in the next time
+                              (1-z[t-1,g]) * gamma[t,g] ###  if not occupied, p of originate in the next time
                             
                 z[t,g] ~ dbern(muZ[t,g])
         
@@ -217,7 +232,7 @@ perhaps constant over time (REF). The model design looks like:
             Ngen[t]<-sum(z[t,])
         }
         
-        # average extinction and origination
+        # average persistence and origination
         for (g in 1:ngenus) {
           avphi[g] <- mean(phi[2:nint,g])
           avgamma[g]<- mean(gamma[2:nint,g])
@@ -237,7 +252,25 @@ perhaps constant over time (REF). The model design looks like:
         
         }
         
+        # relative extinction rate (μ/λ; Rabosky 2018) of each time
+        for (t in 2:nint) { 
+         for (g in 1:ngenus) {
         
+            RER[t,g] <- (1-phi[t,g])/gamma[t,g]
+        
+          }
+    }
+        
+        # net diversification rate (r= μ - λ; Rabosky 2018) of each time
+        for (t in 2:nint) { 
+         for (g in 1:ngenus) {
+        
+            R0[t,g] <- (1-phi[t,g])-gamma[t,g]
+        
+         }
+        }
+        
+            
         }## end of the model
         
         
@@ -258,12 +291,12 @@ varies across genera. We estimated genus detection probability across
 geological formations as each one of them represent a fieldwork effort
 to obtain fossil data, and might represent differential physical
 processes causing sedimentation/erosion, transport, deformation, and
-lost of paleontological/taphonomic information/affect fosssil
+lost of paleontological/taphonomic information/affect fossil
 preservation. The input data consist of detections and non-detections
 (coded as 1 and 0, respectively) of each genus in each geological
 formation and interval. A genus was ‘detected’ if it appeared at least
 once in a geological formation and interval, and it was ‘not-detected’
-if it not appeared in formations and intervals with at least one
+if it did not appear in formations and intervals with at least one
 detected genus. Missing observations (coded as ‘NA’) comprise intervals
 and formations with no detected genus, and were removed from the
 state-space model. Nonetheless, the model estimated data for these
@@ -382,7 +415,7 @@ imperfect detection of genera across geological formations and
 intervals.
 
 <img src="output/taxon_formations.png" width="100%" height="80%" style="display: block; margin: auto;" />
-*Fig. 1. Number of genera (genera) per geological formation.*
+*Fig. 1. Number of genera and families per geological formation.*
 
 <img src="output/effort_formations.png" width="100%" height="80%" style="display: block; margin: auto;" />
 *Fig. 2. Number of time intervals per geological formation.*
@@ -404,7 +437,8 @@ Hettangian (Tr-J boundary), and between Bajocian and Bathonian
 extinction exceeded origination (RER\>0) between the Norian and
 Rhaetian, Callovian and Bathonian, and Ladinian and Carnian. In
 contrast, origination exceeded extinction (RER \<0) for most Jurrasic
-(except between Callovian and Bathonian) (Fig. 4).
+(except between Callovian and Bathonian) (Fig. 4). These indicators
+displayed similar patterns at the level of family and genus.
 
 <img src="output/dyn_par.png" width="100%" height="80%" style="display: block; margin: auto;" />
 *Fig. 4. Extinction (EPSLON), origination (GAMMA), and relative
@@ -432,17 +466,19 @@ number of genera. Indeed, the detection probability was always lower
 than 1 (Fig. 6), implying that some genera were declared absent/were not
 detected in truly occupied formations and intervals.
 
-<img src="output/exp_Ngenera.png" width="100%" height="80%" style="display: block; margin: auto;" />
-*Fig. 5. Number of genera across the 17 intervals comprising the
-Triassic-Jurassic geological periods. The thick line depicts the
-expected number of genera produced by the state-space model, and the
-horizontal red line depicts the average expected number of genera across
-intervals. The thin line represent the observed (naïve) number of genera
-across intervals, and the gray thin horizontal line depicted the average
-observed number of genera. The error bars around the expected number of
-genera is the 95% Credible Interval across the 3.000 posterior
-distribution samples of this derived parameter. The vertical red-dashed
-line depict the Triassic-Jurassic extinction event.*
+<img src="output/exp_Ngenera_fam.png" width="100%" height="80%" style="display: block; margin: auto;" />
+*Fig. 5. The expected number of genera (black lines) and families (green
+lines) across the 17 intervals comprising the Triassic-Jurassic
+geological periods. The thick lines depict the expected number of genera
+and families produced by two parallel state-space model, and the
+horizontal black and green lines depict the average expected number of
+genera and families across intervals. The thin lines represent the
+observed (naïve) number of genera and families across intervals,
+following the color scheme presented above. The error bars around the
+expected number of genera and families depict the 95% Credible Interval
+across the 3.000 posterior distribution samples of this derived
+parameter. The vertical red-dashed line depict the Triassic-Jurassic
+extinction event.*
 
 <img src="output/detection.png" width="100%" height="80%" style="display: block; margin: auto;" />
 *Fig. 6. Detection probability across genera. Plotted values and summary
@@ -461,10 +497,11 @@ and Rhaetian) (Triassic), and within Bajocian and Bathonian (Jurassic).
 
 <img src="output/prop_change.png" width="100%" height="80%" style="display: block; margin: auto;" />
 *Fig. 7. The proportional change in the expected number of genera
-between the start and the end of each time interval. The vertical
-red-dashed line depict the Triassic-Jurassic extinction event. The error
-bars around the plotted values are 95% Credible Interval across the
-3.000 posterior distribution samples of this derived parameter.*
+(black) and families (green) between the start and the end of each time
+interval. The vertical red-dashed line depict the Triassic-Jurassic
+extinction event. The error bars around the plotted values are 95%
+Credible Interval across the 3.000 posterior distribution samples of
+this derived parameter.*
 
 Finally, the Equilibrium occupancy, showing the trend of the genera to
 either decline or increase in occupancy over time over time (if *psi.eq*
@@ -476,7 +513,9 @@ only the decreasing occupancy trend was consistent across taxa, with 210
 (18%) out of 1139 genera presenting a decreasing trend and none
 presenting an increasing trend (Fig. 9). The three genera with most
 negative *psi.eq* were: the shellfish *Buchia* and *Myophoria*, and the
-ammonite *Leiophyllites* (Fig. 9).
+ammonite *Leiophyllites* (Fig. 9). The three families with most negative
+*psi.eq* were the ammonoids Hedenstroemiidae, Palaeophyllitidae, and
+Ceratitidae (Fig. 10).
 
 <img src="output/psi_eq.png" width="100%" height="80%" style="display: block; margin: auto;" />
 *Fig. 8. Histogram of equilibrium occupancy across genera. Plotted
@@ -493,20 +532,32 @@ the 3.000 posterior distribution samples of this parameter. The
 horizontal red-dashed line runs over 0.5, the region lacking a trend in
 occupancy.*
 
+<img src="output/psi_eq_family_PEP.png" width="100%" height="80%" style="display: block; margin: auto;" />
+*Fig. 10: Equilibrium occupancy across families with posterior
+exceedance probability\>0.8 across posterior distribution samples of
+psi.eq. Plotted values are the averages of psi.eq for each family across
+the 3.000 posterior distribution samples of this parameter. The
+horizontal red-dashed line runs over 0.5, the region lacking a trend in
+occupancy.*
+
 <!-- badges: start -->
 <!-- badges: end -->
 
 # Discussion
 
-We found that the depression in the number of genera found in Tr-J
-boundary was a byproduct of high extinction rates during the Rhaetian
-and the intervals preceding it (Norian and Carnian), when extinction
-rates far surpassed the origination rates (as shown by the relative
-extinction rates, *RER\[t\]*).
+We found that the depression in the number of genera and family found in
+Tr-J boundary was a byproduct of high extinction rates during the
+Rhaetian and the intervals preceding it (Norian and Carnian), when
+extinction rates far surpassed the origination rates (as shown by the
+relative extinction rates, *RER\[t\]*).
 
-Psi.eq showed the genera undergoing high turnover rates over time. A
-total of 18% (n=210 out of 1139) of the studied genera showed a
-consistent declining trend over time, which can be as index fossils to
+The patterns were consistent/congruent at the level of families and
+genera.
+
+Psi.eq showed the genera and families undergoing high turnover rates
+over time. A total of 18% of the studied genera (n=210 out of 1139) and
+28% of the studied families (n=201 out of 717) showed a consistent
+declining trend over time, which can be as index fossils to
 characterizing different ecological communities and dating rocks.
 
 #### This paper was produced using the following software and associated packages:

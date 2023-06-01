@@ -9,7 +9,7 @@
     
     
     # Priors
-        
+    # 10    
     for (t in 2:nint) {
     
        for (g in 1:ngenus) {
@@ -17,9 +17,11 @@
         
           ## colonization (origination)
           gamma [t,g] ~ dunif (0,1)
-          ## extinction
-          phi [t,g]~ dunif (0,1)
-        
+          #gamma [g] ~ dunif (0,1)
+          
+          ## persistence probability
+          phi [t,g] ~ dunif (0,1)
+          #phi [g] ~ dunif (0,1)
         }
        
        }
@@ -29,8 +31,8 @@
     ## priors for occupancy in time 1
      for (g in 1:ngenus) {
      
-      psi1 [g] ~ dunif (0,1)
-     
+          psi1 [g] ~ dunif (0,1)
+     # 33
      }
     
     ############ Model ########################
@@ -42,12 +44,12 @@
             
               # model likelihood
               ### modeling dynamics conditional on previous time realized occurrence z
-              muZ[t,g] <- z[t-1,g] * (1-phi[t,g]) + ### if occupied, p of not getting extinct in the next time
-                          (1-z[t-1,g]) * gamma[t,g] ###  if not occupied, p of getting colonized in the next time
+              muZ[t,g] <- z[t-1,g] *  phi[t,g] + ### if occupied, p of not getting extinct/persist in the next time
+                          (1-z[t-1,g]) *  gamma[t,g] ###  if not occupied, p of originate in the next time
                         
             z[t,g] ~ dbern(muZ[t,g])
     
-        }#t
+        }#t # 50
     }#i
     
     #############################################################
@@ -58,15 +60,13 @@
     
     # priors
     ## detection
-    #for (t in 1:nint) {
     
-      for (g in 1:ngenus) {
+    for (g in 1:ngenus) {
     
             p[g] ~ dunif (0,1)
 
-      }
-    #}
-
+      } 
+    # 68
     ### model
     for (k in 1:nobs){
         
@@ -84,16 +84,16 @@
         Ngen[t]<-sum(z[t,])
     }
     
-    # average extinction and origination
-    for (g in 1:ngenus) {
-      avphi[g] <- mean(phi[2:nint,g])
-      avgamma[g]<- mean(gamma[2:nint,g])
-    }
+    # average persistence and origination
+    #for (g in 1:ngenus) {
+    #  avphi[g] <- mean(phi[2:nint,g])
+    #  avgamma[g]<- mean(gamma[2:nint,g])
+    #}
       
     # turnover (proportional gain or loss)
     for (t in 2:nint) {  
       
-        propcH [t] <-(sum (z[t-1,]) - sum(z[t,]))/sum(z[t-1,]) 
+        propcH [t] <-(sum(z[t,])-sum (z[t-1,]))/sum(z[t-1,]) 
       
     }
     
@@ -101,10 +101,30 @@
     for (g in 1:ngenus) {
     
         psi.eq[g] <- mean(gamma[2:nint,g])/(mean(gamma[2:nint,g])+mean(1-phi[2:nint,g])) # Equilibrium occupancy
-    
+        #psi.eq[g] <- gamma[g]/(gamma[g]+(1-phi[g])) # Equilibrium occupancy
     }
     
+    # relative extinction rate (μ/λ; Rabosky 2018) of each time
+    for (t in 2:nint) { 
+     for (g in 1:ngenus) {
     
+        #RER[g] <- (1-phi[g])/gamma[g]
+        RER[t,g] <- (1-phi[t,g])/gamma[t,g]
+    
+      }
+	}
+    
+    # net diversification rate (r= μ - λ; Rabosky 2018) of each time
+    for (t in 2:nint) { 
+     for (g in 1:ngenus) {
+    
+        #R0[g] <- (1-phi[g])-gamma[g]
+        R0[t,g] <- (1-phi[t,g])-gamma[t,g]
+    
+     }
+    }
+    
+        
     }## end of the model
     
     
