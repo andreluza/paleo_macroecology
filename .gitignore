@@ -6,3 +6,6 @@ data
 README.docx
 output/*.RData
 output/maps_*.png
+processed_data
+R/old_codes
+output
