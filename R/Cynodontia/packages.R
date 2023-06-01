@@ -1,0 +1,25 @@
+# load packages
+library(here);library(rgeos);library(rgdal);library(sp);library(raster); library(openxlsx)
+# data processing
+library(ggplot2); library(rasterVis); library(viridis); library(dplyr); library(magick); library(reshape)
+
+
+# functions
+library(palaeoverse)
+library(deeptime)
+
+# hierarchical models
+library(jagsUI)
+library(R2WinBUGS) 
+
+
+# load paleoDEM dataset
+library(ncdf4) # package for netcdf manipulation
+library(raster) # package for raster manipulation
+library(rgdal) # package for geospatial analysis
+library(ggplot2) # package for plotting
+library(sp)
+library(rgeos)
+library(mapast)
+library(sf)
+
