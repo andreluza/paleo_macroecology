@@ -9,3 +9,5 @@ output/maps_*.png
 processed_data
 R/old_codes
 output
+Manuscript.Rmd
+*.docx
