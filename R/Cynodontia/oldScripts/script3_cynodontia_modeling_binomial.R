@@ -3,7 +3,7 @@
 # design the model
 
 
-sink("dyn_model_vectorized_covariates.txt")
+sink("dyn_model_vectorized_covariates_binomial.txt")
 cat("
    
     model {
@@ -36,22 +36,22 @@ cat("
           # ----------------------
           
           # elevation
-          beta.gamma.elev[g] ~ dnorm (mu.int.gamma[g],tau.mu.gamma[g])  
-          mu.int.gamma[g] ~ dnorm(0, 0.001)
-          tau.mu.gamma[g] <- 1/(sigma.int.gamma[g]*sigma.int.gamma[g])
-          sigma.int.gamma[g] ~ dunif(0,10)
+          beta.gamma.elev[g] ~ dnorm(0, 0.001)#dnorm (mu.int.gamma[g],tau.mu.gamma[g])  
+          #mu.int.gamma[g] ~ dnorm(0, 0.001)
+          #tau.mu.gamma[g] <- 1/(sigma.int.gamma[g]*sigma.int.gamma[g])
+          #sigma.int.gamma[g] ~ dunif(0,10)
           
           # precipitation
-          beta.gamma.prec[g] ~ dnorm (mu.int.gamma.prec[g],tau.mu.gamma.prec[g])  
-          mu.int.gamma.prec[g] ~ dnorm(0, 0.001)
-          tau.mu.gamma.prec[g] <- 1/(sigma.int.gamma.prec[g]*sigma.int.gamma.prec[g])
-          sigma.int.gamma.prec[g] ~ dunif(0,10)
+          beta.gamma.prec[g] ~ dnorm(0, 0.001)#dnorm (mu.int.gamma.prec[g],tau.mu.gamma.prec[g])  
+          #mu.int.gamma.prec[g] ~ dnorm(0, 0.001)
+          #tau.mu.gamma.prec[g] <- 1/(sigma.int.gamma.prec[g]*sigma.int.gamma.prec[g])
+          #sigma.int.gamma.prec[g] ~ dunif(0,10)
           
           # temperature
-          beta.gamma.temp[g] ~ dnorm (mu.int.gamma.temp[g],tau.mu.gamma.temp[g])  
-          mu.int.gamma.temp[g] ~ dnorm(0, 0.001)
-          tau.mu.gamma.temp[g] <- 1/(sigma.int.gamma.temp[g]*sigma.int.gamma.temp[g])
-          sigma.int.gamma.temp[g] ~ dunif(0,10)
+          beta.gamma.temp[g] ~ dnorm(0, 0.001)#dnorm (mu.int.gamma.temp[g],tau.mu.gamma.temp[g])  
+          #mu.int.gamma.temp[g] ~ dnorm(0, 0.001)
+          #tau.mu.gamma.temp[g] <- 1/(sigma.int.gamma.temp[g]*sigma.int.gamma.temp[g])
+          #sigma.int.gamma.temp[g] ~ dunif(0,10)
           
           
           # ----------------------
@@ -59,23 +59,24 @@ cat("
           # ----------------------
           
           # precipitation
-          beta.phi.prec[g] ~ dnorm (mu.int[g],tau.mu[g])  
-          mu.int[g] ~ dnorm(0, 0.001)
-          tau.mu[g] <- 1/(sigma.int[g]*sigma.int[g])
-          sigma.int[g] ~ dunif(0,10)
+          beta.phi.prec[g] ~ dnorm(0, 0.001)#dnorm (mu.int[g],tau.mu[g])  
+          #mu.int[g] ~ dnorm(0, 0.001)
+          #tau.mu[g] <- 1/(sigma.int[g]*sigma.int[g])
+          #sigma.int[g] ~ dunif(0,10)
           
           # temperature
-          beta.phi.temp[g] ~ dnorm (mu.int.temp[g],tau.mu.temp[g])  
-          mu.int.temp[g] ~ dnorm(0, 0.001)
-          tau.mu.temp[g] <- 1/(sigma.int.temp[g]*sigma.int.temp[g])
-          sigma.int.temp[g] ~ dunif(0,10)
+          beta.phi.temp[g] ~ dnorm(0, 0.001)#dnorm (mu.int.temp[g],tau.mu.temp[g])  
+          #mu.int.temp[g] ~ dnorm(0, 0.001)
+          #tau.mu.temp[g] <- 1/(sigma.int.temp[g]*sigma.int.temp[g])
+          #sigma.int.temp[g] ~ dunif(0,10)
           
           
         }
        
        
   
-      ## set initial conditions
+    
+        ## set initial conditions
         ## priors for occupancy in time 1
         for (i in 1:nsites) {
         
@@ -89,7 +90,6 @@ cat("
     # Specify the hyperparameters for the Beta distribution
     a <- 10   # probability of success
     b <- 90   # probability of failures
-    
     
     
     ############      Model       #############
@@ -138,31 +138,34 @@ cat("
         # Priors for detection probability
         
         ### temperature effect on detection
-        for (g in 1:ngen) {
-           
-             alpha.p[g] ~ dunif(0,1)
-             intercept.p[g] <- logit(alpha.p[g])
-             alpha1.temp[g] ~ dnorm(0, 0.001)
-           
-           }
+        for (l in 1:nlith) {
         
+          for (g in 1:ngen) {
+           
+             alpha.p[l,g] ~ dunif(0,1)
+             intercept.p[l,g] <- logit(alpha.p[l,g])
+             
+          }
+        }
+        
+        # temp effect
+        for (g in 1:ngen) {
+          
+          alpha1.temp[g] ~ dnorm(0, 0.001)
+           
+        } 
 
      ############      Model       #############
      
      
-     
-     # observation submodel: detection probability based on depth and videos
-     for (k in 1:nobs) { ## loop over observations
-                            
-               y [k] ~ dbern(muY[site[k],form[k],int[k],gen[k]])
-               muY [site[k],form[k],int[k],gen[k]] <- z[site[k],int[k],gen[k]] * p[k]
-                         
-               # model
-               logit(p[k])<- intercept.p[gen[k]]+ 
+      # Observation model for replicated counts
+      for (k in 1:nobs) { # Loop over all n observations
+        
+          y[k] ~ dbin(z[site[k],int[k],gen[k]]*p[k], nsurvey[k])
+          logit(p[k])<- intercept.p[lith[k],gen[k]]+ 
                                       alpha1.temp[gen[k]]*tempObs[k] 
-                
-             }
       
+      }
     
     # -----------------------------------------------
     
@@ -269,24 +272,43 @@ elevation <- as.matrix(elevation [match( rownames(table_data_basis[[1]]),rowname
 # data onto 0,1
 table_data_long_df$det[which(table_data_long_df$det >0)]<-1
 
-
-
 # subset
-# table_data_long_df <- table_data_long_df[which(table_data_long_df$taxon %in% seq(1,10)),]
+#table_data_long_df <- table_data_long_df[which(table_data_long_df$taxon %in% seq(1,10)),]
+
+mode <- function(codes){
+  which.max(tabulate(codes))
+}
+
+# aggregate 
+table_data_long_df_agg <- table_data_long_df %>%
+
+  group_by(site, int, taxon) %>% 
+  
+  summarise (det= max(det),
+             c_det = sum (det),
+             nform = length(unique(form)),
+             lith=mode(lith2),
+             temp= mean(temp))
+
+# filter to a smaller dataset
+table_data_long_df_agg <- table_data_long_df_agg %>% 
+  
+                        filter (taxon %in% seq (1,20))
 
 ## bundle data
-str(jags.data <- list(y = table_data_long_df$det,
-                      gen = table_data_long_df$taxon,
-                      int=table_data_long_df$int,
-                      form = table_data_long_df$form,
-                      #lith = table_data_long_df$lith2,
-                      site = table_data_long_df$site,
+str(jags.data <- list(y = table_data_long_df_agg$det,
+                      nsurvey=table_data_long_df_agg$nform,
+                      gen = table_data_long_df_agg$taxon,
+                      int=table_data_long_df_agg$int,
+                      #form = table_data_long_df$form,
+                      lith = table_data_long_df_agg$lith,
+                      site = table_data_long_df_agg$site,
                       nsites = nrow(temperature),
-                      nint= length(unique(table_data_long_df$int)), 
-                      ngen = max(unique(table_data_long_df$taxon)),
-                      #nlith= length(unique(table_data_long_df$lith2)),
-                      tempObs = as.vector(scale (table_data_long_df$temp)),
-                      nobs=nrow(table_data_long_df),
+                      nint= length(unique(table_data_long_df_agg$int)), 
+                      ngen = max(unique(table_data_long_df_agg$taxon)),
+                      nlith= length(unique(table_data_long_df$lith2)),
+                      tempObs = as.vector(scale (table_data_long_df_agg$temp)),
+                      nobs=nrow(table_data_long_df_agg),
                       elevation = unname (elevation),
                       temperature = unname(temperature),
                       precipitation = unname(precipitation)
@@ -297,9 +319,9 @@ str(jags.data <- list(y = table_data_long_df$det,
 # Set initial values
 
 require(reshape)
-table_inits <- lapply (seq (1,max(table_data_long_df$taxon)), function (i)
+table_inits <- lapply (seq (1,max(table_data_long_df_agg$taxon)), function (i)
   
-        cast(table_data_long_df[which (table_data_long_df$taxon == i),], site ~ int, 
+        cast(table_data_long_df_agg[which (table_data_long_df_agg$taxon == i),], site ~ int, 
             max, 
             value = "det",
             fill=0,
@@ -315,13 +337,13 @@ zst<-array( unlist( table_inits ) , dim = c(nrow(table_inits[[1]]),
                                             length((table_inits)))
 )
 
-
 # inits for psi1
 psi1 <- (apply (zst, c(1,3),mean))
 
 # function inits (to be placed in each chain)
-inits <- function(){ list(z = zst,
-                          psi1 = psi1)}
+inits <- function(){ list(z = zst#,
+                          #psi1 = psi1
+                          )}
 
 ## Parameters to monitor
 ## long form
@@ -338,7 +360,8 @@ params <- c(
  "alpha.p",
  "intercept.p",
  "alpha1.temp",
- "psi1",	
+  "z"	,
+ "psi1",
  "Ngen",
  "Ngen_site"#, 
  #"avphi",
@@ -359,7 +382,7 @@ na <- 250; nb <- 500; ni <- 1000; nc <- 3; nt <- 1
 
 samples_paleo_synapsida <- jags (data = jags.data, 
                        parameters.to.save = params, 
-                       model.file = "dyn_model_vectorized_covariates.txt", 
+                       model.file = "dyn_model_vectorized_covariates_binomial.txt", 
                        inits = inits, 
                        n.chains = nc, 
                        n.thin = nt, 
@@ -370,7 +393,7 @@ samples_paleo_synapsida <- jags (data = jags.data,
                        parallel=F
 )
 
-
+colSums(apply(samples_paleo_synapsida$sims.list$z,c(2,3),mean))
 
 # save
 save (samples_paleo_synapsida,file = here ("output","samples_paleo_synapsida.RData"))
@@ -396,4 +419,20 @@ samples_paleo_synapsida <- bugs(data = jags.data,
 save (samples_paleo_synapsida,file = here ("output","samples_paleo_synapsida.RData"))
 
 
+plot(NA,ylim=c(0,1),xlim=c(0,33),xlab="interval",ylab= "probability")
+lines(colMeans(apply (samples_paleo_synapsida$mean$gamma,c(1,2),mean,na.rm=T),na.rm=T),type="l")
+lines(1-colMeans(apply (samples_paleo_synapsida$mean$phi,c(1,2),mean,na.rm=T),na.rm=T),type="l",add=T,col="red")
+legend("topright", 
+       legend = c("gamma", "epslon"),
+       col = c("black", "red"),
+       lty=1,
+       bty="n")
 
+
+plot(NA,ylim=c(20,250),xlim=c(0,33),xlab="interval",ylab= "realized richness (sum of z)")
+lapply (seq(1,nrow (samples_paleo_synapsida$sims.list$Ngen)), function (i) 
+  
+  lines(samples_paleo_synapsida$sims.list$Ngen[i,],type="l",col=rgb (0,0,0.1,alpha=0.01)))
+
+  
+lines(samples_paleo_synapsida$mean$Ngen,type="l",col="red",lwd=2)
