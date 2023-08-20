@@ -5,8 +5,6 @@
 
 source(here ("R","packages.R"))
 
-# create a folder for processed data
-dir.create ("processed_data")
 
 # ------------------------------------------------------------
 

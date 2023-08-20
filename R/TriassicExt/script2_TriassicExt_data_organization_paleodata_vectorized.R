@@ -13,26 +13,25 @@
 
 # load packages
 source("R/packages.R")
+source("R/functions.R")
 
-# =====================================================
+
 # load data
 # collections
-pbdb_data_collections <- read.csv (here ("data", "PaleoData","cynodontia", "pbdb_data_collections.csv"),
-                       skip=18)
+pbdb_data_collections <- read.csv (here ("data", "PaleoData","TrJ", "pbdb_data_collections.csv"),
+                       skip=19)
 
 # strata
-pbdb_data_strata <- read.csv (here ("data", "PaleoData","cynodontia", "pbdb_data_strata.csv"),
-                              skip=17)
+pbdb_data_strata <- read.csv (here ("data", "PaleoData","TrJ", "pbdb_data_strata.csv"),
+                              skip=18)
 
 #taxa
-pbdb_data_taxa <- read.csv (here ("data", "PaleoData","cynodontia", "pbdb_data_taxa.csv"),
-                              skip=15)
+pbdb_data_taxa <- read.csv (here ("data", "PaleoData","TrJ", "pbdb_data_taxa.csv"),
+                              skip=22)
 
 # occ
-pbdb_data_occ <- read.csv (here ("data", "PaleoData","cynodontia", "pbdb_data_occ.csv"),
-                           skip=18)
-
-
+pbdb_data_occ <- read.csv (here ("data", "PaleoData","TrJ", "pbdb_data_occ.csv"),
+                           skip=19)
 
 
 # --------------------------------------------------------------------
@@ -77,7 +76,6 @@ coll_occ_taxa <- cbind (coll_occ_taxa,
                         )
 
 
-
 # --------------------------------------------------------------------
 # obtain ages
 # all this done with the help of paleoverse package
@@ -86,54 +84,23 @@ coll_occ_taxa <- cbind (coll_occ_taxa,
 
 
 # binning time intervals
-bins <- time_bins(interval = c("Permian", "Cretaceous"), rank = "stage")
+bins <- time_bins(interval = c("Triassic"), rank = "stage")
+bins <- bins %>%
+  filter (interval_name  %in% c("Carnian", "Norian", "Rhaetian"))
 
-
-
-# the max_ma.y and min_ma.y will be the original ages
-#colnames(coll_occ_taxa)[which(colnames(coll_occ_taxa) == "max_ma.x")] <- "max_ma"
-#colnames(coll_occ_taxa)[which(colnames(coll_occ_taxa) == "min_ma.x")] <- "max_ma"
-#
-## Get new numeric ages for named intervals using the interval key that is supplied with Palaeoverse
-#coll_occ_taxa <- look_up(coll_occ_taxa, 
-#                     early_interval = "early_interval.x",
-#                     late_interval = "late_interval.x")
-#
-## Make sure that any values which could not be matched contain their original values
-#coll_occ_taxa$interval_max_ma <- ifelse(is.na(coll_occ_taxa$interval_max_ma),
-#                                        coll_occ_taxa$max_ma,
-#                                        coll_occ_taxa$interval_max_ma)
-#coll_occ_taxa$interval_min_ma <- ifelse(is.na(coll_occ_taxa$interval_min_ma),
-#                                        coll_occ_taxa$min_ma,
-#                                        coll_occ_taxa$interval_min_ma)
-#coll_occ_taxa$interval_mid_ma <- (coll_occ_taxa$min_ma + coll_occ_taxa$max_ma)/2
+# mid times
 coll_occ_taxa$interval_mid_ma <- (coll_occ_taxa$min_ma.x + coll_occ_taxa$max_ma.x)/2
 
-# rename
-#colnames(coll_occ_taxa)[which(colnames (coll_occ_taxa) %in% c("max_ma", "min_ma"))] <- c("old_max_ma", "old_min_ma")
-#colnames(coll_occ_taxa)[which(colnames (coll_occ_taxa) %in% c("interval_max_ma", "interval_min_ma"))] <- c("max_ma", "min_ma")
+# we're interested in end Triassic data (carnian, norian, rhaetian)
+coll_occ_taxa_perm_cret <- subset(coll_occ_taxa, max_ma.x <= max(bins$max_ma) & 
+                                                 min_ma.x >= min(bins$min_ma)
+                                    )
 
-
-
-# we're interested in permian to triassic data
-# Remove occurrences that are younger than the time intervals we're interested in
-coll_occ_taxa_perm_cret <- subset(coll_occ_taxa, min_ma.x > min(bins$min_ma))
-
-
-# rename cols to feed the binning function
-# the max_ma.y and min_ma.y will be the original ages
-colnames(coll_occ_taxa_perm_cret)[which(colnames(coll_occ_taxa_perm_cret) == "max_ma.x")] <- "max_ma"
-colnames(coll_occ_taxa_perm_cret)[which(colnames(coll_occ_taxa_perm_cret) == "min_ma.x")] <- "min_ma"
-
-
-# Generate time bins
-coll_occ_taxa_perm_cret <- bin_time(occdf = coll_occ_taxa_perm_cret,
-                      bins = bins,
-                      method = 'all')
-
-# Make a table of potential number of bins
-table(coll_occ_taxa_perm_cret$n_bins) # raw counts
-table(coll_occ_taxa_perm_cret$n_bins) / nrow(coll_occ_taxa_perm_cret) # proportions
+# alternative bin
+coll_occ_taxa_perm_cret <- coll_occ_taxa_perm_cret %>%
+  filter(abs(max_ma.x - min_ma.x) < 25) %>% # exclude uncertain data
+  mutate(mid_ma = (max_ma.x + min_ma.x) / 2,
+         bin = bin_ages(mid_ma, by = 1))
 
 
 ## Testing age validity
@@ -142,12 +109,10 @@ rang <- coll_occ_taxa_perm_cret$max_ma - coll_occ_taxa_perm_cret$min_ma # age ra
 # the precision is ok
 hist(rang, breaks = 40, xlab = "Date range [max age - min age]", main = "Age Range (my)")
 
-
-
 ## Testing spatio-temporal outliers on dataset level
 # Outlier dataset
-cl <- cf_outl(coll_occ_taxa_perm_cret, taxon = "", lat = "lat.x", lon = "lng.x",
-              min_age = "min_ma", max_age = "max_ma")
+#cl <- cf_outl(coll_occ_taxa_perm_cret, taxon = "", lat = "lat.x", lon = "lng.x",
+#              min_age = "min_ma", max_age = "max_ma")
 # Outlier taxon
 cf_out <- cf_outl(coll_occ_taxa_perm_cret, taxon = "accepted_name", lat = "lat.x", lon = "lng.x",
               min_age = "min_ma", max_age = "max_ma", value = "flagged")
@@ -158,336 +123,13 @@ coll_occ_taxa_perm_cret<-coll_occ_taxa_perm_cret[cf_out==T,] # filter
 
 # --------------------------------------------------------------------
 
-
-
-
-# adjust formation and lithology names
-
-# remove quotes and other characters
-
-coll_occ_taxa_perm_cret$formation.x <- gsub ("\\? ", "", coll_occ_taxa_perm_cret$formation.x)
-coll_occ_taxa_perm_cret$formation.x <- gsub ("\"", "", coll_occ_taxa_perm_cret$formation.x)
-coll_occ_taxa_perm_cret$formation.x <- gsub ("^[:alnum:]", "", coll_occ_taxa_perm_cret$formation.x)
-coll_occ_taxa_perm_cret$formation.x <- gsub ("=", "", coll_occ_taxa_perm_cret$formation.x)
-coll_occ_taxa_perm_cret$formation.x <-  (noquote(coll_occ_taxa_perm_cret$formation.x))
-coll_occ_taxa_perm_cret$formation.x <- gsub("\"", '', coll_occ_taxa_perm_cret$formation.x)
-coll_occ_taxa_perm_cret$formation.x <- gsub("'", '', coll_occ_taxa_perm_cret$formation.x)
-
-# remove weird names
-coll_occ_taxa_perm_cret<- coll_occ_taxa_perm_cret [which(coll_occ_taxa_perm_cret$formation.x %in% c("", "=", "5","6") == F),]
-unique(coll_occ_taxa_perm_cret$formation.x ) [order(unique(coll_occ_taxa_perm_cret$formation.x ))]
-
-#as factor
-coll_occ_taxa_perm_cret$formation.x <- as.factor (coll_occ_taxa_perm_cret$formation.x)
-
-# recode
-coll_occ_taxa_perm_cret <- data.frame (coll_occ_taxa_perm_cret) %>% 
-  mutate (formation.x = recode (formation.x,
-                                "Baños del Flaco" = "Banos del Flaco",
-                                "Asiento" = "Asientos",
-                                "Cantos del Agua" = "Canto del Agua",
-                                "Ischigalasto"  = "Ischigualasto", 
-                                "Quehita"="Quehuita",
-                                "Agardfjellet" = "Agardhfjellet",
-                                "Alcobaca" = "Alcobaça",
-                                "Bakkar" = "Bakhar",
-                                "Bazanovo and Bokhto Suites" = "Bazanov and Bokhtin Suite",
-                                "Bihin Limestone" = "Bihen Limestone",
-                                "Birdlip Limestone " = "Birdlip Limestone",
-                                "Buchenstein " = "Buchenstein",
-                                "Cabacos" = "Cabaços",
-                                "Fullers Earth" = "Fuller's Earth",
-                                "Halstatt" = "Hallstatt",
-                                "Hallstätt" = "Hallstatt",
-                                "Inklin " = "Inklin",
-                                "Kimmeridge-clay" = "Kimmeridge Clay",
-                                "Kossen"="Kössen",
-                                "Limanangcong" = "Liminangcong",
-                                "Lower Calcaerous Grit"="Lower Calcareous Grit",
-                                "luning" = "Luning",
-                                "Manual Creek"="Manuel Creek",
-                                "Nordenskjold" = "Nordenskjöld",
-                                "Parson Bay" = "Parsons Bay",
-                                "Ronne" = "Rønne",
-                                "Schöll"= "Schnöll",
-                                "Sewa" = "Sêwa",
-                                "steinalm Limestones" = "Steinalm Limestones",
-                                "Timezgadiwine" = "Timezgadiouine",
-                                "Tschermakjfellet" = "Tschermakfjellet",
-                                "Ulughey" = "Ulugei",
-                                "Vikinghogda"="Vikinghøgda",
-                                "AG 4" = "AG4"
-                                
-  ))
-
-
-# corrected names
-# all_formations <- unique(coll_occ_taxa_perm_cret$formation.x)
-
-# correct names of lithology
-coll_occ_taxa_perm_cret$lithology1.x <- gsub ("\\? ", "", coll_occ_taxa_perm_cret$lithology1.x)
-coll_occ_taxa_perm_cret$lithology1.x <- gsub ("\"", "", coll_occ_taxa_perm_cret$lithology1.x)
-coll_occ_taxa_perm_cret$lithology1.x[which(coll_occ_taxa_perm_cret$lithology1.x == "not reported")] <- NA
-coll_occ_taxa_perm_cret$lithology1.x[which(coll_occ_taxa_perm_cret$lithology1.x == "")] <- NA
-
-
-
-
-
-# --------------------------------------------------------------------
-# bin occurrences spatially into spatial bins
-coll_occ_taxa_perm_cret <- bin_space(occdf = coll_occ_taxa_perm_cret %>%
-                             filter (is.na(paleolat2.x) != T),
-                              lng = 'paleolng2.x',
-                              lat = 'paleolat2.x',
-                              spacing = 2000,
-                              plot=T,return=T)
-
-# object with the grid
-grid_info <- coll_occ_taxa_perm_cret [2:4]
-plot(grid_info$grid_base)
-plot(grid_info$grid,add=T, col = rgb(0.1,0.1,0.5,alpha=0.2))
-
-# occurrence data
-coll_occ_taxa_perm_cret <- coll_occ_taxa_perm_cret$occdf
-
-
-# cell coordinates 
-cell_coordinates <- coll_occ_taxa_perm_cret %>% 
-  group_by (cell_ID) %>%
-  summarise (centroid_lat = mean (cell_centroid_lat),
-             centroid_lng = mean(cell_centroid_lng),
-             sd_lat = sd (cell_centroid_lat),
-             sd_lng = sd (cell_centroid_lng))
-
-
-
-
-# load spatial covariates 
-load (here ("processed_data", "brick_rasters_elevation.RData"))
-load (here ("processed_data", "brick_rasters_precipitation.RData"))
-load (here ("processed_data", "brick_rasters_temp.RData"))
-
-
-# load intervals
-# find the interval of each raster
-intervals <- openxlsx::read.xlsx (here ("data", "periods_intervals_ages.xlsx"))
-# reverse the order to the past be the first period
-rev_order <- rev(intervals$Interval)
-intervals <- intervals [match (intervals$Interval, rev_order),]
-
-
-# extract covariates for each cell
-
-site_covs <- lapply (list(brick_rasters,
-                        brick_rasters_paleoprec,
-                        brick_rasters_paleotemp), function (layer) {
-                          
-                          # extract
-                          
-                          df_var <- (extract(
-                              
-                                  layer,
-                                  st_as_sf(cell_coordinates[,c("centroid_lng","centroid_lat")],
-                                        coords = c("centroid_lng", "centroid_lat"),
-                                        crs = "+proj=longlat +datum=WGS84 +no_defs"),
-                               
-                               fun = "mean",
-                               method = "simple",
-                               cellnumbers=T,
-                               df=T))
-                          colnames(df_var) <- gsub ("index_", "",colnames(df_var)) # adjust colnames
-                          rownames (df_var) <- cell_coordinates$cell_ID
-                          ; #return
-                          df_var
-                          
-                          }
-                     )
-
-            
-names (site_covs) <- c("elevation", "prec", "temp")
-
-
-# bind missing data
-
-site_covs_input <- lapply (site_covs, function (i) { 
+# filter taxa
+coll_occ_taxa_perm_cret <- coll_occ_taxa_perm_cret %>% 
+  filter (phylum == "Chordata") %>%
+  filter (class %in% c("Reptilia", "Mammalia", "Saurischia", "Ornithischia","NO_CLASS_SPECIFIED"))
   
-  # if not in the colnames, take the previous one
-  
-  sel_int <- intervals$Interval [-which(intervals$Interval %in% colnames (i)[-c(1:2)])]
-  
-  # for each missing interval made the input
-  to_bind <- lapply (seq (1,length(sel_int)), function (int) {
-    
-    # interval to select
-    sel_col <- intervals$Interval[which(intervals$Interval %in% sel_int[int])-1]
-    to_bind <- i[which(colnames(i) %in% sel_col)]
-    
-    
-    if (ncol (to_bind) > 0 ) {
-      
-      colnames(to_bind) <- sel_int[int]
-      
-      
-    } else { # if stil not in the colnames, regret two time steps
-      
-      sel_col <- intervals$Interval[which(intervals$Interval %in% sel_int[int])-2]
-      to_bind <- i[which(colnames(i) %in% sel_col)]
-      colnames(to_bind) <- sel_int[int]
-      
-    }
-    
-    
-    #colnames(to_bind) <- sel_int[int]
-    # try also with NAs
-    to_bind_NAs <- to_bind
-    to_bind_NAs  <- ifelse (to_bind > -9999,NA,NA)
-    output <- list (input_vals = to_bind,
-                    input_NAs = to_bind_NAs)
-    output
-    })
-  
-  
-})
 
-# input elevation
-site_covs[[1]] <- cbind (site_covs[[1]],
-                         do.call(cbind, sapply (site_covs_input[[1]], "[[", "input_vals")))[,-c(1:2)]
-site_covs[[1]] <- site_covs[[1]] [match (intervals$Interval, colnames(site_covs[[1]]))]
-
-# input precipitation
-site_covs[[2]] <- cbind (site_covs[[2]],
-                         do.call(cbind, sapply (site_covs_input[[2]], "[[", "input_vals")))[,-c(1:2)]
-site_covs[[2]] <- site_covs[[2]] [match (intervals$Interval, colnames(site_covs[[2]]))]
-
-# input temp
-site_covs[[3]] <- cbind (site_covs[[3]],
-                         do.call(cbind, sapply (site_covs_input[[3]], "[[", "input_vals")))[,-c(1:2)]
-site_covs[[3]] <- site_covs[[3]] [match (intervals$Interval, colnames(site_covs[[3]]))]
-
-# -----------------------------------
-
-#  observation covariates
-
-# i= 1594 
-# i = 1000
-# i = 163
-
-
-# extract altitude per occurrence point
-paleo_env <- lapply (list(brick_rasters,
-                          brick_rasters_paleoprec,
-                          brick_rasters_paleotemp), function (layer)
-      
-      lapply (seq (1,nrow (coll_occ_taxa_perm_cret)), function (i) {
-  
-      # extract
-      extracted_data <- (extract(layer,
-                                coll_occ_taxa_perm_cret[i,c("paleolng2.x","paleolat2.x")],
-                                fun = "mean",
-                                method = "simple"))
-      colnames(extracted_data) <- gsub ("index_", "",colnames(extracted_data)) # adjust colnames
-      
-      # select
-      selected_bin_n <- coll_occ_taxa_perm_cret[i,"bin_assignment"]
-      selected_bin <- bins[which(bins$bin %in% selected_bin_n),"interval_name"]
-      output <- (extracted_data[,which(colnames(extracted_data) %in% selected_bin)])
-      
-      
-      # if no output is reported
-      if (length(output)==0){
-        
-        # gather the paloaltitude from the previous period in the same point
-        selected_bin_n <- coll_occ_taxa_perm_cret[i,"bin_assignment"]
-        selected_bin <- bins[which(bins$bin %in% (selected_bin_n-1)),"interval_name"]
-        output <- (extracted_data[,which(colnames(extracted_data) %in% selected_bin)])
-        
-        
-      } else { output }
-      
-      
-      # if still the previous one misses data, regret two periods
-      if (length(output)==0){
-          
-          # gather the paloaltitude from the previous period in the same point
-          selected_bin_n <- coll_occ_taxa_perm_cret[i,"bin_assignment"]
-          selected_bin <- bins[which(bins$bin %in% (selected_bin_n-2)),"interval_name"]
-          output <- (extracted_data[,which(colnames(extracted_data) %in% selected_bin)])
-          
-          
-        } else {
-          
-        
-        output
-        
-        }
-        
-      # if still the previous one misses data, regret three periods
-      if (length(output)==0){
-        
-        # gather the paloaltitude from the previous period in the same point
-        selected_bin_n <- coll_occ_taxa_perm_cret[i,"bin_assignment"]
-        selected_bin <- bins[which(bins$bin %in% (selected_bin_n-3)),"interval_name"]
-        output <- (extracted_data[,which(colnames(extracted_data) %in% selected_bin)])
-        
-        
-      } else {
-        
-        
-        output
-        
-      }
-        
-  })
-)
-#paleoaltitude[sapply(paleoaltitude, function(x) length(x)==0L)] <- NULL
-
-
-# all filled with data
-which(unlist(lapply (paleo_env[[3]], function (i) length(i) == 0))==T)
-which(unlist(lapply (paleo_env[[3]], function (i) is.na(i) == T))==T)
-
-
-# melt and bind
-
-coll_occ_taxa_perm_cret$elevation <- do.call(rbind,paleo_env[[1]])[,1]
-coll_occ_taxa_perm_cret$precipitation <- do.call(rbind,paleo_env[[2]])[,1]
-coll_occ_taxa_perm_cret$temperature <- do.call(rbind,paleo_env[[3]])[,1]
-
-# mean(coll_occ_taxa_perm_cret$elevation[which(coll_occ_taxa_perm_cret$elevation>-1000)])
-# sd(coll_occ_taxa_perm_cret$elevation[which(coll_occ_taxa_perm_cret$elevation>-1000)])
-
-# some elevations are lower than zero
-table(coll_occ_taxa_perm_cret$elevation<0)
-
-# number of formations per cellid
-hist(colSums(table (coll_occ_taxa_perm_cret$formation.x, coll_occ_taxa_perm_cret$cell_ID)>0))
-mean(colSums(table (coll_occ_taxa_perm_cret$formation.x, coll_occ_taxa_perm_cret$cell_ID)>0))# mean
-
-# Extract unique interval midpoints
-midpoints <- sort(unique(coll_occ_taxa_perm_cret$bin_midpoint))
-
-# Calculate the number of unique cells in each time bin
-unique_cells <- unique(coll_occ_taxa_perm_cret[, c("bin_midpoint","cell_ID")])
-spat.cov <- group_apply(unique_cells, group = "bin_midpoint", fun = nrow)
-
-
-
-# taxonomic resolution 
-# species level : Occurrences identified to a coarser taxonomic resolution than the desired level
-# are retained if they belong to a clade which is not otherwise represented in the dataset 
-coll_occ_taxa_perm_cret <- tax_unique(occdf = coll_occ_taxa_perm_cret, 
-                      genus = "genus", 
-                      family = "family",
-                      order = "order", 
-                      class = "class", 
-                      name = "accepted_name",
-                      resolution="species",
-                      append=T)
-
-# changes
-length(unique(coll_occ_taxa_perm_cret$accepted_name))
-length(unique(coll_occ_taxa_perm_cret$unique_name))
+unique(coll_occ_taxa_perm_cret$order)
 
 # some mistakes (only " sp.")
 coll_occ_taxa_perm_cret <- coll_occ_taxa_perm_cret [which(coll_occ_taxa_perm_cret$unique_name %in% " sp." ==F),]
@@ -792,7 +434,7 @@ PyRate_data2 <- inner_join(PyRate_data, mock_status, by = "unique_name")
 
 # Write PyRate input to disk
 # https://cran.r-project.org/web/packages/CoordinateCleaner/vignettes/Cleaning_PBDB_fossils_with_CoordinateCleaner.html
-write_pyrate(PyRate_data, fname = "processed_data/pyrate_data", status = PyRate_data2$status,
+write_pyrate(PyRate_data, fname = "processed_data_TrJ/pyrate_data", status = PyRate_data2$status,
              taxon = "unique_name", min_age = "min_ma", max_age = "max_ma")
 
 
@@ -810,7 +452,7 @@ write_pyrate(PyRate_data, fname = "processed_data/pyrate_data", status = PyRate_
 
 
 
-synapsida_data <- unique(coll_occ_taxa_perm_cret$unique_name)[order (unique(coll_occ_taxa_perm_cret$unique_name))]
+TrJ_data <- unique(coll_occ_taxa_perm_cret$unique_name)[order (unique(coll_occ_taxa_perm_cret$unique_name))]
 time_bins <- unique(coll_occ_taxa_perm_cret$bin_assignment)[order(unique(coll_occ_taxa_perm_cret$bin_assignment))]
 cells <- unique(coll_occ_taxa_perm_cret$cell_ID)
 formations <- unique(coll_occ_taxa_perm_cret$formation.x)[order(unique(coll_occ_taxa_perm_cret$formation.x))]
@@ -891,14 +533,14 @@ rownames(table_data_basis[[1]]) == rownames(table_data_basis[[33]])
 range(as.numeric(data.matrix(table_data_basis[[1]]))[is.na(as.numeric(data.matrix(table_data_basis[[1]])))!=T])
 
 
-# k = synapsida_data[67]
+# k = TrJ_data[67]
 # i = time_bins[26]
 # 18
 
 # do the table per interval and taxon
 
 # table 
-table_data <- lapply (synapsida_data, function (k) # each species
+table_data <- lapply (TrJ_data, function (k) # each species
   
                         
                      lapply (time_bins, function (i) { # each time bin
@@ -1160,24 +802,24 @@ lapply (table_data_long, function (i)
 #)
 
 # select detection in at least one period and formation
-sel_synapsida <- unlist(lapply (
+sel_TrJ <- unlist(lapply (
   
   table_data_long, function (i)
     
     sum(i$det)
 )
 ) >=1
-barplot(table(sel_synapsida))
+barplot(table(sel_TrJ))
 
 
 
 # table  for naive occupancy
-table_naive_synapsida <- table_data [which(sel_synapsida==T)]
-save (table_naive_synapsida,  file = here ("processed_data", "table_naive_synapsida.RData"))
+table_naive_TrJ <- table_data [which(sel_TrJ==T)]
+save (table_naive_TrJ,  file = here ("processed_data_TrJ", "table_naive_TrJ.RData"))
 
 
 # filter
-table_data_long <- table_data_long [which(sel_synapsida==T)]
+table_data_long <- table_data_long [which(sel_TrJ==T)]
 
 # melt
 table_data_long_df <- do.call(rbind,table_data_long) # [1:2]
@@ -1233,21 +875,21 @@ table_data_long_df <-table_data_long_df %>%
 # save to use in models
 save (site_covs,
       bins,
-      file = here ("processed_data","site_covs.RData"))
+      file = here ("processed_data_TrJ","site_covs.RData"))
 
 
 # save to use in models
 save (coll_occ_taxa_perm_cret,
-      synapsida_data,
-      sel_synapsida,
+      TrJ_data,
+      sel_TrJ,
       table_data_basis,
       table_data_long,
       table_data_long_df,
       formations_lithologies,
-      synapsida_data, 
+      TrJ_data, 
       time_bins, 
       cells,
-      file = here ("processed_data","table_data_array_synapsida.RData"))
+      file = here ("processed_data_TrJ","table_data_array_TrJ.RData"))
 
 
 # save data to use in spatial analyses
@@ -1255,7 +897,7 @@ save (coll_occ_taxa_perm_cret,
       grid_info,
       time_bins, 
       cells,
-      file = here ("processed_data","table_space.RData"))
+      file = here ("processed_data_TrJ","table_space.RData"))
 
 
 # made animations to show climate and continents
