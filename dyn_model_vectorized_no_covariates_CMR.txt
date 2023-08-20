@@ -1,0 +1,94 @@
+
+   
+    model {
+    
+     #############################################################
+    #                                                           #
+    #                  Biological process                       #
+    #                                                           #
+    #############################################################
+    
+    
+    # Site Occupancy Dynamics (Priors)
+    
+   for (t in 1:nint) {
+    
+      gamma [t]~dunif(0,1)
+      phi [t]~dunif(0,1)
+    
+    
+    }
+   
+   ## set initial conditions for each genus
+   for (g in 1:ngen) {
+      psi1[g] ~ dunif(0,1)#dbeta(a,b)
+   }
+   
+    # Specify the hyperparameters for the Beta distribution
+    #a <- 10   # probability of success
+    #b <- 90   # probability of failures
+    
+   ############      Model       #############
+    
+    for (g in 1:ngen) {
+    
+          z[g,1]~dbern(psi1[g]) # occupancy status initialization
+    
+              for (t in 2:nint){
+            
+                # model likelihood
+                ### modeling dynamics conditional on previous time realized occurrence z
+                muZ[g,t] <- z[g,t-1] *  phi[t] + ### if occupied, p of not getting extinct/persist in the next time
+                          (1-z[g,t-1]) *  gamma[t] ###  if not occupied, p of originate in the next time
+                
+        # realized occurrence
+		    z[g,t] ~ dbern(muZ[g,t])
+    
+        }#t
+        
+      } #g
+  
+    #############################################################
+    #                                                           #
+    #         Observation process across formations             #
+    #                                                           #
+    #############################################################
+    
+    # Priors for detection probability
+    # constant detection probability
+    
+    ###  detection intercept
+    intercept.p ~ dnorm(0,0.001)
+    beta.p.form ~ dnorm(0,0.001)   
+    
+    # observation submodel
+    for (t in 1:nint){
+        
+          # model
+          # p dependent on the number of formations
+          logit(p[t])<- intercept.p+beta.p.form*nform[t]
+          
+    
+            for (g in 1:ngen) {
+            
+                  # observation
+                  y [g,t] ~ dbern(muY[g,t])
+                  # Specify the observation model conditional on occupancy state
+                  muY [g,t] <- z[g,t] * p[t]
+                  
+                  
+                }
+        
+    }
+      
+      
+    # derived parameters
+    for (t in 1:nint){
+      SRexp[t] <- sum (z[,t])
+    }
+        
+    }## end of the model
+    
+    
+    
+    

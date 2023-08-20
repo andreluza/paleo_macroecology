@@ -1,0 +1,93 @@
+
+   
+    model {
+    
+     #############################################################
+    #                                                           #
+    #                  Biological process                       #
+    #                                                           #
+    #############################################################
+    
+    
+    # Site Occupancy Dynamics (Priors)
+    
+   for (i in 1:nsites) {
+    
+    for (t in 1:nint) {
+    
+      gamma [i,t]~dunif(0,1)
+      phi [i,t]~dunif(0,1)
+    
+    
+    }
+   
+   }
+   
+   ## set initial conditions
+   for (g in 1:ngen) {
+   
+      psi1[g] ~ dunif(0,1)
+       
+   }
+    ############      Model       #############
+    
+    
+    for (i in 1:nsites) {
+    
+      for (g in 1:ngen) {
+    
+          z[i,1,g]~dbern(psi1[g]) # occupancy status initialization
+    
+              for (t in 2:nint){
+            
+                # model likelihood
+                ### modeling dynamics conditional on previous time realized occurrence z
+                muZ[i,t,g] <- z[i,t-1,g] *  phi[i,t] + ### if occupied, p of not getting extinct/persist in the next time
+                          (1-z[i,t-1,g]) *  gamma[i,t] ###  if not occupied, p of originate in the next time
+                
+        # realized occurrence
+		    z[i,t,g] ~ dbern(muZ[i,t,g])
+    
+        }#t
+        
+      } #g
+    
+    }#i
+    
+    #############################################################
+    #                                                           #
+    #         Observation process across formations             #
+    #                                                           #
+    #############################################################
+    
+    
+    
+        # Priors for detection probability
+        for (g in 1:ngen) {
+   
+            p[g] ~ dunif(0,1)
+        
+        }
+
+     ############      Model       #############
+     
+     
+     # observation submodel
+     
+     for (k in 1:nobs) { ## loop over observations
+                            
+               y [k] ~ dbern(muY[site[k],form[k],int[k],gen[k]])
+               # Specify the observation model conditional on occupancy state
+               muY [site[k],form[k],int[k],gen[k]] <- z[site[k],int[k],gen[k]] * p[gen[k]]
+                
+                
+             }
+      
+        
+    }## end of the model
+    
+    
+    
+
+    
+    

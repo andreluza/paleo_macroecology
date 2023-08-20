@@ -1,0 +1,126 @@
+
+   
+     model {
+    
+    
+      #############################################################
+      #                                                           #
+      #                  Biological process                       #
+      #                                                           #
+      #############################################################
+      
+    
+       # Site Occupancy Dynamics (Priors)
+       
+       # intercepts
+       # gamma
+       intercept.gamma ~ dnorm(0, 0.001)
+          
+       # phi
+       intercept.phi ~ dnorm(0, 0.001)
+          
+          
+      # ----------------------
+      #     Gamma (origination)
+      # ----------------------
+      
+      # regression coefficients
+      beta.gamma.elev ~ dnorm(0, 0.001)# elevation
+      beta.gamma.prec ~ dnorm(0, 0.001)# precipitation
+      beta.gamma.temp ~ dnorm(0, 0.001)# temperature
+      
+      # ----------------------
+      #     Phi (persistence)
+      # ----------------------
+      
+      
+      beta.phi.prec ~ dnorm(0, 0.001)# precipitation
+      beta.phi.temp ~ dnorm(0, 0.001)# temperature
+      beta.phi.elev ~ dnorm(0, 0.001)# elevation
+      
+      
+     ## set initial conditions for each genus
+     psi1 ~ dunif(0,1)
+     
+    
+    ############      Model       #############
+   
+   # model for phi and gamma
+   ### model dynamic parameters
+  
+    for (t in 2:nint){
+  
+         # speciation
+         logit(gamma[t]) <-  intercept.gamma + 
+                                     beta.gamma.elev*elevation[t]+
+                                     beta.gamma.prec*precipitation[t]+
+                                     beta.gamma.temp*temperature[t]
+          # persistence
+          logit(phi[t]) <-    intercept.phi + 
+                                     beta.phi.elev*elevation[t]+
+                                     beta.phi.prec*precipitation[t]+
+                                     beta.phi.temp*temperature[t]
+                                              
+                 }
+                 
+    # occupancy dynamics
+    
+    for (g in 1:ngen) {
+       
+          z[g,1]~dbern(psi1) # occupancy status initialization
+    
+              for (t in 2:nint){
+    
+                    
+                # model likelihood
+                ### modeling dynamics conditional on previous time realized occurrence z
+                muZ[g,t] <- z[g,t-1] *  phi[t] + ### if occupied, p of not getting extinct/persist in the next time
+                              (1-z[g,t-1]) *  gamma[t] ###  if not occupied, p of originate in the next time
+                
+               # realized occurrence
+        		   z[g,t] ~ dbern(muZ[g,t])
+            
+        }#t
+      
+       
+      
+      } #g
+  
+  
+    #############################################################
+    #                                                           #
+    #         Observation process across formations             #
+    #                                                           #
+    #############################################################
+    
+    # Priors for detection probability
+    ###  detection intercept and coefficients
+    intercept.p ~ dnorm(0,0.001)
+    beta.p.time ~ dnorm(0,0.001)   
+    beta.p.range ~ dnorm(0,0.001)   
+    
+    # observation submodel
+     for (g in 1:ngen) {
+      for (t in 1:nint){
+    
+            # observation
+            # p dependent on the number of formations
+            logit(p[g,t])<- intercept.p+beta.p.time*time[t]+beta.p.range*range[g]
+    
+            # Specify the binomial observation model conditional on occupancy state
+            y [g,t] ~ dbin(z[g,t]*p[g,t], nform[t])
+                  
+                  
+                }
+        }
+      
+    # derived parameters
+    for (t in 1:nint){
+        SRexp[t] <- sum (z[,t])
+      }
+    
+    
+        
+    }## end of the model
+    
+    
