@@ -3,6 +3,8 @@
 # Why the niche of some taxa expand over time, while other shrink? Is this a matter of pure evolution, biotic interactions, or both? These questions 
 # led much of research about ecological niche evolution over time, and give rise to the field of ecospace analysis...
 
+# The tempo and mode of clade diversification are key topics in
+# current macroevolutionary and biodiversity studies.
 
 # organizing paleodata
 # the metadata for all this

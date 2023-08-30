@@ -6,10 +6,10 @@
 ## Global MCMC settings
 ######################
 
-na <- 10000; nb <-15000; ni <- 30000; nc <- 3; nt <- 50
+na <- 8000; nb <-10000; ni <- 20000; nc <- 3; nt <- 25
 
 ## short form
-# na <- 250; nb <- 500; ni <- 1000; nc <- 3; nt <- 1
+#na <- 25; nb <- 30; ni <- 50; nc <- 2; nt <- 1
 
 # load packages
 source("R/packages.R")
@@ -583,7 +583,8 @@ cat("
    # change
    for (t in 2:nint) {  
     for (i in 1:nsites) {  
-      
+       
+       #propcH[t,i] <-(sum(z[,t,i])-sum(z[,t-1,i]))/sum(z[,t-1,i]) ### turnover (proportional gain or loss)
        RER[t,i] <- (1-phi[t,i])/gamma[t,i] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
        R0[t,i] <- (1-phi[t,i])-gamma[t,i] ## net diversification rate (r= μ - λ; Rabosky 2018) of each tim
      
@@ -686,18 +687,18 @@ params <- c(
 
 # MCMC runs
 # models
-#samples_cynodontia_CMR_sites <- jags (data = jags.data, 
-#                                  parameters.to.save = params, 
-#                                  model.file = "dyn_model_vectorized_covariates_CMR_sites.txt", 
-#                                  inits = inits, 
-#                                  n.chains = nc, 
-#                                  n.thin = nt, 
-#                                  n.iter = ni, 
-#                                  n.burnin = nb, 
-#                                  DIC = T,  
-#                                  n.cores=nc,
-#                                  parallel=T
-#)
+samples_cynodontia_CMR_sites <- jags (data = jags.data, 
+                                  parameters.to.save = params, 
+                                  model.file = "dyn_model_vectorized_covariates_CMR_sites.txt", 
+                                  inits = inits, 
+                                  n.chains = nc, 
+                                  n.thin = nt, 
+                                  n.iter = ni, 
+                                  n.burnin = nb, 
+                                  DIC = T,  
+                                  n.cores=nc,
+                                  parallel=T
+)
 # save
 #save (samples_cynodontia_CMR_sites,file = here ("output","samples_cynodontia_CMR_sites.RData"))
 
@@ -712,10 +713,17 @@ samples_cynodontia_CMR_sites <- saveJAGS(jags.data, inits, params,
          fileStub="output/CMR_sites_bernoulli")
 
 
+# if need to run longer chains
+# newRes_samples_cynodontia_CMR_sites <- resumeJAGS(fileStub="output/CMR_sites_bernoulli", nSaves=1)
+# combine saves
+# newRes_samples_cynodontia_CMR_sites <- combineSaves(recoverSaves("output/CMR_sites_bernoulli"))
 
-
-
-
+# ------------------------------------------------------------ #
+# interesting parameters
+# temporal trends
+# MUZ_ALLB <- combineSaves(res_ALLB, params = "Nweekinf",thin = 10)
+# MUZ_ALLB_TEMPRAIN <- combineSaves(res_ALLB_TEMPRAIN, params = "Nweekinf", thin = 10)
+# MUZ_ALLB_NoSpace <- combineSaves(res_ALLB_NoSPace, params = "Nweekinf", thin = 10)
 
 # -------------------------------------------------------
 
@@ -1040,24 +1048,27 @@ cat("
     ###  detection intercept
     intercept.p ~ dnorm(0,0.001)
     beta.p.lat ~ dnorm(0,0.001)
-   
+    beta.p.range ~ dnorm(0,0.001)
+    beta.p.time ~ dnorm(0,0.001)
+    
      
     # observation submodel
-    for (i in 1:nsites) {
+    for (g in 1:ngen) {
     
-      for (t in 1:nint){
+      for (i in 1:nsites) {
     
+        for (t in 1:nint){
+    
+            
           #prior 
           # model
           # p dependent on the number of formations
-          logit(p[t,i])<- intercept.p+beta.p.lat*lat[i]
+          logit(p[g,t,i])<- intercept.p+beta.p.lat*lat[i]+beta.p.time*time[t]+beta.p.range*range[g]
           
           
-            for (g in 1:ngen) {
-            
                   # observation
                   # Specify the binomial observation model conditional on occupancy state
-                  y [g,t,i] ~ dbin(z[g,t,i]*p[t,i], nform[t,i])
+                  y [g,t,i] ~ dbin(z[g,t,i]*p[g,t,i], nform[t,i])
                   
                   
                 }
@@ -1124,32 +1135,32 @@ elevation<-(elevation[which(rownames(elevation) %in% cells),])
 lat<-(lat[which(rownames(elevation) %in% cells)])
 
 
-## MCMC settings
-######################
-## short form
-na <- 6000; nb <-10000; ni <- 20000; nc <- 3; nt <- 50
-#na <- 250; nb <- 500; ni <- 1000; nc <- 3; nt <- 1
+# sel sites with 5
+sel_sites <- which(colSums(apply(array_genus_bin_site, c(1,3), sum))>=5)
 
 
 ## bundle data
 # bundle one dataset per site
-str(jags.data <- list(y = array_genus_bin_site,
-                      ngen = dim(array_genus_bin_site)[1],
-                      nint= dim(array_genus_bin_site)[2], 
-                      nsites=dim(array_genus_bin_site)[3],
-                      elevation = t(unname (elevation)),
-                      temperature = t(unname(temperature)),
-                      precipitation = t(unname(precipitation)),
-                      nform = t((formations_per_site_interval)),
-                      lat = as.vector(scale(lat))
+str(jags.data <- list(y = array_genus_bin_site[,,sel_sites],
+                      ngen = dim(array_genus_bin_site[,,sel_sites])[1],
+                      nint= dim(array_genus_bin_site[,,sel_sites])[2], 
+                      nsites=dim(array_genus_bin_site[,,sel_sites])[3],
+                      elevation = t((scaled_elevation))[,sel_sites],
+                      temperature = t((scaled_temperature))[,sel_sites],
+                      precipitation = t((scaled_precipitation))[,sel_sites],
+                      nform = t(formations_per_site_interval)[,sel_sites],
+                      range = scaled_range[,1],
+                      time = scaled_time_stage[,1],
+                      lat = scaled_lat[sel_sites]
                       
 )
 )
 
 # Set initial values
 # function inits (to be placed in each chain)
-inits <- function(){ list(z = array_genus_bin_site)}
-  
+inits <- function(){ list(z = array_genus_bin_site[,,sel_sites])}
+
+
 ## Parameters to monitor
 ## long form
 params <- c(
@@ -1157,14 +1168,13 @@ params <- c(
   "beta.gamma.elev",
   "beta.gamma.prec",
   "beta.gamma.temp",
-  "beta.gamma.lat",
   "intercept.phi",
   "beta.phi.prec",
   "beta.phi.temp",
   "beta.phi.elev",
-  "beta.phi.lat",
   "intercept.p",
-  "beta.p.lat",
+  "beta.p.time",
+  "beta.p.range",
   "gamma",
   "phi",
   "p",
@@ -1190,33 +1200,32 @@ samples_paleo_cynodontia_sites_binomial <- jags (data = jags.data,
                                     parallel=T
   )
 
-#samples_paleo_cynodontia_sites_binomial <- nimbleMCMC(
-#  code = Section6p4_code,
-#  constants = jags.data, ## provide the combined data & constants as constants
-#  inits = inits,
-#  monitors = params,
-#  niter = nt,
-#  nburnin = nb,
-#  thin = nt,
-#  nchains=nc)
-
-
 #devtools::install_github("mikemeredith/saveJAGS")
 require(saveJAGS)
 
+#samples_paleo_cynodontia_sites_binomial <- saveJAGS(jags.data, inits, params, 
+#                                       modelFile="dyn_model_vectorized_covariates_CMR_sites_binomial.txt",
+#                                       chains=nc, 
+#                                       sample2save=((ni-nb)/nt), 
+#                                       nSaves=5, 
+#                                       burnin=nb, 
+#                                       thin=nt,
+#                                       fileStub="output/CMR_sites_binomial")
+#
+#
+# run save jags
 samples_paleo_cynodontia_sites_binomial <- saveJAGS(jags.data, inits, params, 
-                                       modelFile="dyn_model_vectorized_covariates_CMR_sites_binomial.txt",
-                                       chains=nc, 
-                                       sample2save=((ni-nb)/nt), 
-                                       nSaves=5, 
-                                       burnin=nb, 
-                                       thin=nt,
-                                       fileStub="output/CMR_sites_binomial")
+                                         modelFile="dyn_model_vectorized_covariates_CMR_sites_binomial.txt",
+                                         chains=nc, 
+                                         sample2save=((ni-nb)/nt), 
+                                         nSaves=3, 
+                                         burnin=nb, 
+                                         thin=nt,
+                                         fileStub="output/CMR_sites_binomial")
 
-
-
+newRes_samples_cynodontia_CMR_sites_binomial <- combineSaves(recoverSaves("output/CMR_sites_binomial"))
 
 # save each step
-save (samples_paleo_cynodontia_sites_binomial,file = here ("output","samples_paleo_cynodontia_sites_binomial.RData"))
+# save (samples_paleo_cynodontia_sites_binomial,file = here ("output","samples_paleo_cynodontia_sites_binomial.RData"))
   
 

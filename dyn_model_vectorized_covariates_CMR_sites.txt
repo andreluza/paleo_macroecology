@@ -149,7 +149,8 @@
    # change
    for (t in 2:nint) {  
     for (i in 1:nsites) {  
-      
+       
+       #propcH[t,i] <-(sum(z[,t,i])-sum(z[,t-1,i]))/sum(z[,t-1,i]) ### turnover (proportional gain or loss)
        RER[t,i] <- (1-phi[t,i])/gamma[t,i] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
        R0[t,i] <- (1-phi[t,i])-gamma[t,i] ## net diversification rate (r= μ - λ; Rabosky 2018) of each tim
      

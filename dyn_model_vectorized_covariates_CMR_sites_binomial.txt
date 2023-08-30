@@ -108,24 +108,27 @@
     ###  detection intercept
     intercept.p ~ dnorm(0,0.001)
     beta.p.lat ~ dnorm(0,0.001)
-   
+    beta.p.range ~ dnorm(0,0.001)
+    beta.p.time ~ dnorm(0,0.001)
+    
      
     # observation submodel
-    for (i in 1:nsites) {
+    for (g in 1:ngen) {
     
-      for (t in 1:nint){
+      for (i in 1:nsites) {
     
+        for (t in 1:nint){
+    
+            
           #prior 
           # model
           # p dependent on the number of formations
-          logit(p[t,i])<- intercept.p+beta.p.lat*lat[i]
+          logit(p[g,t,i])<- intercept.p+beta.p.lat*lat[i]+beta.p.time*time[t]+beta.p.range*range[g]
           
           
-            for (g in 1:ngen) {
-            
                   # observation
                   # Specify the binomial observation model conditional on occupancy state
-                  y [g,t,i] ~ dbin(z[g,t,i]*p[t,i], nform[t,i])
+                  y [g,t,i] ~ dbin(z[g,t,i]*p[g,t,i], nform[t,i])
                   
                   
                 }
