@@ -6,7 +6,9 @@ data
 README.docx
 output/*.RData
 output/maps_*.png
-processed_data
+processed_data/paleomaps.RData
+processed_data/table_naive_cynodontia_small_bins.RData
+processed_data/animation
 R/old_codes
 output
 Manuscript.Rmd
