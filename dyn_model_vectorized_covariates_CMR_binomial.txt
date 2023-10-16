@@ -9,7 +9,6 @@
       #                                                           #
       #############################################################
       
-    
        # Site Occupancy Dynamics (Priors)
        
        # intercepts
@@ -25,18 +24,18 @@
       # ----------------------
       
       # regression coefficients
-      beta.gamma.elev ~ dnorm(0, 0.001)# elevation
       beta.gamma.prec ~ dnorm(0, 0.001)# precipitation
       beta.gamma.temp ~ dnorm(0, 0.001)# temperature
+      #beta.gamma.prec.sd ~ dnorm(0, 0.001)# precipitation
+      #beta.gamma.temp.sd ~ dnorm(0, 0.001)# temperature
       
       # ----------------------
       #     Phi (persistence)
       # ----------------------
-      
-      
       beta.phi.prec ~ dnorm(0, 0.001)# precipitation
       beta.phi.temp ~ dnorm(0, 0.001)# temperature
-      beta.phi.elev ~ dnorm(0, 0.001)# elevation
+      #beta.phi.prec.sd ~ dnorm(0, 0.001)# precipitation
+      #beta.phi.temp.sd ~ dnorm(0, 0.001)# temperature
       
       
      ## set initial conditions for each genus
@@ -52,14 +51,17 @@
   
          # speciation
          logit(gamma[t]) <-  intercept.gamma + 
-                                     beta.gamma.elev*elevation[t]+
                                      beta.gamma.prec*precipitation[t]+
                                      beta.gamma.temp*temperature[t]
+                                     #beta.gamma.prec.sd*precipitation_sd[t]+
+                                     #beta.gamma.temp.sd*temperature_sd[t]
+                                     
           # persistence
           logit(phi[t]) <-    intercept.phi + 
-                                     beta.phi.elev*elevation[t]+
                                      beta.phi.prec*precipitation[t]+
                                      beta.phi.temp*temperature[t]
+                                     #beta.phi.prec.sd*precipitation_sd[t]+
+                                     #beta.phi.temp.sd*temperature_sd[t]
                                               
                  }
                  
@@ -97,7 +99,10 @@
     ###  detection intercept and coefficients
     intercept.p ~ dnorm(0,0.001)
     beta.p.time ~ dnorm(0,0.001)   
-    beta.p.range ~ dnorm(0,0.001)   
+    beta.p.range ~ dnorm(0,0.001) 
+    beta.p.lat ~ dnorm(0,0.001)   
+    beta.p.temp ~ dnorm(0,0.001) 
+    
     
     # observation submodel
      for (g in 1:ngen) {
@@ -105,7 +110,10 @@
     
             # observation
             # p dependent on the number of formations
-            logit(p[g,t])<- intercept.p+beta.p.time*time[t]+beta.p.range*range[g]
+            logit(p[g,t])<- intercept.p+beta.p.time*time[t]+
+                                        beta.p.range*range[g]+
+                                        beta.p.lat*latitude_obs[g]+
+                                        beta.p.temp*temperature_obs[g]
     
             # Specify the binomial observation model conditional on occupancy state
             y [g,t] ~ dbin(z[g,t]*p[g,t], nform[t])
@@ -119,8 +127,22 @@
         SRexp[t] <- sum (z[,t])
       }
     
+    # mean value of P across genus
+    for (t in 1:nint){
+        mean.p[t] <- mean (p[,t])
+      }
     
         
+   # descriptors of change
+   for (t in 2:nint) {  
+     
+      # propcH[t] <-(sum(z[,t])-sum(z[,t-1]))/sum(z[,t-1]) ### turnover (proportional gain or loss)
+       RER[t] <- (1-phi[t])/gamma[t] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
+       R0[t] <- (1-phi[t])-gamma[t]  ## net diversification rate (r= μ - λ; Rabosky 2018) of each time
+       
+    }
+    
+    
     }## end of the model
     
     

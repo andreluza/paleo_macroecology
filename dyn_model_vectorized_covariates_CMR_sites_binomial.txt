@@ -120,10 +120,10 @@
         for (t in 1:nint){
     
             
-          #prior 
-          # model
-          # p dependent on the number of formations
-          logit(p[g,t,i])<- intercept.p+beta.p.lat*lat[i]+beta.p.time*time[t]+beta.p.range*range[g]
+          # p independent on the number of formations
+          logit(p[g,t,i])<- intercept.p+beta.p.lat*lat[i]+
+                                        beta.p.range*range[g]+
+                                        beta.p.time*time[t]
           
           
                   # observation
