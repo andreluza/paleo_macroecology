@@ -8,9 +8,12 @@ output/*.RData
 output/maps_*.png
 processed_data/paleomaps.RData
 processed_data/table_naive_cynodontia_small_bins.RData
-processed_data/animation_*
+processed_data/animation*
+processed_data/brick*
+processed_data/Trait_data.csv
 R/old_codes
 output
 Manuscript.Rmd
 *.docx
 garbage
+R/Mammals
