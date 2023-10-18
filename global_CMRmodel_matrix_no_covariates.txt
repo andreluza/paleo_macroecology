@@ -1,0 +1,106 @@
+
+   
+    
+   
+     model {
+    
+    
+      #############################################################
+      #                                                           #
+      #                  Biological process                       #
+      #                                                           #
+      #############################################################
+      
+       # Site Occupancy Dynamics (Priors)
+       
+       # intercepts
+       # gamma
+       for (t in 1:nint) {
+       
+         phi[t]~dunif(0,1)
+         gamma[t]~dunif(0,1)
+         
+       }
+       
+       ## set initial conditions for each genus
+       psi1 ~ dunif(0,1)
+     
+    
+    ############      Model       #############
+   
+   # model for phi and gamma
+   ### model dynamic parameters
+  
+  for (g in 1:ngen) {
+       
+          z[g,1]~dbern(psi1) # occupancy status initialization
+    
+              for (t in 2:nint){
+    
+                # model likelihood
+                ### modeling dynamics conditional on previous time realized occurrence z
+                muZ[g,t] <- z[g,t-1] *  phi[t] + ### if occupied, p of not getting extinct/persist in the next time
+                              (1-z[g,t-1]) *  gamma[t] ###  if not occupied, p of originate in the next time
+                
+               # realized occurrence
+        		   z[g,t] ~ dbern(muZ[g,t])
+            
+        }#t
+      
+       
+      
+      } #g
+  
+  
+    #############################################################
+    #                                                           #
+    #         Observation process across formations             #
+    #                                                           #
+    #############################################################
+    
+    # Priors for detection probability
+    ###  detection intercept and coefficients
+    
+    for (t in 1:nint){
+      p[t] ~ dunif(0,1)
+    }
+    
+    # observation submodel
+     for (g in 1:ngen) {
+      for (t in 1:nint){
+    
+            # observation
+            # Specify the binomial observation model conditional on occupancy state
+            y [g,t] ~ dbin(z[g,t]*p[t], nform[t])
+                  
+                  
+                }
+        }
+      
+    # derived parameters
+    for (t in 1:nint){
+        SRexp[t] <- sum (z[,t])
+      }
+    
+    
+        
+   # descriptors of change
+   for (t in 2:nint) {  
+     
+     
+       FSS[t] <- sum (muZ[,t])  # finite sample size
+       CH[t] <- (sum(z[,t]) - sum(z[,t-1])) ### turnover (proportional gain or loss)
+       CH1[t]<-sum(z[,t-1])
+       RER[t] <- (1-phi[t])/gamma[t] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
+       R0[t] <- (1-phi[t])-gamma[t]  ## net diversification rate (r= μ - λ; Rabosky 2018) of each time
+       
+    }
+    
+    
+    }## end of the model
+    
+    
+
+    
+    
+    

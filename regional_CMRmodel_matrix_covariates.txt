@@ -1,0 +1,159 @@
+
+   
+     
+     model {
+    
+    
+      #############################################################
+      #                                                           #
+      #                  Biological process                       #
+      #                                                           #
+      #############################################################
+      
+       # Site Occupancy Dynamics (Priors)
+       # one parameter per group
+       
+        # ----------------------
+        #     Gamma (origination)
+        # ----------------------
+        # intercept
+        intercept.gamma ~ dnorm(0, 0.001)
+        # regression coefficients
+        beta.gamma.prec ~ dnorm(0, 0.001)# precipitation
+        beta.gamma.temp ~ dnorm(0, 0.001)# temperature
+        beta.gamma.lat ~ dnorm(0,0.001) # latitude
+        
+        # ----------------------
+        #     Phi (persistence)
+        # ----------------------
+        # intercept
+        intercept.phi ~ dnorm(0, 0.001)
+        # regression coeff 
+        beta.phi.prec ~ dnorm(0, 0.001)# precipitation
+        beta.phi.temp ~ dnorm(0, 0.001)# temperature
+        beta.phi.lat ~ dnorm(0,0.001)
+       
+        ## set initial conditions for each genus
+        psi1 ~ dunif(0,1)
+        
+      # initial state
+      for (g in 1:ngen) {
+        for (i in 1:nsites) {
+        
+           z[g,1,i]~dbern(psi1) # occupancy status initialization
+                
+        }
+      }
+    
+    ############      Model       #############
+   
+   # occupancy dynamics
+    
+     for (i in 1:nsites) {
+       for (t in 2:nint){
+    
+            # origination
+            logit(gamma[t,i]) <-  intercept.gamma + 
+                                    beta.gamma.prec*precipitation[t,i]+
+                                    beta.gamma.temp*temperature[t,i]+
+                                    beta.gamma.lat*lat[i]
+            # persistence
+            logit(phi[t,i]) <-    intercept.phi + 
+                                    beta.phi.prec*precipitation[t,i]+
+                                    beta.phi.temp*temperature[t,i]+
+                                    beta.phi.lat*lat[i]
+    
+            # dynamics across genus
+              
+            for (g in 1:ngen) {
+                    
+                # model likelihood
+                ### modeling dynamics conditional on previous time realized occurrence z
+                muZ[g,t,i] <- z[g,t-1,i] *  phi[t,i] + ### if occupied, p of not getting extinct/persist in the next time
+                              (1-z[g,t-1,i]) *  gamma[t,i] ###  if not occupied, p of originate in the next time
+                
+               # realized occurrence
+        		   z[g,t,i] ~ dbern(muZ[g,t,i])
+            
+             }#gen
+            } #stages
+          }#i sites
+      
+    
+    #############################################################
+    #                                                           #
+    #         Observation process across formations             #
+    #                                                           #
+    #############################################################
+    
+    # Priors for detection probability
+   
+   
+    ###  detection intercept
+    intercept.p ~ dnorm(0,0.001)
+    beta.p.lat ~ dnorm(0,0.001)
+    beta.p.range ~ dnorm(0,0.001)
+    beta.p.time ~ dnorm(0,0.001)
+    beta.p.temp ~ dnorm(0,0.001)
+        
+     
+    # observation submodel
+    for (g in 1:ngen) { ## loop over observations 
+      
+      for (t in 1:nint) { ## loop over observations 
+    
+          # p independent on the number of formations
+          logit(p[g,t])<- intercept.p+
+                          beta.p.lat*lat_obs[g]+
+                          beta.p.range*range[g]+
+                          beta.p.time*time[t]+
+                          beta.p.temp*temp_obs[g]
+            
+          for (i in 1:nsites) {  
+      
+              # observation process
+              # Specify the binomial observation model conditional on occupancy state
+              y[g,t,i] ~ dbin(z[g,t,i]*p[g,t], nform[t,i])
+                      
+        }
+      
+      }
+    
+    }
+    
+    # derived parameters
+    # true richness
+    for (t in 1:nint){
+       for (i in 1:nsites) {
+       
+         SRexp[t,i] <- sum (z[,t,i]) # true richness estimate
+         
+    
+    }
+   }
+ 
+    
+ #  
+ # # change
+ 
+ for (t in 2:nint) {  
+      
+        for (i in 1:nsites) {  
+         
+           FSS[t,i] <- sum (muZ[,t,i]) # finite sample size 
+           CH[t,i] <- (sum(z[,t,i]) - sum(z[,t-1,i])) ### turnover (proportional gain or loss)
+           CH1[t,i]<-sum(z[,t-1,i])
+           RER[t,i] <- (1-phi[t,i])/gamma[t,i] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
+           R0[t,i] <- (1-phi[t,i])-gamma[t,i] ## net diversification rate (r= μ - λ; Rabosky 2018) of each time
+        
+  
+     }
+  
+    }
+  
+  
+    
+        
+    } ## end of the model
+    
+    
