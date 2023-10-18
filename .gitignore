@@ -12,8 +12,10 @@ processed_data/animation*
 processed_data/brick*
 processed_data/Trait_data.csv
 R/old_codes
+R/Cynodontia/oldScripts
 output
 Manuscript.Rmd
 *.docx
 garbage
 R/Mammals
+
