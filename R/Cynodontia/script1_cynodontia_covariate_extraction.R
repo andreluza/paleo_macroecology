@@ -8,6 +8,9 @@ source(here ("R","packages.R"))
 # create a folder for processed data
 dir.create ("processed_data")
 
+# create a directory to receive the figures
+dir.create (here ("output", "figures"))
+
 # ------------------------------------------------------------
 
 # function do deal with netcdf data
@@ -272,12 +275,158 @@ brick_rasters_paleotemp <- rotate(brick_rasters_paleotemp)
 
 # resample to have the complete raster 
 brick_rasters_paleotemp <- resample (brick_rasters_paleotemp, brick_rasters)
-names(brick_rasters_paleoprec) <- gsub ("index_", "", names(brick_rasters_paleoprec))
+names(brick_rasters_paleotemp) <- gsub ("index_", "", names(brick_rasters_paleotemp))
 
 # save 
 save (brick_rasters_paleotemp, file = here ("processed_data", 
                                             "brick_rasters_temp.RData"))
 par (mfrow=c(1,1))
+
+
+# create animation of paleotemperature and precipitation
+
+require(palaeoverse)
+bins <- time_bins(interval = c("Permian", "Cretaceous"), 
+                  rank = "stage",
+                  plot=T)
+load(here ("processed_data", "paleomaps.RData"))
+names(maps_models) <- rev(bins$interval_name)
+
+# change names
+names (brick_rasters_paleotemp) <- gsub ("index_", "",names (brick_rasters_paleotemp))
+
+# animation per stage
+# plot points
+dir.create(here ("processed_data","animation_temp"))
+lapply (names (brick_rasters_paleotemp), function (i) {
+  
+  png (here ("processed_data","animation_temp", paste ("maps_", (i), ".png",sep ="")),
+       width = 30,height = 15, res=300, 
+       units = "cm")
+  par (mar=rep (1,4))
+  # triassic
+  plot (brick_rasters_paleotemp[[which(names (brick_rasters_paleotemp) %in% i)]],
+        main = paste (i, " (",
+                      bins[which( bins$interval_name %in% i),"mid_ma"],
+                      " Ma)",sep=""))
+  # add map
+  plot (maps_models[[which(names (maps_models) %in% i)]],
+        main = paste (i, " (",
+                      bins[which( bins$interval_name == i),"mid_ma"],
+                      " Ma)",sep=""),
+        
+        border = "black",
+        col = NA,
+        add=T)
+  
+  
+  dev.off()
+})
+
+#anime
+list_img <- list.files(path = here ("processed_data","animation_temp"), full.names = T, pattern = "maps_")
+# ordering
+list_img <- list_img[match (bins$interval_name[7:length(bins$interval_name)],
+                            gsub (".png", "",gsub ("D:/Pos_Doc_Paleonto_Macroecology/modeling/paleo_macroecology/processed_data/animation_temp/maps_","",list_img))
+)]
+# remove missing (some stages had no data - we used the previous in analyses)
+list_img<- list_img[is.na(list_img) !=T]
+
+##https://cran.r-project.org/web/packages/magick/vignettes/intro.html
+a_image<-image_read(list_img)
+animation <-  image_animate(a_image, fps = 1)
+image_write(animation, here ("output","figures","animation_temp.gif"))
+
+
+# animation Precipitation
+# animation per stage
+# plot points
+dir.create(here ("processed_data","animation_prec"))
+lapply (names (brick_rasters_paleoprec), function (i) {
+  
+  png (here ("processed_data","animation_prec", paste ("maps_", (i), ".png",sep ="")),
+       width = 30,height = 15, res=300, 
+       units = "cm")
+  par (mar=rep (1,4))
+  # triassic
+  plot (brick_rasters_paleoprec[[which(names (brick_rasters_paleoprec) %in% i)]],
+        main = paste (i, " (",
+                      bins[which( bins$interval_name %in% i),"mid_ma"],
+                      " Ma)",sep=""))
+  # add map
+  plot (maps_models[[which(names (maps_models) %in% i)]],
+        main = paste (i, " (",
+                      bins[which( bins$interval_name == i),"mid_ma"],
+                      " Ma)",sep=""),
+        
+        border = "black",
+        col = NA,
+        add=T)
+  
+  
+  dev.off()
+})
+
+#anime
+list_img <- list.files(path = here ("processed_data","animation_prec"), full.names = T, pattern = "maps_")
+# ordering
+list_img <- list_img[match (bins$interval_name[7:length(bins$interval_name)],
+                            gsub (".png", "",gsub ("D:/Pos_Doc_Paleonto_Macroecology/modeling/paleo_macroecology/processed_data/animation_prec/maps_","",list_img))
+)]
+# remove missing (some stages had no data - we used the previous in analyses)
+list_img<- list_img[is.na(list_img) !=T]
+
+##https://cran.r-project.org/web/packages/magick/vignettes/intro.html
+a_image<-image_read(list_img)
+animation <-  image_animate(a_image, fps = 1)
+image_write(animation, here ("output","figures","animation_prec.gif"))
+
+
+# animation elevation
+# animation per stage
+# plot points
+dir.create(here ("processed_data","animation_elev"))
+lapply (names (brick_rasters), function (i) {
+  
+  png (here ("processed_data","animation_elev", paste ("maps_", (i), ".png",sep ="")),
+       width = 30,height = 15, res=300, 
+       units = "cm")
+  par (mar=rep (1,4))
+  # triassic
+  plot (brick_rasters[[which(names (brick_rasters) %in% i)]],
+        main = paste (i, " (",
+                      bins[which( bins$interval_name %in% i),"mid_ma"],
+                      " Ma)",sep=""))
+  # add map
+  plot (maps_models[[which(names (maps_models) %in% i)]],
+        main = paste (i, " (",
+                      bins[which( bins$interval_name == i),"mid_ma"],
+                      " Ma)",sep=""),
+        
+        border = "black",
+        col = NA,
+        add=T)
+  
+  
+  dev.off()
+})
+
+#anime
+list_img <- list.files(path = here ("processed_data","animation_elev"), full.names = T, pattern = "maps_")
+# ordering
+list_img <- list_img[match (bins$interval_name[7:length(bins$interval_name)],
+                            gsub (".png", "",gsub ("D:/Pos_Doc_Paleonto_Macroecology/modeling/paleo_macroecology/processed_data/animation_elev/maps_","",list_img))
+)]
+# remove missing (some stages had no data - we used the previous in analyses)
+list_img<- list_img[is.na(list_img) !=T]
+
+##https://cran.r-project.org/web/packages/magick/vignettes/intro.html
+a_image<-image_read(list_img)
+animation <-  image_animate(a_image, fps = 1)
+image_write(animation, here ("output","figures","animation_elev.gif"))
+
+
+# clean workspace
 
 rm(list=ls())
 

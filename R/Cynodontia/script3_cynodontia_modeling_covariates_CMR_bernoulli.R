@@ -6,10 +6,11 @@
 ## Global MCMC settings
 ######################
 
-na <- 8000; nb <-10000; ni <- 20000; nc <- 3; nt <- 25
+#na <- 8000; nb <-10000; ni <- 20000; nc <- 3; nt <- 25
 
 ## short form
-#na <- 25; nb <- 30; ni <- 50; nc <- 2; nt <- 1
+na <- 400; nb <- 700; ni <- 1000; nc <- 3; nt <- 1
+#na <- 10; nb <- 20; ni <- 30; nc <- 3; nt <- 1
 
 # load packages
 source("R/packages.R")
@@ -634,29 +635,35 @@ scaled_range <- scale(range_taxon_analysis$range_area)
 scaled_formations <- (formations_per_site_interval - mean(as.matrix(formations_per_site_interval))) / sd(as.matrix(formations_per_site_interval))
 
 # sel sites with 5
-sel_sites <- which(colSums(apply(array_genus_bin_site, c(1,3), sum))>=5)
+#sel_sites <- which(colSums(apply(array_genus_bin_site, c(1,3), sum))>=5)
 
+# remove sites with less than 5 detections
+#array_genus_bin_site <- array_genus_bin_site[,,sel_sites]
+
+# remove genus without detections
+#sel_genus <- which(apply (array_genus_bin_site,1,sum)>0)
+#array_genus_bin_site <- array_genus_bin_site [sel_genus,,]
 
 ## bundle data
 # bundle one dataset per site
-str(jags.data <- list(y = array_genus_bin_site[,,sel_sites],
-                          ngen = dim(array_genus_bin_site[,,sel_sites])[1],
-                          nint= dim(array_genus_bin_site[,,sel_sites])[2], 
-                          nsites=dim(array_genus_bin_site[,,sel_sites])[3],
-                          elevation = t((scaled_elevation))[,sel_sites],
-                          temperature = t((scaled_temperature))[,sel_sites],
-                          precipitation = t((scaled_precipitation))[,sel_sites],
-                          nform = t(scaled_formations)[,sel_sites],
-                          range = scaled_range[,1],
+str(jags.data <- list(y = array_genus_bin_site,
+                          ngen = dim(array_genus_bin_site)[1],
+                          nint= dim(array_genus_bin_site)[2], 
+                          nsites=dim(array_genus_bin_site)[3],
+                          elevation = t((scaled_elevation)),#[,sel_sites],
+                          temperature = t((scaled_temperature)),#[,sel_sites],
+                          precipitation = t((scaled_precipitation)),#[,sel_sites],
+                          nform = t(scaled_formations),#[,sel_sites],
+                          range = scaled_range[,1],#[sel_genus],
                           time = scaled_time_stage[,1],
-                          lat = scaled_lat[sel_sites]
+                          lat = scaled_lat#[sel_sites]
                           
     )
     )
     
 # Set initial values
 # function inits (to be placed in each chain)
-inits <- function(){ list(z = array_genus_bin_site[,,sel_sites])}
+inits <- function(){ list(z = array_genus_bin_site)}
 
 ## Parameters to monitor
 ## long form
@@ -714,7 +721,7 @@ samples_cynodontia_CMR_sites <- saveJAGS(jags.data, inits, params,
 
 
 # if need to run longer chains
-# newRes_samples_cynodontia_CMR_sites <- resumeJAGS(fileStub="output/CMR_sites_bernoulli", nSaves=1)
+newRes_samples_cynodontia_CMR_sites <- resumeJAGS(fileStub="output/CMR_sites_bernoulli", nSaves=2)
 # combine saves
 # newRes_samples_cynodontia_CMR_sites <- combineSaves(recoverSaves("output/CMR_sites_bernoulli"))
 
@@ -1060,10 +1067,10 @@ cat("
         for (t in 1:nint){
     
             
-          #prior 
-          # model
-          # p dependent on the number of formations
-          logit(p[g,t,i])<- intercept.p+beta.p.lat*lat[i]+beta.p.time*time[t]+beta.p.range*range[g]
+          # p independent on the number of formations
+          logit(p[g,t,i])<- intercept.p+beta.p.lat*lat[i]+
+                                        beta.p.range*range[g]+
+                                        beta.p.time*time[t]
           
           
                   # observation
@@ -1103,62 +1110,33 @@ cat("
 sink()
 
 #  ----------------------------------------------------
+nform_model <- matrix(as.numeric(t(formations_per_site_interval)),
+                      nrow=nrow(t(formations_per_site_interval)),
+                      ncol=ncol(t(formations_per_site_interval)))
 
-
-# load data
-load (here ("processed_data", "site_covs.RData"))
-
-# scale variables
-elevation<-(scale (site_covs$elevation)) # scaled elevation
-temperature <- (scale (site_covs$temp)) # scaled temp
-precipitation <-  (scale (site_covs$prec))
-lat <- ( (site_covs$paleolat))
-
-# reverse the order of columns
-elevation<-elevation[,rev(colnames(elevation))]
-temperature<-temperature[,rev(colnames(temperature))]
-precipitation<-precipitation[,rev(colnames(precipitation))]
-
-
-# bins in data
-elevation <- elevation [, which(colnames(elevation) %in% (bins [which(bins$bin %in% time_bins),"interval_name"]))]
-colnames(elevation)==bins [which(bins$bin %in% time_bins),"interval_name"]
-temperature <- temperature [, which(colnames(temperature) %in% (bins [which(bins$bin %in% time_bins),"interval_name"]))]
-colnames(temperature)==bins [which(bins$bin %in% time_bins),"interval_name"]
-precipitation <- precipitation [, which(colnames(precipitation) %in% (bins [which(bins$bin %in% time_bins),"interval_name"]))]
-colnames(precipitation)==bins [which(bins$bin %in% time_bins),"interval_name"]
-
-# subsetting of cells
-precipitation<-(precipitation[which(rownames(precipitation) %in% cells),])
-temperature<-(temperature[which(rownames(temperature) %in% cells),])
-elevation<-(elevation[which(rownames(elevation) %in% cells),])
-lat<-(lat[which(rownames(elevation) %in% cells)])
-
-
-# sel sites with 5
-sel_sites <- which(colSums(apply(array_genus_bin_site, c(1,3), sum))>=5)
-
+nform_model <-as.matrix(nform_model)
 
 ## bundle data
 # bundle one dataset per site
-str(jags.data <- list(y = array_genus_bin_site[,,sel_sites],
-                      ngen = dim(array_genus_bin_site[,,sel_sites])[1],
-                      nint= dim(array_genus_bin_site[,,sel_sites])[2], 
-                      nsites=dim(array_genus_bin_site[,,sel_sites])[3],
-                      elevation = t((scaled_elevation))[,sel_sites],
-                      temperature = t((scaled_temperature))[,sel_sites],
-                      precipitation = t((scaled_precipitation))[,sel_sites],
-                      nform = t(formations_per_site_interval)[,sel_sites],
+str(jags.data <- list(y = array_genus_bin_site,
+                      ngen = dim(array_genus_bin_site)[1],
+                      nint= dim(array_genus_bin_site)[2], 
+                      nsites=dim(array_genus_bin_site)[3],
+                      elevation = t((scaled_elevation)),
+                      temperature = t((scaled_temperature)),
+                      precipitation = t((scaled_precipitation)),
+                      nform = nform_model,
                       range = scaled_range[,1],
                       time = scaled_time_stage[,1],
-                      lat = scaled_lat[sel_sites]
+                      lat = scaled_lat
                       
 )
 )
 
 # Set initial values
 # function inits (to be placed in each chain)
-inits <- function(){ list(z = array_genus_bin_site[,,sel_sites])}
+inits <- function(){ list(z = array_genus_bin_site)}
+
 
 
 ## Parameters to monitor
@@ -1175,6 +1153,7 @@ params <- c(
   "intercept.p",
   "beta.p.time",
   "beta.p.range",
+  "beta.p.lat",
   "gamma",
   "phi",
   "p",
@@ -1200,8 +1179,6 @@ samples_paleo_cynodontia_sites_binomial <- jags (data = jags.data,
                                     parallel=T
   )
 
-#devtools::install_github("mikemeredith/saveJAGS")
-require(saveJAGS)
 
 #samples_paleo_cynodontia_sites_binomial <- saveJAGS(jags.data, inits, params, 
 #                                       modelFile="dyn_model_vectorized_covariates_CMR_sites_binomial.txt",
