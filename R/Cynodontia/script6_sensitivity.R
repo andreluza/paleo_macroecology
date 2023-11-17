@@ -1,12 +1,15 @@
 
 
-# --------------------------------------------
+# -----------------------------------------------------------------------
 
 
-#     Interpretation: Global-scale analysis
+#     Interpretation: Global-scale analysis (SENSITIVITY ANALYSES - SUPP INFORMATION)
 
 
-# ------------------------------------------------------------
+# -----------------------------------------------------------------------
+
+
+
 # load packages
 source("R/packages.R")
 source("R/functions.R")
@@ -20,11 +23,11 @@ cols <- c("Non-mammaliaform cynodonts" = "red", "Non-mammalian Mammaliaformes" =
 # load results
 # load model binomial output 
 load (here ("output",
-            "interesting_params_global_occ.RData"))
+            "interesting_params_global_occ_no_cov.RData"))
 
 # change
 load (here ("output",
-            "interesting_params_global_change.RData"))
+            "interesting_params_global_change_no_cov.RData"))
 
 # load basic data
 load(here ("processed_data", "site_covs.RData"))
@@ -84,113 +87,6 @@ stages_mammaf <- (function_stages (x = array_genus_bin[which(clades %in% "Non-ma
 stages_mamm <- (function_stages (x = array_genus_bin[which(clades %in% "Mammalia"),]))
 
 
-# create a function to optimize plots
-# plot covariates
-plot1 <- ggplot (data = time_covariates %>%
-                  cbind (group = 1,
-                          bins[-c(1:6),c("mid_ma","max_ma", "min_ma", "cols_strip")]),
-                
-                aes(x=mid_ma,y=temperature, #fill=temperature,col=temperature,
-                    group = group))+
-  
-   geom_point(position = position_jitter(width=0.1),size=3,col= "#F83E4B")+
-   
-   theme_bw()+
-   geom_line()+
-  geom_ribbon(aes(x=mid_ma, y=temperature, 
-                  ymax=temperature+temperature_sd, 
-                  ymin=temperature-temperature_sd), 
-              alpha=0.2,fill="#F83E4B") + 
-  
-   scale_x_reverse("Age (Ma)") +
-   theme (legend.position = "none")+
-   coord_geo(
-     dat = list("stages", "periods"), 
-     xlim = c( 66,270), 
-     ylim = c(-15, 45),
-     pos = list("b", "b"),
-     rot=90,
-     size = list(2, 4),
-     abbrv = list(TRUE, T)
-   ) + 
-  geom_line( aes(y=precipitation*10),col = "black") +
-  geom_point(aes(y=precipitation*10),size=3,col= "#00917C")+
-  geom_ribbon(aes(x=mid_ma, y=precipitation*10, 
-                  ymax=precipitation*10+precipitation_sd*10, 
-                  ymin=precipitation*10-precipitation_sd*10), 
-              alpha=0.2,fill="#00917C") + 
-  
-  scale_y_continuous(
-    
-    # Features of the first axis
-    name = "Temperature (ºC)",
-    
-    # Add a second axis and specify its features
-    sec.axis = sec_axis(trans=~./10, name="Precipitation (mm/day)")
-    
-  ) +
-  geom_rect(aes(xmin = max_ma, 
-                xmax = min_ma, 
-                ymin = -Inf, 
-                ymax = Inf, 
-                fill = cols_strip), 
-            
-            
-            alpha = 0.2)+
-  scale_fill_manual(values = cols_strip)
-
-
-plot1
-
-# area
-
-plot_area <- ggplot (data = data.frame (m_area = rowMeans(region_area),
-                                        sd_area = apply (region_area,1,sd),
-                                        group = 1,
-                                        bins[-c(1:6),c("mid_ma","max_ma", "min_ma", "cols_strip")]),
-                                      
-        aes(x=mid_ma,y=m_area, 
-            group = group))+
-  
-  geom_point(position = position_jitter(width=0.1),size=3,col= "blue")+
-  geom_ribbon(aes(x=mid_ma, y=sd_area, 
-                  ymax=m_area+sd_area, 
-                  ymin=m_area-sd_area), 
-              alpha=0.2,fill="cyan")+
-  theme_bw()+
-  geom_line()+
-  ylab ("Land area (squared degrees)\n(ncells * cell area (1 latlong degree))")  +
-  scale_x_reverse("Age (Ma)") +
-  theme (legend.position = "none")+
-  coord_geo(
-    dat = list("stages", "periods"), 
-    xlim = c( 66,270), 
-    #ylim = c(17000, 28000),
-    pos = list("b", "b"),
-    rot=90,
-    size = list(2, 4),
-    abbrv = list(TRUE, T)
-  ) +
-  
-  geom_rect(aes(xmin = max_ma, 
-                xmax = min_ma, 
-                ymin = -Inf, 
-                ymax = Inf, 
-                fill = cols_strip), 
-            
-            
-            alpha = 0.2)+
-  scale_fill_manual(values = cols_strip)
-
-# arrange plots
-
-png (here ("output", "figures", "FigS2-2_covariates.png"),width=22,height=12,res=300, unit="cm")
-grid.arrange(plot1,
-             plot_area,nrow=1)
-
-dev.off()
-
-
 # plot parameters
 dat <-   rbind (
   
@@ -243,9 +139,9 @@ dat <-   rbind (
               average = 1-interesting_params_occ_mammalia$phi$stat$statistics[,"Mean"],
               lw=1-interesting_params_occ_mammalia$phi$stat$quantiles[,"2.5%"],
               up=1-interesting_params_occ_mammalia$phi$stat$quantiles[,"97.5%"])
-  )
+)
 
-   
+
 dat$Taxon <- factor (dat$Taxon,
                      levels = c("Non-mammaliaform cynodonts",
                                 "Non-mammalian Mammaliaformes",
@@ -253,42 +149,42 @@ dat$Taxon <- factor (dat$Taxon,
 # plot results
 # binmial model
 plot2 <- ggplot (data = dat ,
-              
-              aes(x=mid_ma,
-                  y=average, 
-                  fill=var,
-                  group = var,
-                  col=Taxon))+
-    geom_point(aes (shape = var),
-               position = position_jitter(width=0.1),size=3)+
-    #  scale_fill_viridis_d(option="magma",begin=0.3,end=0.7)+
-    #scale_colour_viridis_d(option="magma",begin=0.1,end=1)+
-    #scale_fill_viridis_d(option="magma",begin=0.1,end=1)+
+                 
+                 aes(x=mid_ma,
+                     y=average, 
+                     fill=var,
+                     group = var,
+                     col=Taxon))+
+  geom_point(aes (shape = var),
+             position = position_jitter(width=0.1),size=3)+
+  #  scale_fill_viridis_d(option="magma",begin=0.3,end=0.7)+
+  #scale_colour_viridis_d(option="magma",begin=0.1,end=1)+
+  #scale_fill_viridis_d(option="magma",begin=0.1,end=1)+
   scale_colour_manual(values = cols)+
   scale_fill_manual(values = cols)+
   
-    geom_errorbar(aes(x = mid_ma, ymin = lw, ymax = up,col=var),
-                  width=0.1,size=1,position = position_jitter(width=0.1))+
-    
-    geom_ribbon(aes(x=mid_ma, y=average, ymax=up, ymin=lw,fill=Taxon), 
-                alpha=0.2) + 
-      # other settings
-    
+  geom_errorbar(aes(x = mid_ma, ymin = lw, ymax = up,col=var),
+                width=0.1,size=1,position = position_jitter(width=0.1))+
+  
+  geom_ribbon(aes(x=mid_ma, y=average, ymax=up, ymin=lw,fill=Taxon), 
+              alpha=0.2) + 
+  # other settings
+  
   facet_wrap(~Taxon,scales = "fixed")+
   theme_bw()+
   ylab ("Probability")+
-    geom_line()+
-    scale_x_reverse("Age (Ma)") +
-    theme (legend.position = c(0.8,0.9))+
-    coord_geo(
-      dat = list("stages", "periods"), 
-      xlim = c( 66,270), 
-      ylim = c(0, 1),
-      pos = list("b", "b"),
-      rot=90,
-      size = list(2, 4),
-      abbrv = list(TRUE, T)
-    ) +
+  geom_line()+
+  scale_x_reverse("Age (Ma)") +
+  theme (legend.position = c(0.8,0.9))+
+  coord_geo(
+    dat = list("stages", "periods"), 
+    xlim = c( 66,270), 
+    ylim = c(0, 1),
+    pos = list("b", "b"),
+    rot=90,
+    size = list(2, 4),
+    abbrv = list(TRUE, T)
+  ) +
   
   geom_rect(aes(xmin = max_ma, 
                 xmax = min_ma, 
@@ -301,13 +197,13 @@ plot2 <- ggplot (data = dat ,
   scale_fill_manual(values = cols_strip)
 
 
-  
+
 plot2
 
 
 
 # plot of species richness
-  
+
 
 dat1 <- rbind (
   
@@ -363,11 +259,11 @@ dat1 <- rbind (
   
   
 )# %>%
-    
+
 dat1$Taxon <- factor (dat1$Taxon,
-                     levels = c("Non-mammaliaform cynodonts",
-                                "Non-mammalian Mammaliaformes",
-                                "Mammalia"))
+                      levels = c("Non-mammaliaform cynodonts",
+                                 "Non-mammalian Mammaliaformes",
+                                 "Mammalia"))
 
 # explore
 dat1 %>%
@@ -396,11 +292,11 @@ dat1 %>%
 # plot the binomial results
 
 plot3 <-  ggplot (dat1, 
-                 aes(x=mid_ma,y=average, 
-                     fill=var,
-                     group = var,
-                     col=Taxon))+
- facet_wrap(~Taxon)+
+                  aes(x=mid_ma,y=average, 
+                      fill=var,
+                      group = var,
+                      col=Taxon))+
+  facet_wrap(~Taxon)+
   # points - average
   geom_point(aes (shape = var),position = position_jitter(width=0.1),size=3)+
   #  scale_fill_viridis_d(option="magma",begin=0.3,end=0.7)+
@@ -409,39 +305,39 @@ plot3 <-  ggplot (dat1,
   
   # bars
   geom_errorbar(aes(x = mid_ma, ymin = lw, ymax = up,col=Taxon),
-                  width=0.1,size=1,position = position_jitter(width=0.1))+
-    # credible intervals
-    geom_ribbon(data = dat1,
-                  aes(x=mid_ma, y=average, ymax=up, ymin=lw,fill=Taxon), 
-                alpha=0.2) +
+                width=0.1,size=1,position = position_jitter(width=0.1))+
+  # credible intervals
+  geom_ribbon(data = dat1,
+              aes(x=mid_ma, y=average, ymax=up, ymin=lw,fill=Taxon), 
+              alpha=0.2) +
   
   
- 
- # include the observed data
- geom_point(data = dat1 , aes (shape=var),
-            position = position_jitter(width=0.1),
-            size=3)+
- geom_line(data = dat1)+
+  
+  # include the observed data
+  geom_point(data = dat1 , aes (shape=var),
+             position = position_jitter(width=0.1),
+             size=3)+
+  geom_line(data = dat1)+
   scale_colour_manual(values = cols)+
   scale_fill_manual(values = cols)+
   
   theme_bw()+
   geom_line()+
- 
+  
   theme (legend.position = c(0.15,0.9))+
-    #scale_fill_viridis_d(option="magma",begin=0.3,end=0.7)+
-    #scale_colour_viridis_d(option="magma",begin=0.3,end=0.7)+
-    scale_x_reverse("Age (Ma)") +
-    coord_geo(
-      dat = list("stages", "periods"), 
-      xlim = c( 66,270), 
-      #ylim = c(0,200),
-      pos = list("b", "b"),
-      rot=90,
-      size = list(2, 4),
-      abbrv = list(TRUE, T)
-    ) +
- ylab ("Taxonomic diversity")+
+  #scale_fill_viridis_d(option="magma",begin=0.3,end=0.7)+
+  #scale_colour_viridis_d(option="magma",begin=0.3,end=0.7)+
+  scale_x_reverse("Age (Ma)") +
+  coord_geo(
+    dat = list("stages", "periods"), 
+    xlim = c( 66,270), 
+    #ylim = c(0,200),
+    pos = list("b", "b"),
+    rot=90,
+    size = list(2, 4),
+    abbrv = list(TRUE, T)
+  ) +
+  ylab ("Taxonomic diversity")+
   
   geom_rect(aes(xmin = max_ma, 
                 xmax = min_ma, 
@@ -451,7 +347,7 @@ plot3 <-  ggplot (dat1,
             col=NA,
             alpha = 0.2)+
   scale_fill_manual(values = cols_strip)
-  
+
 plot3
 
 # 
@@ -497,7 +393,7 @@ total_TD_mammals <- TD_fc (interesting_params_change_mammalia)
 
 rbind (
   data.frame (Taxon = "Non-mammaliaform cynodonts",
-            TD = total_TD_cyn),
+              TD = total_TD_cyn),
   data.frame (Taxon = "Non-mammalian Mammaliaformes",
               TD = total_TD_mammaliaforms),
   data.frame (Taxon = "Mammalia",
@@ -512,9 +408,9 @@ rbind (
   geom_vline(aes (xintercept=mean(total_TD_mammals)),col= "green4")+
   theme(legend.position = "top")+
   theme_classic()
-  
-  
-  
+
+
+
 # total estimate
 quantile(total_TD_cyn,c(0.025,0.5,0.975))
 quantile(total_TD_mammaliaforms,c(0.025,0.5,0.975))
@@ -546,10 +442,10 @@ dat_rhat$Taxon <- factor (dat_rhat$Taxon,
                                      "Mammalia"))
 # adjust names
 dat_rhat <- rbind (dat_rhat [grep ("phi",dat_rhat$par),],
-       dat_rhat [grep ("gamma",dat_rhat$par),]) %>%
+                   dat_rhat [grep ("gamma",dat_rhat$par),]) %>%
   filter (is.na(rhat) != T)
 dat_rhat$par <- factor (dat_rhat$par,
-                           levels = rev(unique(dat_rhat$par)))
+                        levels = rev(unique(dat_rhat$par)))
 # dynamic params
 #plot
 ggplot(data=  dat_rhat,
@@ -572,26 +468,26 @@ ggsave (here ("output", "figures","convergence_dyn_global_params.png"),width =10
 
 # function  to calculate change in TD
 change_fc <- function (output) {
-
+  
   change_TD <- lapply (seq(1,length(output$z$PP_mat)), function (k)
     
-      do.call(rbind, lapply (output$z$PP_mat[[k]], function (i) {
+    do.call(rbind, lapply (output$z$PP_mat[[k]], function (i) {
       
-          CH <- rep (NA,ncol (i))
-          for (t in 2:ncol (i)) {
-            
-            CH[t] <- (sum(i[,t]) - sum(i[,t-1]))#/sum(i[,t-1])
-            
-            
-          }
-          
-          CH
-    
+      CH <- rep (NA,ncol (i))
+      for (t in 2:ncol (i)) {
+        
+        CH[t] <- (sum(i[,t]) - sum(i[,t-1]))#/sum(i[,t-1])
+        
+        
+      }
+      
+      CH
+      
     })))
-    # melt
+  # melt
   change_TD<-do.call(rbind,change_TD)
   return(change_TD)
-    
+  
 }
 
 change_TD_cyn <- change_fc (interesting_params_change_cynodonts)
@@ -601,38 +497,38 @@ change_TD_mammals <- change_fc (interesting_params_change_mammalia)
 # bind data to plot
 dat_change <- rbind (
   
-          data.frame ('average' = (apply (change_TD_cyn,2,mean,na.rm=T)),
-                          'lci' = t(apply (change_TD_cyn,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,1],
-                          'uci' = t(apply (change_TD_cyn,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,3],
-                          "Taxon" = "Non-mammaliaform cynodonts",
-                          bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_cyn,]),
-          data.frame ('average' = (apply (change_TD_mammaliaforms,2,mean,na.rm=T)),
-                      'lci' = t(apply (change_TD_mammaliaforms,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,1],
-                      'uci' = t(apply (change_TD_mammaliaforms,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,3],
-                      "Taxon" = "Non-mammalian Mammaliaformes",
-                      bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf,])
-          ,
-          data.frame ('average' = (apply (change_TD_mammals,2,mean,na.rm=T)),
-                      'lci' = t(apply (change_TD_mammals,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,1],
-                      'uci' = t(apply (change_TD_mammals,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,3],
-                      "Taxon" = "Mammalia",
-                      bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mamm,])
+  data.frame ('average' = (apply (change_TD_cyn,2,mean,na.rm=T)),
+              'lci' = t(apply (change_TD_cyn,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,1],
+              'uci' = t(apply (change_TD_cyn,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,3],
+              "Taxon" = "Non-mammaliaform cynodonts",
+              bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_cyn,]),
+  data.frame ('average' = (apply (change_TD_mammaliaforms,2,mean,na.rm=T)),
+              'lci' = t(apply (change_TD_mammaliaforms,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,1],
+              'uci' = t(apply (change_TD_mammaliaforms,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,3],
+              "Taxon" = "Non-mammalian Mammaliaformes",
+              bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf,])
+  ,
+  data.frame ('average' = (apply (change_TD_mammals,2,mean,na.rm=T)),
+              'lci' = t(apply (change_TD_mammals,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,1],
+              'uci' = t(apply (change_TD_mammals,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,3],
+              "Taxon" = "Mammalia",
+              bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mamm,])
 )
 
 
 # order of groups
 dat_change$Taxon <- factor (dat_change$Taxon,
-                     levels = c("Non-mammaliaform cynodonts",
-                                "Non-mammalian Mammaliaformes",
-                                "Mammalia"))
+                            levels = c("Non-mammaliaform cynodonts",
+                                       "Non-mammalian Mammaliaformes",
+                                       "Mammalia"))
 # replacing inf by NA (all will be zero)
-#dat_change[is.infinite(dat_change$average),c("average","lci","uci")] <- NA
+dat_change[is.infinite(dat_change$average),c("average","lci","uci")] <- NA
 
 # plot results
 
 plot_change <- ggplot (data = dat_change,
-                 
-                 aes(x=mid_ma,y=average, fill=Taxon,group = Taxon,col=Taxon))+
+                       
+                       aes(x=mid_ma,y=average, fill=Taxon,group = Taxon,col=Taxon))+
   geom_point(position = position_jitter(width=0.1),size=3)+
   #  scale_fill_viridis_d(option="magma",begin=0.3,end=0.7)+
   scale_colour_manual(values = cols)+
@@ -682,7 +578,7 @@ div_fc <- function (output) {
     do.call(rbind,res_gamma$gamma$PP_mat[[1]]),
     do.call(rbind,res_gamma$gamma$PP_mat[[2]]),
     do.call(rbind,res_gamma$gamma$PP_mat[[3]]))
- 
+  
   # phi
   res_phi<-output[which(names(output) == "phi")]
   res_phi<-rbind (
@@ -693,13 +589,13 @@ div_fc <- function (output) {
   
   # calculate diversification
   div_rate <- lapply (seq(1,ncol (res_phi)), function (t) {
-  
+    
     RER <- (1-res_phi[,t])/res_gamma[,t] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
     R0 <- res_gamma[,t]-(1-res_phi[,t]) ## net diversification rate (r= μ - λ; Rabosky 2018) of each time
     output <- list(RER=RER,
                    R0=R0)
     output
-      
+    
   })
   
   res <- list (RER = sapply (div_rate, "[[", "RER"),
@@ -713,6 +609,7 @@ div_fc <- function (output) {
 div_cyn <- div_fc (interesting_params_occ_cynodonts)
 div_mammaliaforms <- div_fc (interesting_params_occ_mammaliaformes)
 div_mammals <- div_fc (interesting_params_occ_mammalia)
+
 
 # bind data to plot
 dat_div <- rbind (
@@ -737,13 +634,13 @@ dat_div <- rbind (
 
 # order of groups
 dat_div$Taxon <- factor (dat_div$Taxon,
-                            levels = c("Non-mammaliaform cynodonts",
-                                       "Non-mammalian Mammaliaformes",
-                                       "Mammalia"))
+                         levels = c("Non-mammaliaform cynodonts",
+                                    "Non-mammalian Mammaliaformes",
+                                    "Mammalia"))
 # plot results
 plot_div <- ggplot (data = dat_div,
-                       
-                       aes(x=mid_ma,y=average, fill=Taxon,group = Taxon,col=Taxon))+
+                    
+                    aes(x=mid_ma,y=average, fill=Taxon,group = Taxon,col=Taxon))+
   geom_point(position = position_jitter(width=0.1),size=3)+
   #  scale_fill_viridis_d(option="magma",begin=0.3,end=0.7)+
   scale_colour_manual(values = cols)+
@@ -780,9 +677,7 @@ plot_div <- ggplot (data = dat_div,
             alpha = 0.2)+
   scale_fill_manual(values = cols_strip)
 
-
-
-
+plot_div
 
 
 # relationship between diversification and change
@@ -795,164 +690,36 @@ rel_div_change <-dat_div %>%
               dplyr::rename("int_name"="interval_name",
                             "change" = "average") %>%
               filter (is.na(change)!=T) 
-            
-            
-  )
-
+              
+              
+            )
 
 # plot the relationship
-ggplot (rel_div_change,aes (x=average, 
-                            y=change, 
-                            group=Taxon,
-                            col= Taxon))+
+  
+ggplot (rel_div_change,aes (x=average, y=change, group=Taxon,col= Taxon))+
   geom_point()+
   geom_smooth(method="lm")+
   scale_colour_manual(values = cols)+
   scale_fill_manual(values = cols) +
   xlab ("Net diversification rate (NDRt)")+
-  ylab ("Change in taxonomic diversity (ΔTDt)")+
-  theme_bw()+
-  theme(legend.position="top",
-        legend.direction = "vertical")
-
-ggsave (here ("output", "figures", "rel_div_change.png"))
-
+  ylab ("Change in taxonomic diversity (ΔTDt)")
+  
 
 
 
 # insert a lag
-rel_div_change_lag <- rel_div_change
-rel_div_change_lag<-rel_div_change_lag %>% 
-  filter(Taxon == "Non-mammaliaform cynodonts") 
-
-plot(rel_div_change_lag$average[-length(rel_div_change_lag$average)],
-     rel_div_change_lag$change[-1])
+plot(rel_div_change$average[-length(rel_div_change$average)],rel_div_change$change[-1])
 
 
 
 
 # save plot
-
-# supporting info
-pdf(here ("output","figures", "panel_suppl_covariates.pdf"),width=12,height=5)
-ret_panel <-gridExtra::grid.arrange (plot1,
-                                     plot_area,
-                                     ncol=2)
-dev.off()
-
 # params
-pdf(here ("output","figures", "panel_diversity.pdf"),width=15,height=17)
+pdf(here ("output","figures", "panel_diversity_SUpp_FIgS2-3.3.pdf"),width=15,height=17)
 ret_panel <-gridExtra::grid.arrange (plot3,
                                      plot_change,
                                      plot_div,
                                      nrow=3)
 dev.off()
-
-# detection
-
-plot(colMeans(interesting_params_change_cynodonts$muY$PP_mat$AA[[1]]),type="b")
-lines(colMeans(interesting_params_change_mammaliaformes$muY$PP_mat$AA[[1]]))
-lines(colMeans(interesting_params_change_mammalia$muY$PP_mat$AA[[1]]))
-
-# detection probability
-dat2 <- rbind (
-  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")],
-              Taxon = "Non-mammaliaform cynodonts",
-              var= "Detection probability",
-              average = rowMeans(matrix(interesting_params_occ_cynodonts$p$stat$statistics[,"Mean"],
-                                        ncol=100+100,byrow=T)),
-              
-              
-              lw=rowMeans(matrix(interesting_params_occ_cynodonts$p$stat$quantiles[,"2.5%"],
-                                 ncol=100+100,byrow=T)),
-              
-              up=rowMeans(matrix(interesting_params_occ_cynodonts$p$stat$quantiles[,"97.5%"],
-                                 ncol=100+100,byrow=T)),
-              nForm = formations_per_interval$formations_per_interval),
-  
-  data.frame ( bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")],
-               Taxon = "Non-mammalian Mammaliaformes",
-               var= "Detection probability",
-               average = rowMeans(matrix(interesting_params_occ_mammaliaformes$p$stat$statistics[,"Mean"],
-                                         ncol=44+100,byrow=T)),
-               
-               
-               lw=rowMeans(matrix(interesting_params_occ_mammaliaformes$p$stat$quantiles[,"2.5%"],
-                                  ncol=44+100,byrow=T)),
-               
-               up=rowMeans(matrix(interesting_params_occ_mammaliaformes$p$stat$quantiles[,"97.5%"],
-                                  ncol=44+100,byrow=T)),
-               
-               nForm = formations_per_interval$formations_per_interval),
-  
-  
-  data.frame ( bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")],
-               Taxon = "Mammalia",
-               var= "Detection probability",
-               average = rowMeans(matrix(interesting_params_occ_mammalia$p$stat$statistics[,"Mean"],
-                                         ncol=387+100,byrow=T)),
-               
-               
-               lw=rowMeans(matrix(interesting_params_occ_mammalia$p$stat$quantiles[,"2.5%"],
-                                  ncol=387+100,byrow=T)),
-               
-               up=rowMeans(matrix(interesting_params_occ_mammalia$p$stat$quantiles[,"97.5%"],
-                                  ncol=387+100,byrow=T)),
-               
-               nForm = formations_per_interval$formations_per_interval)
-  
-  
-)
-
-# plot    
-plot4 <-  ggplot (data = dat2 ,
-                  
-                  aes(x=mid_ma,y=average, fill=Taxon,group = Taxon,col=Taxon))+
-  # pts
-  geom_point(position = position_jitter(width=0.1),size=3)+
-  # error
-  geom_errorbar(aes(x = mid_ma, ymin = lw, ymax = up,col=var),
-                width=0.1,size=1,position = position_jitter(width=0.1))+
-  
-  # credible intervals
-  geom_ribbon(aes(x=mid_ma, y=average, ymax=up, ymin=lw,fill=Taxon), 
-              alpha=0.2)+
-  scale_colour_manual(values = cols)+
-  scale_fill_manual(values = cols)+
-  
-  # other settings
-  theme_bw()+
-  geom_line()+theme (legend.position = c(0.2,0.9))+
-  scale_x_reverse("Age (Ma)") +
-  coord_geo(
-    dat = list("stages", "periods"), 
-    xlim = c( 66,270), 
-    ylim = c(0,1),
-    pos = list("b", "b"),
-    rot=90,
-    size = list(2, 4),
-    abbrv = list(TRUE, T)
-  ) + 
-  geom_line( aes(y=nForm/max(nForm)),col="black",size=1) +
-  scale_y_continuous(
-    
-    # Features of the first axis
-    name = "Detection probability in occupied sites",
-    
-    # Add a second axis and specify its features
-    sec.axis = sec_axis(trans=~.*55, name="Number of geological formations per stage")
-  ) +
-  ylab ("Taxonomic diversity")+
-  
-  geom_rect(aes(xmin = max_ma, 
-                xmax = min_ma, 
-                ymin = -Inf, 
-                ymax = Inf, 
-                fill = cols_strip),
-            col=NA,
-            alpha = 0.2)+
-  scale_fill_manual(values = cols_strip)
-
-plot4
 
 rm(list=ls())

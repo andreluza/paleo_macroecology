@@ -121,7 +121,8 @@ cf_out <- cf_outl(coll_occ_taxa_perm_cret, taxon = "accepted_name", lat = "lat.x
                   min_age = "min_ma", max_age = "max_ma", value = "flagged")
 coll_occ_taxa_perm_cret<-coll_occ_taxa_perm_cret[cf_out==T,] # filter
 
-
+3904 - dim (coll_occ_taxa_perm_cret)[1]
+3872 - dim (coll_occ_taxa_perm_cret)[1]
 # --------------------------------------------------------------------
 
 
@@ -359,8 +360,11 @@ cell_coordinates <- coll_occ_taxa_perm_cret %>%
              sd_lng = sd (cell_centroid_lng))
 
 # A function to assign fossil occurrences to user-specified latitudinal bins.
-bins_lat <- lat_bins(size = 10)
-coll_occ_taxa_perm_cret <- bin_lat(coll_occ_taxa_perm_cret, bins=bins_lat, lat = "paleolat2", boundary = FALSE)
+bins_lat <- lat_bins(size = 35) # size = degrees
+coll_occ_taxa_perm_cret <- bin_lat(coll_occ_taxa_perm_cret, 
+                                   bins=bins_lat, 
+                                   lat = "paleolat2",
+                                   boundary = FALSE)
 
 
 #--------------------------------------------------------------
@@ -849,7 +853,7 @@ coll_occ_taxa_perm_cret$Period <- factor(coll_occ_taxa_perm_cret$Period,
 
 png (here ("output", "figures", "descriptive_hists.png"),height=15,width=20,units ="cm",res=300)
 
-par(mfrow=c(1,3),mar=c(15,5,15,4))
+par(mfrow=c(2,2),mar=c(4,4,4,4)) # (15,5,15,4)
 
 # binned intervals per cell
 hist (
@@ -887,6 +891,19 @@ hist (
     )>0)
   ),
   main = "Formations per stage",
+  xlab = "Count"
+)
+
+# formations per lat bin
+hist (
+  
+  
+  (colSums(
+    table (coll_occ_taxa_perm_cret$formation,
+           coll_occ_taxa_perm_cret$lat_bin
+    )>0)
+  ),
+  main = "Formations per latitudinal bin",
   xlab = "Count"
 )
 
@@ -952,6 +969,8 @@ tapply(coll_occ_taxa_perm_cret$detection,
 
 # the basic table summarizing all detections across intervals and formations
 
+
+
 table_data_basis <- lapply (cells, function (i) {
   
   
@@ -1004,9 +1023,10 @@ table_data_basis <- lapply (cells, function (i) {
 })
 
 # checknames
-colnames(table_data_basis[[1]]) == colnames(table_data_basis[[10]])
-rownames(table_data_basis[[1]]) == rownames(table_data_basis[[10]])
+colnames(table_data_basis[[1]]) == colnames(table_data_basis[[9]])
+rownames(table_data_basis[[1]]) == rownames(table_data_basis[[9]])
 
+rownames(table_data_basis[[1]]) == genus
 
 # data to array
 array_genus_bin_site <- array (unlist (table_data_basis),
@@ -1016,6 +1036,18 @@ array_genus_bin_site <- array (unlist (table_data_basis),
 
 array_genus_bin_site[array_genus_bin_site>0]<-1
 
+
+
+# tapply option
+array_genus_bin_site <- tapply (coll_occ_taxa_perm_cret$detection,
+                                list(coll_occ_taxa_perm_cret$unique_name,
+                                     coll_occ_taxa_perm_cret$bin_assignment,
+                                      coll_occ_taxa_perm_cret$lat_bin),
+                        sum,na.rm=T)
+
+rownames(array_genus_bin_site) == rownames (array_genus_bin)
+array_genus_bin_site[array_genus_bin_site>0]<-1
+array_genus_bin_site[is.na(array_genus_bin_site)]<-0
 
 # ---------------------------------------------
 
@@ -1082,6 +1114,10 @@ table_data_formations <- lapply (cells, function (i) {
 formations_per_site_interval<-do.call(rbind,table_data_formations)
 
 
+head(formations_per_site_interval)
+
+
+
 
 # ------------------------------------------------------------------------------------
 
@@ -1093,12 +1129,21 @@ array_genus_bin <- cast (formula = clade+unique_name ~ bin_assignment,
                          fun.aggregate = sum,
                          drop=F,
                          fill=0)
+
+array_genus_bin <- tapply (coll_occ_taxa_perm_cret$detection,
+        list(coll_occ_taxa_perm_cret$unique_name,
+             coll_occ_taxa_perm_cret$bin_assignment),
+        sum,na.rm=T)
+
+
 # clades
-clades <- array_genus_bin$clade
-genus <- array_genus_bin$unique_name
+clades <- taxonomy$clade3 [match (rownames (array_genus_bin), taxonomy$genus)]
+genus <- rownames (array_genus_bin)
 
 # >1 == 1  
-array_genus_bin[-c(1,2)][array_genus_bin[-c(1,2)]>0]<-1
+array_genus_bin[array_genus_bin>0]<-1
+array_genus_bin[is.na(array_genus_bin)]<-0
+
 #array_genus_bin <- as.matrix(array_genus_bin[,-c(1:2)])
 
 
@@ -1115,6 +1160,20 @@ formations_per_interval[,-1] [formations_per_interval[,-1] > 0] <- 1
 formations_per_interval <- data.frame (bin_assignment=formations_per_interval$bin_assignment,
             formations_per_interval = rowSums(formations_per_interval[,-1]))
 
+
+
+# tapply option
+formations_per_interval <- tapply (coll_occ_taxa_perm_cret$detection,
+                                        list(coll_occ_taxa_perm_cret$formation,
+                                             coll_occ_taxa_perm_cret$bin_assignment),
+                                        sum,na.rm=T)
+formations_per_interval[formations_per_interval>0]<-1
+formations_per_interval[is.na(formations_per_interval)]<-0
+formations_per_interval <- data.frame (bin_assignment=colnames(formations_per_interval),
+                                       formations_per_interval = apply (formations_per_interval,2,sum))
+
+
+
 # get the number of collections per interval
 
 coll_per_interval <-  cast (formula =  bin_assignment ~ collection_no,
@@ -1128,15 +1187,26 @@ coll_per_interval[,-1] [coll_per_interval[,-1] > 0] <- 1
 coll_per_interval <- data.frame (bin_assignment=coll_per_interval$bin_assignment,
                                       coll_per_interval = rowSums(coll_per_interval[,-1]))
 
+
+
+# tapply option
+coll_per_interval <- tapply (coll_occ_taxa_perm_cret$detection,
+                                   list(coll_occ_taxa_perm_cret$collection_no,
+                                        coll_occ_taxa_perm_cret$bin_assignment),
+                                   sum,na.rm=T)
+coll_per_interval[coll_per_interval>0]<-1
+coll_per_interval[is.na(coll_per_interval)]<-0
+coll_per_interval <- data.frame (bin_assignment=colnames(coll_per_interval),
+                                 coll_per_interval = apply (coll_per_interval,2,sum))
 # save fig
-png(here ("output", "figures","pull_of_the_recent.png"),height=15,width=20,units ="cm",res=300)
-par(mfrow=c(1,1),mar=c(5,5,5,5))
+png(here ("output", "figures","pull_of_the_recent.png"),height=20,width=22,units ="cm",res=300)
+par(mfrow=c(2,1),mar=c(5,5,5,5))
 
 # plot observed SR per site
 plot(NA,ylim=c(range(apply (array_genus_bin_site,c(2,3),sum))[1],
                150),
      xlim=c(1,33),
-     ylab = "Number of formations (black) and\ngenus (total: red, regional:gray)",
+     ylab = "Number of genus",
      xlab = "Intervals (0: Capitanian; 33: Maastrichtian)")
 
 lapply (seq(1,dim(array_genus_bin_site)[3]), function (i)
@@ -1149,11 +1219,21 @@ lapply (seq(1,dim(array_genus_bin_site)[3]), function (i)
 lines (colSums(array_genus_bin), col="red", lwd=2)
 
 # pull of the recent?
+plot(NA,ylim=c(range(coll_per_interval$coll_per_interval)[1],
+               range(coll_per_interval$coll_per_interval)[2]),
+     xlim=c(1,33),
+     ylab = "Number of formations (black)\nand collections (green)",
+     xlab = "Intervals (0: Capitanian; 33: Maastrichtian)")
 lines(formations_per_interval$formations_per_interval,type= "b",lwd=2)
 lines(coll_per_interval$coll_per_interval,type= "b",lwd=2,col="green")
 
 dev.off()
 
+# correlation
+cor(coll_per_interval$coll_per_interval,
+    formations_per_interval$formations_per_interval)
+plot(log(coll_per_interval$coll_per_interval),
+    log(formations_per_interval$formations_per_interval))
 # --------------------------------------------------
 
 # try a vectorized version of the region-level dataset
@@ -1162,14 +1242,14 @@ colnames (vectorized_occ) <- c("genus", "stage","site", "detection")
 vectorized_occ$int <- paste (vectorized_occ$stage,vectorized_occ$site,sep="_")
 
 # paste genus
-vectorized_occ$genusID <- cynodontia_data
+vectorized_occ$genusID <- genus
 vectorized_occ$cladeID <- clades
 vectorized_occ$clade <- (as.numeric(as.factor(vectorized_occ$cladeID)))
 
 # vectorized formations
 vectorized_formations <- (melt (unname(formations_per_site_interval), as.is=T))
 colnames (vectorized_formations) <- c("site","stage", "formations")
-vectorized_formations$int <- paste (vectorized_formations$stage,vectorized_formations$site,sep="_")
+vectorized_formations$int <- paste (vectorized_formations$stage+6,vectorized_formations$site,sep="_")
 
 # match
 vectorized_occ$formations<- vectorized_formations [match (vectorized_occ$int,
@@ -1203,7 +1283,7 @@ vectorized_occ$range_size <- range_area_taxon [match (vectorized_occ$genusID,
 
 # try a vectorized version of the region-level dataset
 vectorized_occ_global <-melt(array_genus_bin)
-colnames (vectorized_occ_global) <- c("cladeID","genusID", "detection", "stage" )
+colnames (vectorized_occ_global) <- c("genusID", "stage" , "detection")
 # clade and genus code
 vectorized_occ_global$clade <- (as.numeric(as.factor(vectorized_occ_global$cladeID)))
 vectorized_occ_global$genus <- (as.numeric(as.factor(vectorized_occ_global$genusID)))

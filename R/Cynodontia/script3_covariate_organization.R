@@ -86,16 +86,42 @@ values (elevation_raster) <- ifelse (values (elevation_raster) >=0, 1,NA)
 # weight temperature and precipitation
 precipitation_raster <- precipitation_raster*elevation_raster
 temperature_raster <- temperature_raster*elevation_raster
+names(temperature_raster) <- names(raster_imputation[[3]])
+names(precipitation_raster) <- names(raster_imputation[[2]])
 
 # select stages we're studying
 precipitation_raster <- precipitation_raster[[which(names(precipitation_raster) %in% 
                                                       bins$interval_name [7:length(bins$interval_name)])]]
 temperature_raster <- temperature_raster[[which(names(temperature_raster) %in% 
                                                       bins$interval_name [7:length(bins$interval_name)])]]
+elevation_raster <- elevation_raster[[which(names(elevation_raster) %in% 
+                                             bins$interval_name [7:length(bins$interval_name)])]]
 # make a dataframe
 
 table(is.na(values(temperature_raster[[1]])))
 table(is.na(values(precipitation_raster[[1]])))
+
+# area 
+plot(apply (values(precipitation_raster),2, function (x) sum(x>0,na.rm=T))*prod(res(temperature_raster)),type="b")
+plot(apply (values(precipitation_raster),2, function (x) sum(x>0,na.rm=T))*prod(res(temperature_raster)),type="b")
+
+cbind(
+  apply (values(precipitation_raster),2, function (x) sum(x>0,na.rm=T)) , 
+  apply (values(temperature_raster),2, function (x) sum(x>0,na.rm=T)))
+
+cor(  apply (values(precipitation_raster),2, function (x) sum(x>0,na.rm=T)) , 
+      apply (values(temperature_raster),2, function (x) sum(x>0,na.rm=T)))
+
+
+cor(  apply (values(precipitation_raster),2, function (x) sum(x>0,na.rm=T)) , 
+      apply (values(elevation_raster),2, function (x) sum(x>0,na.rm=T)) )
+
+cor(  apply (values(temperature_raster),2, function (x) sum(x>0,na.rm=T)) , 
+      apply (values(elevation_raster),2, function (x) sum(x>0,na.rm=T)) )
+
+lines(apply (values(elevation_raster),2, function (x) sum(x>0,na.rm=T)) ,type="b")
+
+
 
 df_var <- lapply (seq(1,dim(temperature_raster)[3]), function (i){
   
@@ -103,12 +129,19 @@ df_var <- lapply (seq(1,dim(temperature_raster)[3]), function (i){
                         "precipitation" = mean(values(precipitation_raster[[i]]),na.rm=T),
                         "temperature_sd" = sd(values(temperature_raster[[i]]),na.rm=T),
                         "precipitation_sd" = sd(values(precipitation_raster[[i]]),na.rm=T),
-                        "stage" = names (precipitation_raster)[i])
+                        "stage" = names (precipitation_raster)[i],
+                        "area" = sum (values(elevation_raster[[i]])>0,na.rm=T)*prod(res(elevation_raster[[i]])))
   
   }
   
 )
 time_covariates <- do.call(rbind,df_var)
+
+# correlations
+cor.test(time_covariates$temperature,time_covariates$precipitation)
+cor.test(time_covariates$temperature,time_covariates$area)
+cor.test(time_covariates$precipitation,time_covariates$area)
+
 
 # -----------------------------------
 
@@ -183,6 +216,7 @@ paleo_env <- lapply (list(brick_rasters_paleoprec,
         
   })
 )
+
 #paleoaltitude[sapply(paleoaltitude, function(x) length(x)==0L)] <- NULL
 
 
@@ -244,12 +278,14 @@ site_covs <-  lapply (seq(1,nrow(bins_lat)), function (k)
                                     e <- extent(-180, 180,bins_lat[k,4],bins_lat[k,2])
                                     a.temp <- crop(temperature_raster, e)
                                     a.prec <- crop(precipitation_raster, e)
+                                    a.elev <- crop(elevation_raster, e)
                                     
                                     
                                     df_var <- data.frame ("temperature" = mean(values(a.temp[[i]]),na.rm=T),
                                                           "precipitation" = mean(values(a.prec[[i]]),na.rm=T),
                                                           "temperature_sd" = sd(values(a.temp[[i]]),na.rm=T),
                                                           "precipitation_sd" = sd(values(a.prec[[i]]),na.rm=T),
+                                                          "area" =  sum (values(a.elev[[i]])>0,na.rm=T)*prod(res(a.elev[[i]])),
                                                           "stage" = names (precipitation_raster)[i],
                                                           "lat_min" = bins_lat[k,4],
                                                           "lat_mid" = bins_lat[k,3],
@@ -270,6 +306,7 @@ region_temperature_sd <- sapply (site_covs, "[[", "temperature_sd")
 region_precipitation <- sapply (site_covs, "[[", "precipitation")
 region_precipitation_sd <- sapply (site_covs, "[[", "precipitation_sd")
 region_latitude <- sapply (site_covs, "[[", "lat_mid")
+region_area <- sapply (site_covs, "[[", "area")
 
 # select sites of study
 region_temperature<-region_temperature[,cells]
@@ -277,6 +314,8 @@ region_temperature_sd<-region_temperature_sd[,cells]
 region_precipitation<-region_precipitation[,cells]
 region_precipitation_sd<-region_precipitation_sd[,cells]
 region_latitude <- region_latitude[1,cells]
+region_area <- region_area[,cells]
+
 
 # save  the updated dataset
 save (coll_occ_taxa_perm_cret,
@@ -308,6 +347,7 @@ save (time_covariates,
       region_temperature,
       region_temperature_sd,
       region_latitude,
+      region_area,
       file = here ("processed_data","site_covs.RData"))
 
 

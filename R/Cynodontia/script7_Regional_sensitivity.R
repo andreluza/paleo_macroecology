@@ -21,7 +21,7 @@ cols <- c("Non-mammaliaform cynodonts" = "red", "Non-mammalian Mammaliaformes" =
 # load results
 # load model binomial output 
 load (here ("output",
-            "interesting_params_regional_occ.RData"))
+            "interesting_params_regional_rdm_area_occ.RData"))
 
 # load basic data
 load (here ("processed_data", "site_covs.RData"))
@@ -104,42 +104,6 @@ bins <- time_bins(interval = c("Permian", "Cretaceous"),
 
 bins <- cbind (bins,cols_strip = rep (c("yes", "no"),20)[-1])
 cols_strip <- c("yes" = "gray", "no" = "white")
-
-
-# plot of species richness
-
-# find the period of first and last detection
-function_stages <- function (x) {
-  
-  # the first stage with the taxon,    
-  sel_cols <- if  (max(which(colSums (x)>0)) == 33) {
-    
-    a <- seq(
-      ifelse (min(which(colSums (x)>0)) ==1,
-              min(which(colSums (x)>0)),
-              min(which(colSums (x)>0))-1),
-      
-      
-      max(which(colSums (x)>0)),
-      
-      1)
-    
-  } else {
-    
-    a <- seq(ifelse (min(which(colSums (x)>0)) ==1,
-                     min(which(colSums (x)>0)),
-                     min(which(colSums (x)>0))-1),
-             max(which(colSums (x)>0))+1,
-             1)
-  }
-  
-  return(a)
-  
-}
-
-stages_cyn <- (function_stages (x = array_genus_bin[which(clades %in% "Non-mammaliaform cynodonts"),]))
-stages_mammaf <- (function_stages (x = array_genus_bin[which(clades %in% "Non-mammalian Mammaliaformes"),]))
-stages_mamm <- (function_stages (x = array_genus_bin[which(clades %in% "Mammalia"),]))
 
 
 # diversification
@@ -232,7 +196,7 @@ function_plot_div <- function (output,title,label_yaxis) {
         coord_geo(
           dat = list("stages", "periods"), 
           xlim = c( 66,270), 
-          ylim = c(-1, 0.75),
+          ylim = c(-1, 1),
           pos = list("b", "b"),
           rot=90,
           size = list(2, 4),
@@ -287,7 +251,7 @@ function_plot_div <- function (output,title,label_yaxis) {
 
 #ggsave (filename=here ("output", "figures","diversification_regional.png"))
 
-pdf (here ("output", "figures", "div_space_time.pdf"),onefile=T,width=15,height=11)
+pdf (here ("output", "figures", "div_space_time_sensitivity.pdf"),onefile=T,width=15,height=11)
 grid.arrange (
   
   function_plot_div(output = interesting_params_occ_cynodonts_reg,
@@ -317,15 +281,7 @@ dev.off()
 
 # function to produce plots with uncertainty around a desired parameter
 parameter = "SRexp"
-title = "cyn"
-output = interesting_params_occ_mammaliaformes_reg
-stages_clade = stages_mammaf
-
-function_plot_sites <- function (output,
-                                 title,
-                                 parameter, 
-                                 label_yaxis,
-                                 stages_clade) {
+function_plot_sites <- function (output,title,parameter, label_yaxis) {
   
   
   # calculate statistics
@@ -336,57 +292,43 @@ function_plot_sites <- function (output,
   if (parameter %in% c("phi", "gamma","CH","CH1", "R0")) {
     
     ncols <- length(time_bins[-1])
-  
     
-      
   } else {ncols <- length(time_bins)}
     
-  
-  
-  dims_mat <- gsub ("[^0-9,]" , "" , names(s[[1]]$stat$statistics[,"Mean"]),  perl = TRUE)
-  ncol_mat<- max(as.numeric(sapply (strsplit (dims_mat, ","), "[[",1)))
-  nrow_mat <- max(as.numeric(sapply (strsplit (dims_mat, ","), "[[",2)))
-  
   # variation in genus richness
   # try to incorporate uncertainty
   SR_matrix <- matrix(s[[1]]$stat$statistics[,"Mean"],
-                      nrow=nrow_mat,
-                      ncol=ncol_mat,
+                      nrow=length(cells),
+                      ncol=ncols,
                       byrow=T)
   SR_matrix_lwr <- matrix(s[[1]]$stat$quantiles[,"2.5%"],
-                          nrow=nrow_mat,
-                          ncol=ncol_mat,
+                          nrow=length(cells),
+                          ncol=ncols,
                           byrow=T)
   SR_matrix_upr <- matrix(s[[1]]$stat$quantiles[,"97.5%"],
-                          nrow=nrow_mat,
-                          ncol=ncol_mat,
+                          nrow=length(cells),
+                          ncol=ncols,
                           byrow=T)
   # set names
   rownames(SR_matrix) <- rownames(SR_matrix_lwr)<-rownames(SR_matrix_upr) <- cells
-  colnames(SR_matrix) <- colnames(SR_matrix_lwr)<-colnames(SR_matrix_upr) <- stages_clade
   
-  #if (parameter %in% c("phi", "gamma","CH","CH1", "R0")) {
-  #
-  #  colnames(SR_matrix) <- colnames(SR_matrix_lwr)<- colnames(SR_matrix_upr) <- time_bins[-1]
-  #
-  #} else {
-  #  
-  #  colnames(SR_matrix) <- colnames(SR_matrix_lwr)<- colnames(SR_matrix_upr) <- time_bins
-  #  
-  #  
-  #}
+  if (parameter %in% c("phi", "gamma","CH","CH1", "R0")) {
+  
+    colnames(SR_matrix) <- colnames(SR_matrix_lwr)<- colnames(SR_matrix_upr) <- time_bins[-1]
+  
+  } else {
+    
+    colnames(SR_matrix) <- colnames(SR_matrix_lwr)<- colnames(SR_matrix_upr) <- time_bins
+    
+    
+  }
   
   # melt each one and then bind
   # average
   SR_df <- cbind (melt (SR_matrix,as.is=T),
                   data = "Average")
   SR_df$Latitude <- bins_lat [match (SR_df$X1,bins_lat$bin),"mid"]
-  # change bins
-  bins_a <- bins[-c(1:6),]
-  bins_a$bin <- bins_a$bin-6
-  
-  # get the age
-  SR_df$age <- bins_a [match (SR_df$X2,bins_a$bin),"mid_ma"]
+  SR_df$age <- bins [match (SR_df$X2,bins$bin),"mid_ma"]
   
   # lower interval
   SR_df_lwd <- cbind (melt (as.data.frame(SR_matrix_lwr)),
@@ -451,7 +393,7 @@ function_plot_sites <- function (output,
     xlab ("Latitude")+
     theme_bw()+
     theme(legend.position = "none")+
-    ylab ("")+
+    ylab (label_yaxis)+
     scale_colour_gradientn(colours = cols, 
                            values = rescale(c(-80,-60,-40, -20, 0, 20, 40,60, 80)),
                            guide = "colorbar", 
@@ -490,7 +432,7 @@ function_plot_sites <- function (output,
 
 # save origination prob
 
-pdf (here ("output", "figures", "SR_space_time.pdf"),onefile=T,width=15,height=11)
+pdf (here ("output", "figures", "SR_space_time_sensitivity.pdf"),onefile=T,width=15,height=11)
 grid.arrange (
 
   function_plot_sites(output = interesting_params_occ_cynodonts_reg,
@@ -515,26 +457,304 @@ grid.arrange (
 dev.off()
 
 
-# change
+# -------------------------------------------------------------
+# load results
+# load model binomial output 
+load (here ("output",
+            "interesting_params_regional_rdm_area_coeff_matrix.RData"))
 
-grid.arrange (
+
+# table of parameters
+
+
+output_list <- list(interesting_params_cynodonts_reg,
+                    interesting_params_mammaliaformes_reg,
+                    interesting_params_mammalia_reg)
+
+# taxon list
+tax_list <- c("Non-mammaliaform cynodonts",
+              "Non-mammalian Mammaliaformes",
+              "Mammalia")
+
+
+require(knitr)
+table_coeff <- lapply (seq(1,length(output_list)), function (i) {
   
-  function_plot_sites(output = interesting_params_change_cynodonts_reg,
-                      title = "Non-mammaliaform cynodonts",
-                      parameter = "R0", 
-                      label_yaxis = "Taxonomic diversity")
-  ,
+  table_coeff<-rbind (
+    
+    data.frame (
+      par =  "Origination",
+      taxon = tax_list[i],
+      var = "Average (logit)",
+      mean = (output_list[[i]]$intercept.gamma$stat$statistics[,"Mean"]),
+      lci = (output_list[[i]]$intercept.gamma$stat$quantiles[,"2.5%"]),
+      uci =  (output_list[[i]]$intercept.gamma$stat$quantiles[,"97.5%"])),
+    
+    data.frame (par =  "Origination",
+                taxon = tax_list[i],
+                var = "Precipitation",
+                mean = output_list[[i]]$beta.gamma.prec$stat$statistics["Mean"],
+                lci = output_list[[i]]$beta.gamma.prec$stat$quantiles["2.5%"],
+                uci =  output_list[[i]]$beta.gamma.prec$stat$quantiles["97.5%"]),
+    
+    data.frame (par =  "Origination",
+                taxon = tax_list[i],
+                var = "Temperature",
+                mean = output_list[[i]]$beta.gamma.temp$stat$statistics["Mean"],
+                lci = output_list[[i]]$beta.gamma.temp$stat$quantiles[,"2.5%"],
+                uci =  output_list[[i]]$beta.gamma.temp$stat$quantiles[,"97.5%"]),
+    
+    data.frame (par =  "Origination",
+                taxon = tax_list[i],
+                var = "Latitude",
+                mean = output_list[[i]]$beta.gamma.temp$stat$statistics[,"Mean"],
+                lci = output_list[[i]]$beta.gamma.temp$stat$quantiles[,"2.5%"],
+                uci =  output_list[[i]]$beta.gamma.temp$stat$quantiles[,"97.5%"]),
+    
+    data.frame (par =  "Persistence",
+                taxon = tax_list[i],
+                var = "Average (logit)",
+                mean = (output_list[[i]]$intercept.phi$stat$statistics[,"Mean"]),
+                lci = (output_list[[i]]$intercept.phi$stat$quantiles[,"2.5%"]),
+                uci =  (output_list[[i]]$intercept.phi$stat$quantiles[,"97.5%"])),
+    
+    data.frame (par =  "Persistence",
+                taxon = tax_list[i],
+                var = "Precipitation",
+                mean = output_list[[i]]$beta.phi.prec$stat$statistics[,"Mean"],
+                lci = output_list[[i]]$beta.phi.prec$stat$quantiles[,"2.5%"],
+                uci =  output_list[[i]]$beta.phi.prec$stat$quantiles[,"97.5%"]),
+    
+    data.frame (par =  "Persistence",
+                taxon = tax_list[i],
+                var = "Temperature",
+                mean = output_list[[i]]$beta.phi.temp$stat$statistics[,"Mean"],
+                lci = output_list[[i]]$beta.phi.temp$stat$quantiles[,"2.5%"],
+                uci =  output_list[[i]]$beta.phi.temp$stat$quantiles[,"97.5%"]),
+    
+    data.frame (par =  "Persistence",
+                taxon = tax_list[i],
+                var = "Latitude",
+                mean = output_list[[i]]$beta.phi.lat$stat$statistics[,"Mean"],
+                lci = output_list[[i]]$beta.phi.lat$stat$quantiles[,"2.5%"],
+                uci =  output_list[[i]]$beta.phi.lat$stat$quantiles[,"97.5%"]),
+    
+    data.frame (par =  "Detection",
+                taxon = tax_list[i],
+                var = "Average (logit)",
+                mean = output_list[[i]]$intercept.p$stat$statistics[,"Mean"],
+                lci = output_list[[i]]$intercept.p$stat$quantiles[,"2.5%"],
+                uci =  output_list[[i]]$intercept.p$stat$quantiles[,"97.5%"]),
+    
+    data.frame (par =  "Detection",
+                taxon = tax_list[i],
+                var = "Time",
+                mean = output_list[[i]]$beta.p.time$stat$statistics["Mean"],
+                lci = output_list[[i]]$beta.p.time$stat$quantiles["2.5%"],
+                uci =  output_list[[i]]$beta.p.time$stat$quantiles["97.5%"]),
+    
+    data.frame (par =  "Detection",
+                taxon = tax_list[i],
+                var = "Range size",
+                mean = output_list[[i]]$beta.p.range$stat$statistics["Mean"],
+                lci = output_list[[i]]$beta.p.range$stat$quantiles["2.5%"],
+                uci =  output_list[[i]]$beta.p.range$stat$quantiles["97.5%"]),
+    
+    data.frame (par =  "Detection",
+                taxon = tax_list[i],
+                var = "Latitude",
+                mean = output_list[[i]]$beta.p.lat$stat$statistics["Mean"],
+                lci = output_list[[i]]$beta.p.lat$stat$quantiles["2.5%"],
+                uci =  output_list[[i]]$beta.p.lat$stat$quantiles["97.5%"]),
+    
+    data.frame (par =  "Detection",
+                taxon = tax_list[i],
+                var = "Temperature",
+                mean = output_list[[i]]$beta.p.temp$stat$statistics["Mean"],
+                lci = output_list[[i]]$beta.p.temp$stat$quantiles["2.5%"],
+                uci =  output_list[[i]]$beta.p.temp$stat$quantiles["97.5%"])
+  )     
+  table_coeff
   
-  function_plot_sites(output = interesting_params_change_mammaliaformes_reg,
-                      title = "Non-mammalian Mammaliaformes",
-                      parameter = "R0", 
-                      label_yaxis = "Taxonomic diversity")
+})
+
+# melt
+table_coeff<-do.call(rbind, table_coeff)
+# order
+table_coeff$taxon <- factor (table_coeff$taxon ,
+                             levels = c("Non-mammaliaform cynodonts",
+                                        "Non-mammalian Mammaliaformes",
+                                        "Mammalia"))
+
+
+# table intercepts
+
+table_intercepts <- lapply (seq(1,length(output_list)), function (i) {
   
-  ,
-  function_plot_sites(output = interesting_params_change_mammalia_reg,
-                      title = "Mammalia",
-                      parameter = "R0", 
-                      label_yaxis = "Taxonomic diversity")
-  , nrow=3
+  table_intercepts<-rbind (
+    
+    data.frame (
+      par =  "Origination",
+      taxon = tax_list[i],
+      var = "Average (logit)",
+      mean = output_list[[i]]$intercept.gamma$stat$statistics[,"Mean"],
+      lci = output_list[[i]]$intercept.gamma$stat$quantiles[,"2.5%"],
+      uci =  output_list[[i]]$intercept.gamma$stat$quantiles[,"97.5%"]),
+    
+    data.frame (par =  "Persistence",
+                taxon = tax_list[i],
+                var = "Average (logit)",
+                mean = output_list[[i]]$intercept.phi$stat$statistics[,"Mean"],
+                lci = output_list[[i]]$intercept.phi$stat$quantiles[,"2.5%"],
+                uci =  output_list[[i]]$intercept.phi$stat$quantiles[,"97.5%"])
+    )     
+  table_intercepts
   
+})
+
+
+cols <- c("Non-mammaliaform cynodonts" = "red", "Non-mammalian Mammaliaformes" = "blue", "Mammalia" = "darkgreen",
+          "Cynodonts" = "red", "Mammaliaformes" = "blue", "Mammals" = "darkgreen")
+
+# Show the between-S CI's in red, and the within-S CI's in black
+ggplot(data= table_coeff,
+       aes(x=var, y=mean, group=par)) +
+  facet_wrap(~taxon+par,scales="free")+
+  geom_errorbar(width=.1, aes(ymin=lci, ymax=uci,col=taxon)) +
+  geom_point(aes (col=taxon,fill=taxon),alpha=0.5,shape=21, size=3) +
+  scale_colour_manual(values = cols)+
+  scale_fill_manual(values = cols)+
+  geom_hline(yintercept = 0, linewidth=1,alpha=0.3)+
+  ylab ("Coefficient value")+
+  xlab ("Model parameter")+
+  
+  coord_flip()+
+  
+  theme_bw()+
+  theme(legend.position = "none")
+
+ggsave (here ("output", "figures", "coeff_regional.png"),width=9,height=7)
+ggsave (here ("output", "figures", "coeff_regional.pdf"),width=9,height=7)
+
+
+# random intercept
+table_intercepts<- do.call(rbind, table_intercepts)
+# order
+table_intercepts$taxon <- factor (table_intercepts$taxon ,
+                             levels = c("Non-mammaliaform cynodonts",
+                                        "Non-mammalian Mammaliaformes",
+                                        "Mammalia"))
+
+# regions
+table_intercepts$regions <- rep(bins_lat$mid,6)
+
+
+# Show the between-S CI's in red, and the within-S CI's in black
+ggplot(data= table_intercepts,
+       aes(x=plogis(mean), 
+           y=regions, 
+           group=par)) +
+  facet_wrap(~par+taxon,scales="free")+
+  geom_errorbar(width=.1, aes(xmin=plogis(lci), 
+                              xmax=plogis(uci),
+                              col=taxon)) +
+  geom_point(aes (col=taxon,fill=taxon),alpha=0.5,shape=21, size=3) +
+  scale_colour_manual(values = cols)+
+  scale_fill_manual(values = cols)+
+  geom_hline(yintercept = 0, linewidth=1,alpha=0.3)+
+  ylab ("Latitude of the region (20-degree bin)")+
+  xlab ("Probability")+
+  
+  coord_flip()+
+  
+  theme_bw()+
+  theme(legend.position = "none")
+
+# temperature
+# origination
+interesting_params_mammalia_reg$beta.gamma.temp$post_prob
+interesting_params_mammaliaformes_reg$beta.gamma.temp$post_prob
+interesting_params_cynodonts_reg$beta.gamma.temp$post_prob
+# persistence
+interesting_params_mammalia_reg$beta.phi.temp$post_prob
+interesting_params_mammaliaformes_reg$beta.phi.temp$post_prob
+interesting_params_cynodonts_reg$beta.phi.temp$post_prob
+
+# Precipitation
+# origination
+interesting_params_mammalia_reg$beta.gamma.prec$post_prob
+interesting_params_mammaliaformes_reg$beta.gamma.prec$post_prob
+interesting_params_cynodonts_reg$beta.gamma.prec$post_prob
+# persistence
+interesting_params_mammalia_reg$beta.phi.prec$post_prob
+interesting_params_mammaliaformes_reg$beta.phi.prec$post_prob
+interesting_params_cynodonts_reg$beta.phi.prec$post_prob
+
+# detection
+# time
+interesting_params_mammalia_reg$beta.p.time$post_prob
+interesting_params_mammaliaformes_reg$beta.p.time$post_prob
+interesting_params_cynodonts_reg$beta.p.time$post_prob
+
+# range
+interesting_params_mammalia_reg$beta.p.range$post_prob
+interesting_params_mammaliaformes_reg$beta.p.range$post_prob
+interesting_params_cynodonts_reg$beta.p.range$post_prob
+
+# latitude
+interesting_params_mammalia_reg$beta.p.lat$post_prob
+interesting_params_mammaliaformes_reg$beta.p.lat$post_prob
+interesting_params_cynodonts_reg$beta.p.lat$post_prob
+
+
+# temperature
+interesting_params_mammalia_reg$beta.p.temp$post_prob
+interesting_params_mammaliaformes_reg$beta.p.temp$post_prob
+interesting_params_cynodonts_reg$beta.p.temp$post_prob
+
+# rhat
+
+
+# ---------------------------------------------
+# convergence (RHat!)
+
+# fit statistics
+# Rhat
+
+dat_rhat <- rbind (
+  data.frame (Taxon = "Non-mammaliaform cynodonts", 
+              rhat = unlist(sapply (interesting_params_cynodonts_reg, "[[", "rhat")),
+              par = names(unlist(sapply (interesting_params_cynodonts_reg, "[[", "rhat")))),
+  data.frame (Taxon = "Non-mammalian Mammaliaformes", 
+              rhat = unlist(sapply (interesting_params_mammaliaformes_reg, "[[", "rhat")),
+              par = names(unlist(sapply (interesting_params_mammaliaformes_reg, "[[", "rhat")))),
+  data.frame (Taxon = "Mammalia",
+              rhat=unlist(sapply (interesting_params_mammalia_reg, "[[", "rhat")),
+              par = names(unlist(sapply (interesting_params_mammalia_reg, "[[", "rhat"))))
 )
+
+# order of groups
+dat_rhat$Taxon <- factor (dat_rhat$Taxon,
+                          levels = c("Non-mammaliaform cynodonts",
+                                     "Non-mammalian Mammaliaformes",
+                                     "Mammalia"))
+# adjust names
+dat_rhat$par <-  substr(dat_rhat$par,
+                        nchar (dat_rhat$par)/2+1,
+                        round (nchar (dat_rhat$par)))
+
+
+# plot
+ggplot(data= dat_rhat,
+       aes(x=rhat, y=par)) +
+  facet_wrap(~Taxon)+
+  geom_bar(stat="identity")+
+  
+  geom_vline(xintercept=1.1) + 
+  theme_bw() + 
+  
+  xlab ("Rhat value")+
+  ggtitle ("Parameter convergence in the region-scale model")
+
+ggsave (here ("output", "figures","convergence_global_params.png"))
+

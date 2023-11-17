@@ -2,6 +2,10 @@
 
 # 2 . modeling
 
+
+# conditional on the first and last detection of the taxon
+
+
 # saveJAGS help
 # https://web.archive.org/web/20220408094124/http://mmeredith.net/blog/2018/Intro_saveJAGS.htm
 
@@ -9,10 +13,10 @@
 ######################
 
 # number of interactions for a global-scale analyses
-na <- 10000; nb <- 15000; ni <- 20000; nc <- 3; nt <- 10
+na <- 15000; nb <- 30000; ni <- 50000; nc <- 3; nt <- 20
 
 ## short form for tests
-# na <- 400; nb <- 700; ni <- 1000; nc <- 3; nt <- 1
+#na <- 400; nb <- 700; ni <- 1000; nc <- 3; nt <- 1
 #na <- 40; nb <- 70; ni <- 100; nc <- 3; nt <- 1
 
 # load packages
@@ -23,6 +27,40 @@ load(here ("processed_data","CMR_data_observation_cov.RData"))
 
 # load environmental data
 load (here ("processed_data", "site_covs.RData"))
+
+
+
+
+# find the period of first and last detection
+function_stages <- function (x) {
+  
+  # the first stage with the taxon,    
+  sel_cols <- if  (max(which(colSums (x)>0)) == 33) {
+    
+    a <- seq(
+      ifelse (min(which(colSums (x)>0)) ==1,
+              min(which(colSums (x)>0)),
+              min(which(colSums (x)>0))-1),
+      
+      
+      max(which(colSums (x)>0)),
+      
+      1)
+    
+  } else {
+    
+    a <- seq(ifelse (min(which(colSums (x)>0)) ==1,
+                     min(which(colSums (x)>0)),
+                     min(which(colSums (x)>0))-1),
+             max(which(colSums (x)>0))+1,
+             1)
+  }
+  
+  return(a)
+  
+}
+
+
 
 
 # ------------------------------
@@ -103,11 +141,13 @@ cat("
     
             # observation
             # Specify the binomial observation model conditional on occupancy state
-            y [g,t] ~ dbin(z[g,t]*p[t], nform[t])
-                  
+            y [g,t] ~ dbin(muY[g,t],nform[t])
+            muY[g,t] <- z[g,t]*p[t]      
                   
                 }
         }
+      
+     
       
     # derived parameters
     for (t in 1:nint){
@@ -115,25 +155,7 @@ cat("
       }
     
     
-        
-   # descriptors of change
-   for (t in 2:nint) {  
-     
-     
-       FSS[t] <- sum (muZ[,t])  # finite sample size
-       CH[t] <- (sum(z[,t]) - sum(z[,t-1])) ### turnover (proportional gain or loss)
-       CH1[t]<-sum(z[,t-1])
-       RER[t] <- (1-phi[t])/gamma[t] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
-       R0[t] <- (1-phi[t])-gamma[t]  ## net diversification rate (r= μ - λ; Rabosky 2018) of each time
-       psi.eq[t]<-gamma[t]/((1-phi[t])+gamma[t]) # equilibrium occupancy
-       turnover[t]<-(gamma[t]*(1-phi[t]))/(gamma[t]+(1-phi[t]))
-       
-    }
-    
-    
     }## end of the model
-    
-    
     
     ",fill = TRUE)
 sink()
@@ -149,7 +171,9 @@ no_cov_samples_paleo_cynodontia_binomial_run <- lapply (c ("Non-mammaliaform cyn
         
                                                       
                                                       # augment the dataset
-                                                      A0_input <- array (0, dim = c(100,
+                                                      A0_input <- array (0, dim = c(ifelse (i == "Non-mammalian Mammaliaformes",
+                                                                                            200,
+                                                                                            100),
                                                                                     length(time_bins)))
             
             
@@ -157,16 +181,30 @@ no_cov_samples_paleo_cynodontia_binomial_run <- lapply (c ("Non-mammaliaform cyn
             str(jags.data <- list(
               y =rbind (
                 
-                data.matrix(array_genus_bin [which(array_genus_bin$clade %in% i), -c(1,2)]),
+                data.matrix(array_genus_bin [which(clades %in% i),]),
                 A0_input
               ),
-              ngen = dim(array_genus_bin [which(array_genus_bin$clade %in% i), -c(1,2)])[1] + nrow(A0_input),
-              nint = dim(array_genus_bin [which(array_genus_bin$clade %in% i), -c(1,2)])[2],
+              ngen = dim(array_genus_bin [which(clades %in% i),])[1] + nrow(A0_input),
+              nint = dim(array_genus_bin [which(clades %in% i),])[2],
               nform = formations_per_interval$formations_per_interval
           
         )
         )
         
+        # condition the dataset to one stage before the first appearance in the fossil record, and one stage after its last appearance (detection)    
+        sel_cols <- function_stages(jags.data$y)        
+        
+        # bundle conditional data
+        str(jags.data <- list(
+          y = jags.data$y[,sel_cols],
+          ngen = nrow (jags.data$y[,sel_cols]),
+          nint = ncol(jags.data$y[,sel_cols]),
+          nform = formations_per_interval$formations_per_interval[function_stages(jags.data$y)]
+          
+        )
+        )
+        
+            
         # Set initial values
         # function inits (to be placed in each chain)
         inits <- function(){ list(z = jags.data$y,
@@ -178,11 +216,7 @@ no_cov_samples_paleo_cynodontia_binomial_run <- lapply (c ("Non-mammaliaform cyn
         
         
         ## Parameters to monitor
-        params <- c("psi1","gamma", "phi","p",
-          "FSS","SRexp","RER", "R0",
-          "CH","CH1","psi.eq", "turnover"
-          
-        )
+        params <- c("psi1","gamma", "phi","p","z", "muY", "SRexp")
         
         # MCMC runs
         # models
@@ -335,32 +369,10 @@ cat("
       
     }
       
-      
     # derived parameters
-    
-      for (t in 1:nint){
-      
-        SRexp[t] <- sum (z[,t])  # true richness estimate
-        
+    for (t in 1:nint){
+        SRexp[t] <- sum (z[,t])
       }
-  
-    
-   
-    
-   # descriptors of change
-    for (t in 2:nint){
-     
-       FSS[t] <- sum (muZ[,t])  # finite sample size
-       CH[t] <- (sum(z[,t]) - sum(z[,t-1])) ### turnover (proportional gain or loss)
-       CH1[t]<-sum(z[,t-1])
-       RER[t] <- (1-phi[t])/gamma[t] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
-       R0[t] <- (1-phi[t])-gamma[t]  ## net diversification rate (r= μ - λ; Rabosky 2018) of each time
-       psi.eq[t]<-gamma[t]/((1-phi[t])+gamma[t]) # equilibrium occupancy
-       turnover[t] <- (1 - muZ[t]) * gamma[t]/muZ[t+1]
-       
-    }
-   
-    
     
     
     }## end of the model
@@ -417,28 +429,30 @@ samples_paleo_cynodontia_binomial_run <- lapply (c ("Non-mammaliaform cynodonts"
                       
                                                             
                    # augment the dataset
-                   A0_input <- array (0, dim = c(100,
-                                                  length(time_bins)))
-                   range_input<- array(0,dim = 100)                                            
-                   temp_input<- array(0,dim = 100)                                            
-                   lat_input<- array(0,dim = 100)                                            
+                   A0_input <- array (0, dim = c(ifelse (i == "Non-mammalian Mammaliaformes",
+                                      100, # 200
+                                      100),
+                                      length(time_bins)))
+                   range_input<- array(0,dim = nrow(A0_input))                                            
+                   temp_input<- array(0,dim = nrow(A0_input))                                            
+                   lat_input<- array(0,dim = nrow(A0_input))                                            
                                                             
                                                                                                   
                  # bundle the data                                                       
                  str(jags.data <- list(
                         y =rbind (
                           
-                          data.matrix(array_genus_bin [which(array_genus_bin$clade %in% i), -c(1,2)]),
+                          data.matrix(array_genus_bin [which(clades %in% i), ]),
                           A0_input
                         ),
-                        ngen = dim(array_genus_bin [which(array_genus_bin$clade %in% i), -c(1,2)])[1] + nrow(A0_input),
-                        nint = dim(array_genus_bin [which(array_genus_bin$clade %in% i), -c(1,2)])[2],
+                        ngen = dim(array_genus_bin [which(clades %in% i), ])[1] + nrow(A0_input),
+                        nint = dim(array_genus_bin [which(clades %in% i), ])[2],
                         nform = formations_per_interval$formations_per_interval,
                         # covariates
                         # time = vectorized_occ$
                         range = c(
                           
-                            as.vector(scale(range_area_taxon[which(range_area_taxon$taxon %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"range_area"])),
+                            as.vector(scale(range_area_taxon[which(clades %in% i),"range_area"])),
                             
                             range_input),
                         
@@ -446,27 +460,48 @@ samples_paleo_cynodontia_binomial_run <- lapply (c ("Non-mammaliaform cynodonts"
                         #range_area_taxon[which(range_area_taxon$taxon %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"taxon"] == array_genus_bin [which(array_genus_bin$clade %in% i), 2]
                         lat_obs = c( 
                           
-                          as.vector(scale(observation_covariates[which(observation_covariates$unique_name %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"latitude"])),
+                          as.vector(scale(observation_covariates[which(clades %in% i),"latitude"])),
                           
                           lat_input
                         ),
-                        time = as.vector(scale(bins$mid_ma[7:length(bins$mid_ma)])),
+                        
                         temp_obs = c (
                           
-                          as.vector(scale(observation_covariates[which(observation_covariates$unique_name %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"temperature"])),
+                          as.vector(scale(observation_covariates[which(clades %in% i),"temperature"])),
                           
                           temp_input
-                        ),
-                        # time covs 
-                        temperature = as.vector(scale(time_covariates$temperature)),
-                        precipitation = as.vector(scale(time_covariates$precipitation)),
-                        area = as.vector(scale(time_covariates$area))
-                        
+                        )
                                             
                       )
                       )
                       
                 
+                 
+                 # condition the dataset to one stage before the first appearance in the fossil record, and one stage after its last appearance (detection)    
+                 
+                 
+                 # bundle conditional data
+                 str(jags.data <- list(
+                   y = jags.data$y[,function_stages(jags.data$y)],
+                   ngen = nrow (jags.data$y[,function_stages(jags.data$y)]),
+                   nint = ncol(jags.data$y[,function_stages(jags.data$y)]),
+                   
+                   # observation covs
+                   nform = formations_per_interval$formations_per_interval[function_stages(jags.data$y)],
+                   range = jags.data$range,
+                   lat_obs = jags.data$lat_obs,
+                   temp_obs = jags.data$temp_obs,
+                   # add time
+                   time = as.vector(scale(bins$mid_ma[7:length(bins$mid_ma)][function_stages(jags.data$y)])),
+                   # time covs 
+                   temperature = as.vector(scale(time_covariates$temperature[function_stages(jags.data$y)])),
+                   precipitation = as.vector(scale(time_covariates$precipitation[function_stages(jags.data$y)])),
+                   area = as.vector(scale(time_covariates$area[function_stages(jags.data$y)]))
+                   
+                 ))
+                 
+                 
+                 
                                                             
                 # Set initial values
                 # function inits (to be placed in each chain)
@@ -512,16 +547,11 @@ samples_paleo_cynodontia_binomial_run <- lapply (c ("Non-mammaliaform cynodonts"
                   "gamma",
                   "phi",
                   "p",
-                  "SRexp",
-                  "FSS",
-                  "CH",
-                  "CH1",
+                  "muY",
                   "psi1",
-                  "R0",
-                  "RER",
-                  "turnover",
-                  "psi.eq",
-                  "muY"
+                  "muY",
+                  "z",
+                  "SRexp"
                   
                 )
                 
@@ -530,7 +560,7 @@ samples_paleo_cynodontia_binomial_run <- lapply (c ("Non-mammaliaform cynodonts"
                          modelFile="global_CMRmodel_matrix_covariates.txt",
                          chains=nc, 
                          sample2save=((ni-nb)/nt), 
-                         nSaves=6, 
+                         nSaves=5, 
                          burnin=nb, 
                          thin=nt,
                          fileStub=paste ("output/global/CMR_global_binomial", i,sep="_"))
@@ -595,7 +625,7 @@ cat("
         # regression coeff
         beta.gamma.prec ~ dnorm(0, 0.01)# precipitation
         beta.gamma.temp ~ dnorm(0, 0.01)# temperature
-        beta.gamma.lat ~ dnorm(0,0.01) # latitude
+        #beta.gamma.lat ~ dnorm(0,0.01) # latitude
         beta.gamma.area ~ dnorm(0,0.01) # latitude
         
         # ----------------------
@@ -607,7 +637,7 @@ cat("
         # regression coeff
         beta.phi.prec ~ dnorm(0, 0.01)# precipitation
         beta.phi.temp ~ dnorm(0, 0.01)# temperature
-        beta.phi.lat ~ dnorm(0,0.01)
+        #beta.phi.lat ~ dnorm(0,0.01)
         beta.phi.area ~ dnorm(0,0.01)
         
        
@@ -634,13 +664,13 @@ cat("
             logit(gamma[t,i]) <-  intercept.gamma + 
                                     beta.gamma.prec*precipitation[t,i]+
                                     beta.gamma.temp*temperature[t,i]+
-                                    beta.gamma.lat*lat[i]+
+                                    #beta.gamma.lat*lat[i]+
                                     beta.gamma.area*area[t,i]
             # persistence
             logit(phi[t,i]) <-    intercept.phi + 
                                     beta.phi.prec*precipitation[t,i]+
                                     beta.phi.temp*temperature[t,i]+
-                                    beta.phi.lat*lat[i]+
+                                    #beta.phi.lat*lat[i]+
                                     beta.phi.area*area[t,i]
     
             # dynamics across genus
@@ -715,26 +745,6 @@ cat("
    }
  
     
- #  
- # # change
- 
- for (t in 2:nint) {  
-      
-        for (i in 1:nsites) {  
-         
-           FSS[t,i] <- sum (muZ[,t,i]) # finite sample size 
-           CH[t,i] <- (sum(z[,t,i]) - sum(z[,t-1,i])) ### turnover (proportional gain or loss)
-           CH1[t,i]<-sum(z[,t-1,i])
-           RER[t,i] <- (1-phi[t,i])/gamma[t,i] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
-           R0[t,i] <- (1-phi[t,i])-gamma[t,i] ## net diversification rate (r= μ - λ; Rabosky 2018) of each time
-        
-  
-     }
-  
-    }
-  
-  
-    
         
     } ## end of the model
     
@@ -747,6 +757,9 @@ sink()
 # replace NAs by a very small number
 # create dir
 dir.create (here ("output", "region"))
+
+# subset the data
+range_area_taxon <- range_area_taxon[match(genus ,range_area_taxon$taxon),]
 
 # run
 samples_paleo_cynodontia_sites_binomial_run <- lapply (c ("Non-mammaliaform cynodonts",
@@ -762,22 +775,38 @@ samples_paleo_cynodontia_sites_binomial_run <- lapply (c ("Non-mammaliaform cyno
                                               nform = as.matrix(t(formations_per_site_interval)),
                                               # covariates
                                               # time = vectorized_occ$
-                                              range = as.vector(scale(range_area_taxon[which(range_area_taxon$taxon %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"range_area"])),
-                                              #range_area_taxon[which(range_area_taxon$taxon %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"taxon"] == array_genus_bin [which(array_genus_bin$clade %in% i), 2]
-                                              lat_obs = as.vector(scale(observation_covariates[which(observation_covariates$unique_name %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"latitude"])),
-                                              time = as.vector(scale(bins$mid_ma[7:length(bins$mid_ma)])),
-                                              temp_obs = as.vector(scale(observation_covariates[which(observation_covariates$unique_name %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"temperature"])),
-                                              # lat = site_covs
-                                              temperature = (region_temperature-mean (region_temperature,na.rm=T))/sd(region_temperature,na.rm=T),
-                                              precipitation = (region_precipitation-mean (region_precipitation,na.rm=T))/sd(region_precipitation,na.rm=T),
-                                              area = (region_area-mean (region_area,na.rm=T))/sd(region_area,na.rm=T),
-                                              lat = as.vector(scale (region_latitude))
+                                              range = as.vector(scale(range_area_taxon[which(clades %in% i),"range_area"])),
+                                              lat_obs = as.vector(scale(observation_covariates[which(clades %in% i),"latitude"])),
+                                              temp_obs = as.vector(scale(observation_covariates[which(clades %in% i),"temperature"]))
                         )
                         )
-                        
-                        
+                        sel_int <- function_stages(apply (jags.data$y,c(1,2), max))
+                        # condition on the first and last appearance
+                         str(jags.data <- list(y = jags.data$y [,sel_int,],
+                                               ngen = jags.data$ngen,
+                                               nint = length(sel_int),
+                                               nsites = dim(jags.data$y)[3],
+                                               nform = as.matrix(t(formations_per_site_interval[,sel_int])),
+                                               # add time
+                                               time = as.vector(scale(bins$mid_ma[7:length(bins$mid_ma)][sel_int])),
+                                               
+                                               # covariates
+                                               # time = vectorized_occ$
+                                               range = jags.data$range,
+                                               lat_obs = jags.data$lat_obs,
+                                               temp_obs = jags.data$temp_obs,
+                                               # lat = site_covs
+                                               temperature = (region_temperature[sel_int,]-mean (region_temperature[sel_int,],na.rm=T))/sd(region_temperature[sel_int,],na.rm=T),
+                                               precipitation = (region_precipitation[sel_int,]-mean (region_precipitation[sel_int,],na.rm=T))/sd(region_precipitation[sel_int,],na.rm=T),
+                                               area = (region_area[sel_int,]-mean (region_area[sel_int,],na.rm=T))/sd(region_area[sel_int,],na.rm=T)
+                                               #lat = as.vector(scale (region_latitude))
+                         )
+                         )
+                                                            
+                                                                                                
+                                                            
                         # Set initial values
-                        z_inits<-array_genus_bin_site [which(clades %in% i),,]
+                        z_inits<-jags.data$y 
                         
                         #z_inits<-ifelse (is.na(z_inits),1,z_inits)
                         # function inits (to be placed in each chain)
@@ -785,12 +814,12 @@ samples_paleo_cynodontia_sites_binomial_run <- lapply (c ("Non-mammaliaform cyno
                                                   gamma.u = runif (1),
                                                   beta.gamma.prec = rnorm (1),
                                                   beta.gamma.temp = rnorm (1),
-                                                  beta.gamma.lat = rnorm (1),
+                                                  #beta.gamma.lat = rnorm (1),
                                                   beta.gamma.area = rnorm (1),
                                                   phi.u = runif (1),
                                                   beta.phi.prec = rnorm (1),
                                                   beta.phi.temp = rnorm (1),
-                                                  beta.phi.lat = rnorm (1),
+                                                  #beta.phi.lat = rnorm (1),
                                                   beta.phi.area = rnorm (1),
                                                   p.u = runif (1),
                                                   beta.p.time = rnorm (1),
@@ -808,29 +837,23 @@ samples_paleo_cynodontia_sites_binomial_run <- lapply (c ("Non-mammaliaform cyno
                           "intercept.gamma",
                           "beta.gamma.prec",
                           "beta.gamma.temp",
-                          "beta.gamma.lat",
+                          #"beta.gamma.lat",
                           "beta.gamma.area",
                           "intercept.phi",
                           "beta.phi.prec",
                           "beta.phi.temp",
-                          "beta.phi.lat",
+                          #"beta.phi.lat",
                           "beta.phi.area",
                           "intercept.p",
                           "beta.p.time",
                           "beta.p.range",
                           "beta.p.lat",
                           "beta.p.temp",
-                          "p",
-                          "SRexp",
-                          "FSS",
-                          "CH",
-                          "CH1",
-                          "psi1",
                           "gamma",
                           "phi",
-                          "R0",
-                          "RER",
-                          "muY"
+                          "p",
+                          "muY",
+                          "z"
                           
                         )
                         
@@ -877,311 +900,6 @@ samples_paleo_cynodontia_sites_binomial <- jags (data = jags.data,
 
 
 # ------------------------------------------------------------------------------
-
-
-#--------------------------------------------------------------------- #
-
-# - binomial model with covariates at the site/region level (random effect intercept)
-
-
-sink("regional_CMRmodel_matrix_covariates_rdm.txt")
-cat("
-   
-     
-     model {
-    
-    
-      #############################################################
-      #                                                           #
-      #                  Biological process                       #
-      #                                                           #
-      #############################################################
-      
-       # Site Occupancy Dynamics (Priors)
-       
-        # ----------------------
-        #     Gamma (origination)
-        # ----------------------
-        
-        # intercepts
-        for (i in 1:nsites) {
-        
-          intercept.phi[i]~dnorm(mu.phi[i], tau.phi[i]) # intercept persistence
-          intercept.gamma[i]~dnorm(mu.gamma[i], tau.gamma[i]) # intercept origination
-        
-        }
-        
-        # hyperpriors
-        for (i in 1:nsites) {
-          # phi
-          m.phi[i]~dunif(0,1)
-          mu.phi[i]<-logit(m.phi[i])
-          sigma.phi[i]~dunif(0,4)
-          tau.phi[i]<-1/sigma.phi[i]^2
-          
-          # gamma
-          m.gamma[i]~dunif(0,1)
-          mu.gamma[i]<-logit(m.gamma[i])
-          sigma.gamma[i]~dunif(0,4)
-          tau.gamma[i]<-1/sigma.gamma[i]^2
-          
-        }        
-        
-        # regression coeff
-        beta.gamma.prec ~ dnorm(0, 0.01)# precipitation
-        beta.gamma.temp ~ dnorm(0, 0.01)# temperature
-        beta.gamma.lat ~ dnorm(0,0.01) # latitude
-     
-        # ----------------------
-        #     Phi (persistence)
-        # ----------------------
-        
-        # regression coeff
-        beta.phi.prec ~ dnorm(0, 0.01)# precipitation
-        beta.phi.temp ~ dnorm(0, 0.01)# temperature
-        beta.phi.lat ~ dnorm(0,0.01)
-       
-        ## set initial conditions for the whole system
-        psi1 ~ dunif(0,1)
-        
-        # initial state
-        for (g in 1:ngen) {
-          for (i in 1:nsites) {
-          
-             z[g,1,i]~dbern(psi1) # occupancy status initialization
-                  
-          }
-        }
-    
-    ############      Model       #############
-   
-   # occupancy dynamics
-    
-     for (i in 1:nsites) {
-       for (t in 2:nint){
-    
-            # origination
-            logit(gamma[t,i]) <-  intercept.gamma[i] + 
-                                    beta.gamma.prec*precipitation[t,i]+
-                                    beta.gamma.temp*temperature[t,i]+
-                                    beta.gamma.lat*lat[i]
-            # persistence
-            logit(phi[t,i]) <-    intercept.phi[i] + 
-                                    beta.phi.prec*precipitation[t,i]+
-                                    beta.phi.temp*temperature[t,i]+
-                                    beta.phi.lat*lat[i]
-    
-            # dynamics across genus
-              
-            for (g in 1:ngen) {
-                    
-                # model likelihood
-                ### modeling dynamics conditional on previous time realized occurrence z
-                muZ[g,t,i] <- z[g,t-1,i] *  phi[t,i] + ### if occupied, p of not getting extinct/persist in the next time
-                              (1-z[g,t-1,i]) *  gamma[t,i] ###  if not occupied, p of originate in the next time
-                
-               # realized occurrence
-        		   z[g,t,i] ~ dbern(muZ[g,t,i])
-            
-             }#gen
-            } #stages
-          }#i sites
-      
-    
-    #############################################################
-    #                                                           #
-    #         Observation process across formations             #
-    #                                                           #
-    #############################################################
-    
-    # Priors for detection probability
-    # intercept    
-    p.u ~ dunif(0,1) # range origination
-    intercept.p <- logit(p.u) # intercept origination
-    
-    # regression coef
-    beta.p.lat ~ dnorm(0,0.01)
-    beta.p.range ~ dnorm(0,0.01)
-    beta.p.time ~ dnorm(0,0.01)
-    beta.p.temp ~ dnorm(0,0.01)
-        
-     
-    # observation submodel
-    for (g in 1:ngen) { ## loop over observations 
-      
-      for (t in 1:nint) { ## loop over observations 
-    
-          # p independent on the number of formations
-          logit(p[g,t])<- intercept.p+
-                          beta.p.lat*lat_obs[g]+
-                          beta.p.range*range[g]+
-                          beta.p.time*time[t]+
-                          beta.p.temp*temp_obs[g]
-            
-          for (i in 1:nsites) {  
-      
-              # observation process
-              # Specify the binomial observation model conditional on occupancy state
-              y[g,t,i] ~ dbin(z[g,t,i]*p[g,t], nform[t,i])
-                      
-        }
-      
-      }
-    
-    }
-    
-    # derived parameters
-    # true richness
-    for (t in 1:nint){
-       for (i in 1:nsites) {
-       
-         SRexp[t,i] <- sum (z[,t,i]) # true richness estimate
-         
-    
-    }
-   }
- 
-    
- #  
- # # change
- 
- for (t in 2:nint) {  
-      
-        for (i in 1:nsites) {  
-         
-           FSS[t,i] <- sum (muZ[,t,i]) # finite sample size 
-           CH[t,i] <- (sum(z[,t,i]) - sum(z[,t-1,i])) ### turnover (proportional gain or loss)
-           CH1[t,i]<-sum(z[,t-1,i])
-           RER[t,i] <- (1-phi[t,i])/gamma[t,i] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
-           R0[t,i] <- (1-phi[t,i])-gamma[t,i] ## net diversification rate (r= μ - λ; Rabosky 2018) of each time
-        
-  
-     }
-  
-    }
-  
-  
-    
-        
-    } ## end of the model
-    
-    ",fill = TRUE)
-sink()
-
-#  ----------------------------------------------------
-
-# bundle data
-# replace NAs by a very small number
-
-# create dir
-dir.create (here ("output", "region_rdm"))
-
-# run
-samples_paleo_cynodontia_sites_binomial_run <- lapply (c ("Non-mammaliaform cynodonts",
-                                                          "Non-mammalian Mammaliaformes",
-                                                          "Mammalia" ), function (i) {
-                                                            
-                                                            
-                                                            
-                                                            str(jags.data <- list(y = (array_genus_bin_site [which(clades %in% i),,]),
-                                                                                  ngen = dim(array_genus_bin_site [which(clades %in% i),,])[1],
-                                                                                  nint = dim(array_genus_bin_site [which(clades %in% i),,])[2],
-                                                                                  nsites = dim(array_genus_bin_site [which(clades %in% i),,])[3],
-                                                                                  nform = as.matrix(t(formations_per_site_interval)),
-                                                                                  # covariates
-                                                                                  # time = vectorized_occ$
-                                                                                  range = as.vector(scale(range_area_taxon[which(range_area_taxon$taxon %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"range_area"])),
-                                                                                  #range_area_taxon[which(range_area_taxon$taxon %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"taxon"] == array_genus_bin [which(array_genus_bin$clade %in% i), 2]
-                                                                                  lat_obs = as.vector(scale(observation_covariates[which(observation_covariates$unique_name %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"latitude"])),
-                                                                                  time = as.vector(scale(bins$mid_ma[7:length(bins$mid_ma)])),
-                                                                                  temp_obs = as.vector(scale(observation_covariates[which(observation_covariates$unique_name %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"temperature"])),
-                                                                                  # lat = site_covs
-                                                                                  temperature = (region_temperature-mean (region_temperature,na.rm=T))/sd(region_temperature,na.rm=T),
-                                                                                  precipitation = (region_precipitation-mean (region_precipitation,na.rm=T))/sd(region_precipitation,na.rm=T),
-                                                                                  lat = as.vector(scale (region_latitude))
-                                                            )
-                                                            )
-                                                            
-                                                            
-                                                            # Set initial values
-                                                            z_inits<-array_genus_bin_site [which(clades %in% i),,]
-                                                            
-                                                            #z_inits<-ifelse (is.na(z_inits),1,z_inits)
-                                                            # function inits (to be placed in each chain)
-                                                            inits <- function(){ list(z=z_inits,
-                                                                                      beta.gamma.prec = rnorm (1),
-                                                                                      beta.gamma.temp = rnorm (1),
-                                                                                      beta.phi.prec = rnorm (1),
-                                                                                      beta.phi.temp = rnorm (1),
-                                                                                      p.u = runif (1),
-                                                                                      beta.p.time = rnorm (1),
-                                                                                      beta.p.range = rnorm (1),
-                                                                                      beta.p.lat = rnorm (1),
-                                                                                      beta.p.temp = rnorm (1),
-                                                                                      psi1 = runif (1)
-                                                            )}
-                                                            
-                                                            
-                                                            ## Parameters to monitor
-                                                            ## long form
-                                                            params <- c(
-                                                              
-                                                              "intercept.gamma",
-                                                              "sigma.gamma",
-                                                              "beta.gamma.prec",
-                                                              "beta.gamma.temp",
-                                                              "beta.gamma.lat",
-                                                              "intercept.phi",
-                                                              "sigma.phi",
-                                                              "beta.phi.prec",
-                                                              "beta.phi.temp",
-                                                              "beta.phi.lat",
-                                                              "intercept.p",
-                                                              "beta.p.time",
-                                                              "beta.p.range",
-                                                              "beta.p.lat",
-                                                              "beta.p.temp",
-                                                              "p",
-                                                              "SRexp",
-                                                              "FSS",
-                                                              "CH",
-                                                              "CH1",
-                                                              "psi1",
-                                                              "gamma",
-                                                              "phi"
-                                                              
-                                                              
-                                                            )
-                                                            
-                                                            
-                                                            # MCMC runs
-                                                            # run save jags
-                                                            samples_paleo_cynodontia_sites_binomial_rdm <- saveJAGS(jags.data, inits, params, 
-                                                                                                                modelFile="regional_CMRmodel_matrix_covariates_rdm.txt",
-                                                                                                                chains=nc, 
-                                                                                                                sample2save=((ni-nb)/nt), 
-                                                                                                                nSaves=5, 
-                                                                                                                burnin=nb, 
-                                                                                                                thin=nt,
-                                                                                                                fileStub=paste ("output/region_rdm/CMR_regional_binomial_rdm", i,sep="_"))
-                                                            
-                                                            
-                                                          })
-
-
-# usual jags to test
-samples_paleo_cynodontia_sites_binomial_rdm <- jags (data = jags.data, 
-                                                 parameters.to.save = params, 
-                                                 model.file = "regional_CMRmodel_matrix_covariates_rdm.txt", 
-                                                 inits = inits, 
-                                                 n.chains = nc, 
-                                                 n.thin = nt, 
-                                                 n.iter = ni, 
-                                                 n.burnin = nb, 
-                                                 DIC = T,  
-                                                 n.cores=nc,
-                                                 parallel=F
-)
 
 # ------------------------------------------------------------------------------
 # region with area effect
@@ -1238,7 +956,7 @@ cat("
         beta.gamma.prec ~ dnorm(0, 0.01)# precipitation
         beta.gamma.temp ~ dnorm(0, 0.01)# temperature
         beta.gamma.area ~ dnorm(0, 0.01)# temperature
-        beta.gamma.lat ~ dnorm(0,0.01) # latitude
+        #beta.gamma.lat ~ dnorm(0,0.01) # latitude
      
         # ----------------------
         #     Phi (persistence)
@@ -1248,7 +966,7 @@ cat("
         beta.phi.prec ~ dnorm(0, 0.01)# precipitation
         beta.phi.temp ~ dnorm(0, 0.01)# temperature
         beta.phi.area ~ dnorm(0, 0.01)# temperature
-        beta.phi.lat ~ dnorm(0,0.01)
+        #beta.phi.lat ~ dnorm(0,0.01)
        
         ## set initial conditions for the whole system
         psi1 ~ dunif(0,1)
@@ -1273,14 +991,14 @@ cat("
             logit(gamma[t,i]) <-  intercept.gamma[i] + 
                                     beta.gamma.prec*precipitation[t,i]+
                                     beta.gamma.temp*temperature[t,i]+
-                                    beta.gamma.lat*lat[i]+
+                                    #beta.gamma.lat*lat[i]+
                                     beta.gamma.area*area[t,i]
                                     
             # persistence
             logit(phi[t,i]) <-    intercept.phi[i] + 
                                     beta.phi.prec*precipitation[t,i]+
                                     beta.phi.temp*temperature[t,i]+
-                                    beta.phi.lat*lat[i]+
+                                    #beta.phi.lat*lat[i]+
                                     beta.phi.area*area[t,i]
     
             # dynamics across genus
@@ -1334,8 +1052,8 @@ cat("
       
               # observation process
               # Specify the binomial observation model conditional on occupancy state
-              y[g,t,i] ~ dbin(z[g,t,i]*p[g,t], nform[t,i])
-                      
+              y[g,t,i] ~ dbin(muY[g,t,i], nform[t,i])
+              muY[g,t,i] <- z[g,t,i]*p[g,t]
         }
       
       }
@@ -1357,22 +1075,22 @@ cat("
  #  
  # # change
  
- for (t in 2:nint) {  
-      
-        for (i in 1:nsites) {  
-         
-           FSS[t,i] <- sum (muZ[,t,i]) # finite sample size 
-           CH[t,i] <- (sum(z[,t,i]) - sum(z[,t-1,i])) ### turnover (proportional gain or loss)
-           CH1[t,i]<-sum(z[,t-1,i])
-           RER[t,i] <- (1-phi[t,i])/gamma[t,i] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
-           R0[t,i] <- (1-phi[t,i])-gamma[t,i] ## net diversification rate (r= μ - λ; Rabosky 2018) of each time
-           psi.eq[t,i]<-gamma[t,i]/((1-phi[t,i])+gamma[t,i]) # equilibrium occupancy
-           turnover[t,i]<-(gamma[t,i]*(1-phi[t,i]))/(gamma[t,i]+(1-phi[t,i]))
-       
-  
-     }
-  
-    }
+#for (t in 2:nint) {  
+#     
+#       for (i in 1:nsites) {  
+#        
+#          FSS[t,i] <- sum (muZ[,t,i]) # finite sample size 
+#          CH[t,i] <- (sum(z[,t,i]) - sum(z[,t-1,i])) ### turnover (proportional gain or loss)
+#          CH1[t,i]<-sum(z[,t-1,i])
+#          RER[t,i] <- (1-phi[t,i])/gamma[t,i] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
+#          R0[t,i] <- (1-phi[t,i])-gamma[t,i] ## net diversification rate (r= μ - λ; Rabosky 2018) of each time
+#          psi.eq[t,i]<-gamma[t,i]/((1-phi[t,i])+gamma[t,i]) # equilibrium occupancy
+#          turnover[t,i]<-(gamma[t,i]*(1-phi[t,i]))/(gamma[t,i]+(1-phi[t,i]))
+#      
+# 
+#    }
+# 
+#   }
   
   
     
@@ -1395,8 +1113,6 @@ samples_paleo_cynodontia_sites_binomial_run <- lapply (c ("Non-mammaliaform cyno
                                                           "Non-mammalian Mammaliaformes",
                                                           "Mammalia" ), function (i) {
                                                             
-                                                            
-                                                            
                                                             str(jags.data <- list(y = (array_genus_bin_site [which(clades %in% i),,]),
                                                                                   ngen = dim(array_genus_bin_site [which(clades %in% i),,])[1],
                                                                                   nint = dim(array_genus_bin_site [which(clades %in% i),,])[2],
@@ -1404,34 +1120,52 @@ samples_paleo_cynodontia_sites_binomial_run <- lapply (c ("Non-mammaliaform cyno
                                                                                   nform = as.matrix(t(formations_per_site_interval)),
                                                                                   # covariates
                                                                                   # time = vectorized_occ$
-                                                                                  range = as.vector(scale(range_area_taxon[which(range_area_taxon$taxon %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"range_area"])),
-                                                                                  #range_area_taxon[which(range_area_taxon$taxon %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"taxon"] == array_genus_bin [which(array_genus_bin$clade %in% i), 2]
-                                                                                  lat_obs = as.vector(scale(observation_covariates[which(observation_covariates$unique_name %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"latitude"])),
-                                                                                  time = as.vector(scale(bins$mid_ma[7:length(bins$mid_ma)])),
-                                                                                  temp_obs = as.vector(scale(observation_covariates[which(observation_covariates$unique_name %in% array_genus_bin [which(array_genus_bin$clade %in% i), 2]),"temperature"])),
+                                                                                  range = as.vector(scale(range_area_taxon[which(clades %in% i),"range_area"])),
+                                                                                  lat_obs = as.vector(scale(observation_covariates[which(clades %in% i),"latitude"])),
+                                                                                  temp_obs = as.vector(scale(observation_covariates[which(clades %in% i),"temperature"]))
+                                                            )
+                                                            )
+                                                            sel_int <- function_stages(apply (jags.data$y,c(1,2), max))
+                                                            # condition on the first and last appearance
+                                                            str(jags.data <- list(y = jags.data$y [,sel_int,],
+                                                                                  ngen = jags.data$ngen,
+                                                                                  nint = length(sel_int),
+                                                                                  nsites = dim(jags.data$y)[3],
+                                                                                  nform = as.matrix(t(formations_per_site_interval[,sel_int])),
+                                                                                  # add time
+                                                                                  time = as.vector(scale(bins$mid_ma[7:length(bins$mid_ma)][sel_int])),
+                                                                                  
+                                                                                  # covariates
+                                                                                  # time = vectorized_occ$
+                                                                                  range = jags.data$range,
+                                                                                  lat_obs = jags.data$lat_obs,
+                                                                                  temp_obs = jags.data$temp_obs,
                                                                                   # lat = site_covs
-                                                                                  temperature = (region_temperature-mean (region_temperature,na.rm=T))/sd(region_temperature,na.rm=T),
-                                                                                  precipitation = (region_precipitation-mean (region_precipitation,na.rm=T))/sd(region_precipitation,na.rm=T),
-                                                                                  area = (region_area-mean (region_area,na.rm=T))/sd(region_area,na.rm=T),
-                                                                                  lat = as.vector(scale (region_latitude))
+                                                                                  temperature = (region_temperature[sel_int,]-mean (region_temperature[sel_int,],na.rm=T))/sd(region_temperature[sel_int,],na.rm=T),
+                                                                                  precipitation = (region_precipitation[sel_int,]-mean (region_precipitation[sel_int,],na.rm=T))/sd(region_precipitation[sel_int,],na.rm=T),
+                                                                                  area = (region_area[sel_int,]-mean (region_area[sel_int,],na.rm=T))/sd(region_area[sel_int,],na.rm=T)
+                                                                                  #lat = as.vector(scale (region_latitude))
                                                             )
                                                             )
+                                                            
                                                             
                                                             
                                                             # Set initial values
-                                                            z_inits<-array_genus_bin_site [which(clades %in% i),,]
+                                                            z_inits<-jags.data$y 
                                                             
                                                             #z_inits<-ifelse (is.na(z_inits),1,z_inits)
                                                             # function inits (to be placed in each chain)
                                                             inits <- function(){ list(z=z_inits,
+                                                                                      gamma.u = runif (1),
                                                                                       beta.gamma.prec = rnorm (1),
                                                                                       beta.gamma.temp = rnorm (1),
+                                                                                      #beta.gamma.lat = rnorm (1),
                                                                                       beta.gamma.area = rnorm (1),
-                                                                                      beta.gamma.lat = rnorm (1),
+                                                                                      phi.u = runif (1),
                                                                                       beta.phi.prec = rnorm (1),
                                                                                       beta.phi.temp = rnorm (1),
+                                                                                      #beta.phi.lat = rnorm (1),
                                                                                       beta.phi.area = rnorm (1),
-                                                                                      beta.phi.lat = rnorm (1),
                                                                                       p.u = runif (1),
                                                                                       beta.p.time = rnorm (1),
                                                                                       beta.p.range = rnorm (1),
@@ -1444,39 +1178,30 @@ samples_paleo_cynodontia_sites_binomial_run <- lapply (c ("Non-mammaliaform cyno
                                                             ## Parameters to monitor
                                                             ## long form
                                                             params <- c(
-                                                              "m.phi",
-                                                              "m.gamma",
+                                                              
                                                               "intercept.gamma",
-                                                              "sigma.gamma",
                                                               "beta.gamma.prec",
                                                               "beta.gamma.temp",
-                                                              "beta.gamma.lat",
+                                                              # "beta.gamma.lat",
                                                               "beta.gamma.area",
                                                               "intercept.phi",
-                                                              "sigma.phi",
                                                               "beta.phi.prec",
                                                               "beta.phi.temp",
-                                                              "beta.phi.lat",
+                                                              #"beta.phi.lat",
                                                               "beta.phi.area",
                                                               "intercept.p",
                                                               "beta.p.time",
                                                               "beta.p.range",
                                                               "beta.p.lat",
                                                               "beta.p.temp",
-                                                              "p",
-                                                              "SRexp",
-                                                              "FSS",
-                                                              "CH",
-                                                              "CH1",
-                                                              "psi1",
                                                               "gamma",
                                                               "phi",
-                                                              "psi.eq",
-                                                              "turnover"
-                                                              
+                                                              "p",
+                                                              "SRexp",
+                                                              "muY",
+                                                              "z"
                                                               
                                                             )
-                                                            
                                                             
                                                             # MCMC runs
                                                             # run save jags
@@ -1484,7 +1209,7 @@ samples_paleo_cynodontia_sites_binomial_run <- lapply (c ("Non-mammaliaform cyno
                                                                                                                     modelFile="regional_CMRmodel_matrix_covariates_rdm_area.txt",
                                                                                                                     chains=nc, 
                                                                                                                     sample2save=((ni-nb)/nt), 
-                                                                                                                    nSaves=5, 
+                                                                                                                    nSaves=6, 
                                                                                                                     burnin=nb, 
                                                                                                                     thin=nt,
                                                                                                                     fileStub=paste ("output/region_rdm_area/CMR_regional_binomial_rdm", i,sep="_"))
@@ -1493,18 +1218,28 @@ samples_paleo_cynodontia_sites_binomial_run <- lapply (c ("Non-mammaliaform cyno
                                                           })
 
 
+# extend chains
+newRes <-lapply (c ("Non-mammaliaform cynodonts",
+                    "Non-mammalian Mammaliaformes",
+                    "Mammalia" ), function (i) {
+                      
+                      newRes <- resumeJAGS(fileStub=
+                                             paste ("output/region_rdm_area/CMR_regional_binomial_rdm", i,sep="_"),
+                                           nSaves=3)
+                    })
+
 # usual jags to test
 samples_paleo_cynodontia_sites_binomial_rdm_area <- jags (data = jags.data, 
-                                                     parameters.to.save = params, 
-                                                     model.file = "regional_CMRmodel_matrix_covariates_rdm_area.txt", 
-                                                     inits = inits, 
-                                                     n.chains = nc, 
-                                                     n.thin = nt, 
-                                                     n.iter = ni, 
-                                                     n.burnin = nb, 
-                                                     DIC = T,  
-                                                     n.cores=nc,
-                                                     parallel=F
+                                                          parameters.to.save = params, 
+                                                          model.file = "regional_CMRmodel_matrix_covariates_rdm_area.txt", 
+                                                          inits = inits, 
+                                                          n.chains = nc, 
+                                                          n.thin = nt, 
+                                                          n.iter = ni, 
+                                                          n.burnin = nb, 
+                                                          DIC = T,  
+                                                          n.cores=nc,
+                                                          parallel=F
 )
 
 
