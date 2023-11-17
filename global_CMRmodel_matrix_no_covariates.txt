@@ -15,7 +15,7 @@
        
        # intercepts
        # gamma
-       for (t in 1:nint) {
+       for (t in 2:nint) {
        
          phi[t]~dunif(0,1)
          gamma[t]~dunif(0,1)
@@ -71,11 +71,13 @@
     
             # observation
             # Specify the binomial observation model conditional on occupancy state
-            y [g,t] ~ dbin(z[g,t]*p[t], nform[t])
-                  
+            y [g,t] ~ dbin(muY[g,t],nform[t])
+            muY[g,t] <- z[g,t]*p[t]      
                   
                 }
         }
+      
+     
       
     # derived parameters
     for (t in 1:nint){
@@ -83,24 +85,6 @@
       }
     
     
-        
-   # descriptors of change
-   for (t in 2:nint) {  
-     
-     
-       FSS[t] <- sum (muZ[,t])  # finite sample size
-       CH[t] <- (sum(z[,t]) - sum(z[,t-1])) ### turnover (proportional gain or loss)
-       CH1[t]<-sum(z[,t-1])
-       RER[t] <- (1-phi[t])/gamma[t] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
-       R0[t] <- (1-phi[t])-gamma[t]  ## net diversification rate (r= μ - λ; Rabosky 2018) of each time
-       
-    }
-    
-    
     }## end of the model
-    
-    
-
-    
     
     

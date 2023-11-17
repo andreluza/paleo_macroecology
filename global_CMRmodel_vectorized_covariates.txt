@@ -11,73 +11,78 @@
       
        # Site Occupancy Dynamics (Priors)
        
-             # intercepts
-             # gamma
-             intercept.gamma ~ dnorm(0, 0.001)
-             # phi
-             intercept.phi ~ dnorm(0, 0.001)
-
-            # ----------------------
-            #     Gamma (origination)
-            # ----------------------
-            # regression coefficients
-            beta.gamma.prec ~ dnorm(0, 0.001)# precipitation
-            beta.gamma.temp ~ dnorm(0, 0.001)# temperature
-            
-            # ----------------------
-            #     Phi (persistence)
-            # ----------------------
-            beta.phi.prec ~ dnorm(0, 0.001)# precipitation
-            beta.phi.temp ~ dnorm(0, 0.001)# temperature
-            
-            
-            ## set initial conditions for each genus
-            psi1 ~ dunif(0,1)
-           
-       
-       
-   ############      Model       #############
-   
-   # model for phi and gamma
-   ### model dynamic parameters
-    
-    for (t in 2:nint){
-  
-         # speciation
-         logit(gamma[t]) <-  intercept.gamma + 
-                               beta.gamma.prec*precipitation[t]+
-                               beta.gamma.temp*temperature[t]
-                                     
-          # persistence
-          logit(phi[t]) <-  intercept.phi + 
-                              beta.phi.prec*precipitation[t]+
-                              beta.phi.temp*temperature[t]
-                                              
-    }
-   
-                 
-    # occupancy dynamics
+        # ----------------------
+        #     Gamma (origination)
+        # ----------------------
+        # intercepts
+        gamma.u ~ dunif(0,1) # range origination
+        intercept.gamma <- logit(gamma.u) # intercept origination
+        # regression coeff
+        beta.gamma.prec ~ dnorm(0, 0.01)# precipitation
+        beta.gamma.temp ~ dnorm(0, 0.01)# temperature
+        beta.gamma.area ~ dnorm(0,0.01) # latitude
+        
      
-      for (g in 1:ngen) {
+        # ----------------------
+        #     Phi (persistence)
+        # ----------------------
+        # intercepts
+        phi.u ~ dunif(0,1) # range persistence
+        intercept.phi <- logit(phi.u) # intercept persistence
+        # regression coeff
+        beta.phi.prec ~ dnorm(0, 0.01)# precipitation
+        beta.phi.temp ~ dnorm(0, 0.01)# temperature
+        beta.phi.area ~ dnorm(0,0.01) # area
        
-          z[g,1]~dbern(psi1) # occupancy status initialization
-    
-              for (t in 2:nint){
-            
-                # model likelihood
-                ### modeling dynamics conditional on previous time realized occurrence z
-                muZ[g,t] <- z[g,t-1] *  phi[t] + ### if occupied, p of not getting extinct/persist in the next time
-                              (1-z[g,t-1]) *  gamma[t] ###  if not occupied, p of originate in the next time
+        ## set initial conditions for each genus
+        psi1 ~ dunif(0,1)
+           
+           
+       ############      Model       #############
+       
+       # model for phi and gamma
+       ### model dynamic parameters
+        
+        for (t in 2:nint){
+      
+             # speciation
+             logit(gamma[t]) <-  intercept.gamma + 
+                                   beta.gamma.prec*precipitation[t]+
+                                   beta.gamma.temp*temperature[t]+
+                                   beta.gamma.area*area[t]
+                                   
+                                         
+              # persistence
+              logit(phi[t]) <-  intercept.phi + 
+                                  beta.phi.prec*precipitation[t]+
+                                  beta.phi.temp*temperature[t]+
+                                  beta.phi.area*area[t]
+                                                  
+        }
+       
+                     
+        # occupancy dynamics
+         
+          for (g in 1:ngen) {
+           
+              z[g,1]~dbern(psi1) # occupancy status initialization
+        
+                  for (t in 2:nint){
                 
-               # realized occurrence
-        		   z[g,t] ~ dbern(muZ[g,t])
-            
-        }#t
+                    # model likelihood
+                    ### modeling dynamics conditional on previous time realized occurrence z
+                    muZ[g,t] <- z[g,t-1] *  phi[t] + ### if occupied, p of not getting extinct/persist in the next time
+                                  (1-z[g,t-1]) *  gamma[t] ###  if not occupied, p of originate in the next time
+                    
+                   # realized occurrence
+            		   z[g,t] ~ dbern(muZ[g,t])
+                
+            }#t
+          
+           
+          
+          } #g
       
-       
-      
-      } #g
-  
 
   
     #############################################################
@@ -86,13 +91,14 @@
     #                                                           #
     #############################################################
     
-    ###  detection intercept
-        
-        intercept.p ~ dnorm(0,0.001)
-        beta.p.lat ~ dnorm(0,0.001)
-        beta.p.range ~ dnorm(0,0.001)
-        beta.p.time ~ dnorm(0,0.001)
-        beta.p.temp ~ dnorm(0,0.001)
+       ###  detection intercept
+        # intercept    
+        p.u ~ dunif(0,1) # range origination
+        intercept.p <- logit(p.u) # intercept origination
+        beta.p.lat ~ dnorm(0,0.01)
+        beta.p.range ~ dnorm(0,0.01)
+        beta.p.time ~ dnorm(0,0.01)
+        beta.p.temp ~ dnorm(0,0.01)
         
     
      
@@ -110,6 +116,7 @@
           # observation
           # Specify the binomial observation model conditional on occupancy state
           y[n] ~ dbin(z[genus[n],stage[n]]*p[n], nform[n])
+                  
                   
         }
       

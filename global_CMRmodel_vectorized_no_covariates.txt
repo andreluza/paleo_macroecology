@@ -12,48 +12,39 @@
     # Site Occupancy Dynamics (Priors)
     
     
-   for (k in 1:ntaxa) {  
-       
-      ## set initial conditions for each taxon
-      psi1[k] ~ dunif(0,1)
-      #psi1[k] ~ dbeta(a[k],b[k])
-      # Specify the hyperparameters for the Beta distribution
-      #a[k] ~ dunif (0,100)   # probability of success
-      #b[k] ~ dunif (0,100)   # probability of failures
-      
-       
-       for (t in 1:nint) {
+   ## set initial conditions for each taxon
+   psi1 ~ dunif(0,1)
+    
+    # dynamic params   
+    for (t in 2:nint) {
         
-          gamma [k,t]~dunif(0,1)
-          phi [k,t]~dunif(0,1)
+          gamma [t]~dunif(0,1)
+          phi [t]~dunif(0,1)
         
-        }
+        
    }
    
    ############      Model       #############
     
-    for (k in 1:ntaxa){
+    for (g in 1:ngen) {
     
-      for (g in 1:ngen) {
-    
-          z[k,g,1]~dbern(psi1[k]) # occupancy status initialization
+          z[g,1]~dbern(psi1) # occupancy status initialization
     
               for (t in 2:nint){
             
                 # model likelihood
                 ### modeling dynamics conditional on previous time realized occurrence z
-                muZ[k,g,t] <- z[k,g,t-1] *  phi[k,t] + ### if occupied, p of not getting extinct/persist in the next time
-                              (1-z[k,g,t-1]) *  gamma[k,t] ###  if not occupied, p of originate in the next time
+                muZ[g,t] <- z[g,t-1] *  phi[t] + ### if occupied, p of not getting extinct/persist in the next time
+                              (1-z[g,t-1]) *  gamma[t] ###  if not occupied, p of originate in the next time
                 
-        # realized occurrence
-		    z[k,g,t] ~ dbern(muZ[k,g,t])
-    
+          # realized occurrence
+  		    z[g,t] ~ dbern(muZ[g,t])
+      
         } # t
         
       } # g
       
-    } # k
-    
+
    
     #############################################################
     #                                                           #
@@ -61,62 +52,39 @@
     #                                                           #
     #############################################################
     
-   
-    ###  detection intercept
-    for (k in 1:ntaxa) {
-        
-      # Specify the hyperparameters for the Beta distribution
-      #a.d[k] ~ dunif (0,100)   # probability of success
-      #b.d[k] ~ dunif (0,100)   # probability of failures
-        
-        for (t in 1:nint) {
-        
-            p[k,t] ~ dunif (0,1)
-        
-            #p[k,t] ~ dbeta(a.d[k],b.d[k])
-              
-        }
-        
-    }
-    
-    
-    
-     
+  
     # observation submodel
     for (n in 1:nobs) { ## loop over observations 
     
-         
+        p[n] ~ dunif (0,1)
         # observation
         # Specify the binomial observation model conditional on occupancy state
-        y[n] ~ dbin(z[taxon[n],genus[n],stage[n]]*p[taxon[n],stage[n]], nform[n])
+        y[n] ~ dbin(z[genus[n],stage[n]]*p[n], nform[n])
                   
        }     
    
       
-      
-      
-    # derived parameters
-    for (k in 1:ntaxa) {
-      for (t in 1:nint){
-      
-        SRexp[k,t] <- sum (z[k,,t]) # true richness estimate
-        
-      }
-    }
-    
-   # descriptors of change
-   for (k in 1:ntaxa) {
-    
-    for (t in 2:nint){
-       FSS[k,t] <- sum (muZ[k,,t]) # finite sample size
-       CH[k,t] <- (sum(z[k,,t]) - sum(z[k,,t-1])) ### turnover (proportional gain or loss)
-       CH1[k,t]<-sum(z[k,,t-1])
-       RER[k,t] <- (1-phi[k,t])/gamma[k,t] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
-       R0[k,t] <- (1-phi[k,t])-gamma[k,t]  ## net diversification rate (r= μ - λ; Rabosky 2018) of each time
+   # derived parameters
+   for (t in 1:nint){
+     
+       SRexp[t] <- sum (z[,t])  # true richness estimate
        
-    }
+     }
+  
+
+  
+   # descriptors of change
+   for (t in 2:nint){
+    
+      FSS[t] <- sum (muZ[,t])  # finite sample size
+      CH[t] <- (sum(z[,t]) - sum(z[,t-1])) ### turnover (proportional gain or loss)
+      CH1[t]<-sum(z[,t-1])
+      RER[t] <- (1-phi[t])/gamma[t] ## relative extinction rate (μ/λ; Rabosky 2018) of each time
+      R0[t] <- (1-phi[t])-gamma[t]  ## net diversification rate (r= μ - λ; Rabosky 2018) of each time
+      
+   }
    
-   } 
+    
         
     }## end of the model
     
