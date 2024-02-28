@@ -11,8 +11,17 @@
       #                                                           #
       #############################################################
       
+      # prior to describe the full community size
+      omega~dunif(0,1)
+      
+      # superpopulation process
+      for (g in 1:ngen) {
+        
+        w[g]~dbern(omega)
+        
+      }
+      
        # Site Occupancy Dynamics (Priors)
-       
        # intercepts
        # gamma
        for (t in 2:nint) {
@@ -25,32 +34,32 @@
        ## set initial conditions for each genus
        psi1 ~ dunif(0,1)
      
-    
-    ############      Model       #############
+   ############      Model       #############
    
    # model for phi and gamma
    ### model dynamic parameters
-  
-  for (g in 1:ngen) {
-       
-          z[g,1]~dbern(psi1) # occupancy status initialization
     
-              for (t in 2:nint){
-    
-                # model likelihood
-                ### modeling dynamics conditional on previous time realized occurrence z
-                muZ[g,t] <- z[g,t-1] *  phi[t] + ### if occupied, p of not getting extinct/persist in the next time
+    for (g in 1:ngen) {
+         
+            z[g,1]~dbern(psi1) # occupancy status initialization
+      
+                for (t in 2:nint){
+      
+                  # model likelihood
+                  ### modeling dynamics conditional on previous time realized occurrence z
+                  muZ[g,t] <- z[g,t-1] *  phi[t] + ### if occupied, p of not getting extinct/persist in the next time
                               (1-z[g,t-1]) *  gamma[t] ###  if not occupied, p of originate in the next time
-                
-               # realized occurrence
-        		   z[g,t] ~ dbern(muZ[g,t])
-            
-        }#t
-      
-       
-      
-      } #g
-  
+                  
+                 # realized occurrence
+                 muZW[g,t] <- muZ[g,t]*w[g]
+          		   z[g,t] ~ dbern(muZW[g,t])
+              
+          }#t
+        
+         
+        
+        } #g
+    
   
     #############################################################
     #                                                           #
@@ -83,6 +92,9 @@
     for (t in 1:nint){
         SRexp[t] <- sum (z[,t])
       }
+    
+    # total metacommunity size
+    Ntotal <- sum(w[])
     
     
     }## end of the model
