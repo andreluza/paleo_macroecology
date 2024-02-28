@@ -14,7 +14,7 @@ library(jagsUI)
 library(R2WinBUGS) 
 #devtools::install_github("mikemeredith/saveJAGS")
 require(saveJAGS)
-
+require(bayestestR)
 
 # load paleoDEM dataset
 library(ncdf4) # package for netcdf manipulation

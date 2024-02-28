@@ -12,8 +12,6 @@
 
 # ======================================================
 
-# =====================================================
-
 # load packages
 source("R/packages.R")
 
@@ -23,7 +21,6 @@ source("R/packages.R")
 load (here ("processed_data", "brick_rasters_elevation.RData"))
 load (here ("processed_data", "brick_rasters_precipitation.RData"))
 load (here ("processed_data", "brick_rasters_temp.RData"))
-
 
 # load fossil data
 load(here ("processed_data","CMR_data.RData"))
@@ -35,11 +32,8 @@ intervals <- openxlsx::read.xlsx (here ("data", "periods_intervals_ages.xlsx"))
 #rev_order <- rev(intervals$Interval)
 #intervals <- intervals [match (intervals$Interval, rev_order),]
 
-
-
 # bind missing stages
 # apply to each raster
-
 raster_imputation <- lapply (list(brick_rasters,
                                  brick_rasters_paleoprec,
                                  brick_rasters_paleotemp), function (layer) {
@@ -77,6 +71,7 @@ names (raster_imputation[[1]]) == names (raster_imputation[[3]])
 names (raster_imputation[[2]]) == names (raster_imputation[[3]])
 
 # precipitation and temperature in land
+elevation_raster_continuous <- raster_imputation[[1]]
 elevation_raster <- raster_imputation[[1]]
 precipitation_raster <- raster_imputation[[2]]
 temperature_raster <- raster_imputation[[3]]
@@ -96,8 +91,11 @@ temperature_raster <- temperature_raster[[which(names(temperature_raster) %in%
                                                       bins$interval_name [7:length(bins$interval_name)])]]
 elevation_raster <- elevation_raster[[which(names(elevation_raster) %in% 
                                              bins$interval_name [7:length(bins$interval_name)])]]
-# make a dataframe
+elevation_raster_continuous <- elevation_raster_continuous[[which(names(elevation_raster_continuous) %in% 
+                                              bins$interval_name [7:length(bins$interval_name)])]]
 
+
+# make a dataframe
 table(is.na(values(temperature_raster[[1]])))
 table(is.na(values(precipitation_raster[[1]])))
 
@@ -130,7 +128,16 @@ df_var <- lapply (seq(1,dim(temperature_raster)[3]), function (i){
                         "temperature_sd" = sd(values(temperature_raster[[i]]),na.rm=T),
                         "precipitation_sd" = sd(values(precipitation_raster[[i]]),na.rm=T),
                         "stage" = names (precipitation_raster)[i],
-                        "area" = sum (values(elevation_raster[[i]])>0,na.rm=T)*prod(res(elevation_raster[[i]])))
+                        "area" = sum (values(elevation_raster[[i]])>0,na.rm=T)*prod(res(elevation_raster[[i]])),
+                        "coastalLine" = table(values(clamp(elevation_raster_continuous[[i]], 
+                                                           
+                                                           lower=-700, 
+                                                           
+                                                           upper=0, 
+                                                           
+                                                           useValues=F))
+                                              <0)[2]
+                        )
   
   }
   
@@ -141,6 +148,7 @@ time_covariates <- do.call(rbind,df_var)
 cor.test(time_covariates$temperature,time_covariates$precipitation)
 cor.test(time_covariates$temperature,time_covariates$area)
 cor.test(time_covariates$precipitation,time_covariates$area)
+cor.test(time_covariates$coastalLine,time_covariates$area)
 
 
 # -----------------------------------
@@ -266,11 +274,16 @@ vectorized_occ_global$time <- bins$mid_ma[match (vectorized_occ_global$stage,
                                                  bins$bin)]
 
 
+# choose lat band
+bins_lat <- data.frame (bin = 1,
+                        max = 20,
+                        mid = 0,
+                        min = -20)
 
-# 
 #  variables at site level (latitudinal bin)
-site_covs <-  lapply (seq(1,nrow(bins_lat)), function (k)
-    
+#site_covs <-  lapply (seq(1,nrow(bins_lat[4:6,])), function (k)
+site_covs <-  lapply (nrow(bins_lat), function (k)
+  
                                 do.call(rbind,
                                         lapply (seq(1,dim(precipitation_raster)[3]), function (i) {
                               
@@ -279,13 +292,21 @@ site_covs <-  lapply (seq(1,nrow(bins_lat)), function (k)
                                     a.temp <- crop(temperature_raster, e)
                                     a.prec <- crop(precipitation_raster, e)
                                     a.elev <- crop(elevation_raster, e)
-                                    
+                                    a.elev.cont <- crop(brick_rasters, e)
                                     
                                     df_var <- data.frame ("temperature" = mean(values(a.temp[[i]]),na.rm=T),
                                                           "precipitation" = mean(values(a.prec[[i]]),na.rm=T),
                                                           "temperature_sd" = sd(values(a.temp[[i]]),na.rm=T),
                                                           "precipitation_sd" = sd(values(a.prec[[i]]),na.rm=T),
                                                           "area" =  sum (values(a.elev[[i]])>0,na.rm=T)*prod(res(a.elev[[i]])),
+                                                          "coastalLine" = table(values(clamp(a.elev.cont[[i]], 
+                                                                                             
+                                                                                             lower=-700, 
+                                                                                             
+                                                                                             upper=0, 
+                                                                                             
+                                                                                             useValues=F))
+                                                                                <0)[2],
                                                           "stage" = names (precipitation_raster)[i],
                                                           "lat_min" = bins_lat[k,4],
                                                           "lat_mid" = bins_lat[k,3],
@@ -307,14 +328,7 @@ region_precipitation <- sapply (site_covs, "[[", "precipitation")
 region_precipitation_sd <- sapply (site_covs, "[[", "precipitation_sd")
 region_latitude <- sapply (site_covs, "[[", "lat_mid")
 region_area <- sapply (site_covs, "[[", "area")
-
-# select sites of study
-region_temperature<-region_temperature[,cells]
-region_temperature_sd<-region_temperature_sd[,cells]
-region_precipitation<-region_precipitation[,cells]
-region_precipitation_sd<-region_precipitation_sd[,cells]
-region_latitude <- region_latitude[1,cells]
-region_area <- region_area[,cells]
+region_coastalLine <- sapply (site_covs, "[[", "coastalLine")
 
 
 # save  the updated dataset
@@ -348,7 +362,16 @@ save (time_covariates,
       region_temperature_sd,
       region_latitude,
       region_area,
+      region_coastalLine,
       file = here ("processed_data","site_covs.RData"))
+
+# plots
+par(mfrow=c(2,2))
+plot(region_precipitation, type = "b", ylab = "Precipitation (mm/day)",xlab ="Stage\n(1=Capitanian, 33= Maastrichtian)",pch=19)
+plot(region_temperature, type = "b", ylab = "Temperature (ºC)",xlab ="Stage",pch=19)
+plot(region_area, type = "b", ylab = "Area (1x1º cells above sea level)",xlab ="Stage",pch=19)
+plot(region_coastalLine, type = "b", ylab = "Area (1x1º cells from -700 to 0 m)",xlab ="Stage",pch=19)
+
 
 
 rm(list=ls())

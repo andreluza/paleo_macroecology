@@ -3,7 +3,7 @@
 # https://pjbartlein.github.io/REarthSysSci/netCDF.html#data-frame-to-array-conversionrectangular-to-raster
 
 
-source(here ("R","packages.R"))
+source("R/packages.R")
 
 # create a folder for processed data
 dir.create ("processed_data")
@@ -124,6 +124,39 @@ brick_rasters<-stackApply(brick_rasters,
 names(brick_rasters) <- gsub ("index_", "", names(brick_rasters))
 
 
+# costal line
+par(mfrow=c(1,1))
+
+plot(clamp (brick_rasters[[10]], lower=0))
+plot(clamp(brick_rasters[[10]], lower=-1000, 
+           upper=0, useValues=F),
+     col="black",add=T)
+
+
+# clamp the elevation raster
+coastal_areas <- lapply (seq(1,dim(brick_rasters)[3]), function (i)
+  
+
+  table(values(clamp(brick_rasters[[i]], 
+                     
+                     lower=-1000, 
+             
+                     upper=0, 
+                     
+                     useValues=F))
+        <0)[2]
+  
+)
+
+
+plot(unlist(coastal_areas),type="b")
+plot(clamp(brick_rasters[[i]], 
+           
+           lower=0, 
+           
+           upper=10, 
+           
+           useValues=F))
 
 # save 
 save (brick_rasters, file = here ("processed_data", 
@@ -426,7 +459,63 @@ animation <-  image_animate(a_image, fps = 1)
 image_write(animation, here ("output","figures","animation_elev.gif"))
 
 
-# clean workspace
+# coastal line
+# clamp the elevation raster
+coastal_areas <- lapply (seq(1,dim(brick_rasters)[3]), function (i)
+  
+  
+  table(values(clamp(brick_rasters[[i]], 
+                     
+                     lower=-700, 
+                     
+                     upper=0, 
+                     
+                     useValues=F))
+        <0)[2]
+  
+)
+plot(unlist(coastal_areas))
 
+# store maps
+dir.create(here ("processed_data","animation_coast"))
+lapply (seq(1,length(coastal_areas)), function (i) {
+  
+  png (here ("processed_data","animation_coast", paste ("maps_", (i), ".png",sep ="")),
+       width = 30,height = 15, res=300, 
+       units = "cm")
+  par(mfrow=c(2,1),mar=c(2,3,3,2))
+  # plot maps
+  plot(clamp (brick_rasters[[i]], lower=0), 
+       main = names(brick_rasters)[i])
+  plot(clamp(brick_rasters[[i]], lower=-700, 
+             upper=0, useValues=F),
+       add=T,col = rgb(0,0,1,alpha=0.2))
+  
+  # plot
+  plot(NA,ylim = c(min(unlist(coastal_areas)),
+                   max(unlist(coastal_areas))),
+       xlim = c(1,33),ylab="N coastal cells")
+  # add points
+  points (1:i, unlist(coastal_areas)[1:i],pch=19,cex=1.2,type="b")
+  
+  dev.off()
+
+})
+
+#anime
+list_img <- list.files(path = here ("processed_data","animation_coast"), full.names = T, pattern = "maps_")
+# ordering
+list_img <- list_img[match (bins$bin[7:length(bins$interval_name)]-6,
+                            gsub (".png", "",gsub ("D:/Pos_Doc_Paleonto_Macroecology/modeling/paleo_macroecology/processed_data/animation_coast/maps_","",list_img))
+)]
+# remove missing (some stages had no data - we used the previous in analyses)
+list_img<- list_img[is.na(list_img) !=T]
+
+##https://cran.r-project.org/web/packages/magick/vignettes/intro.html
+a_image<-image_read(list_img)
+animation <-  image_animate(a_image, fps = 1)
+image_write(animation, here ("output","figures","animation_coast.gif"))
+
+# clean workspace
 rm(list=ls())
 
