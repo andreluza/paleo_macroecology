@@ -1,0 +1,57 @@
+
+   
+     model {
+    
+     #############################################################
+    #                                                           #
+    #                  Biological process                       #
+    #                                                           #
+    #############################################################
+    
+    
+    # Site Occupancy Dynamics (Priors)
+    for(i in 1:nsites) {
+      gamma[i]~dunif(0,1)
+      phi[i]~dunif(0,1)
+    }
+    
+    psi1~dunif(0,1)     
+         
+    # Initial values
+    for (i in 1:nsites) {
+      for (s in 1:nspp) {
+    
+        p[i,1,s] <- psinit    # Initial occupancy probability
+     
+      }
+    }
+    
+
+   ############      Model       #############
+   for (i in 1:nsites) {
+      for (s in 1:nspp) {
+      
+          y[i,1,s] ~ dbern(psi1) # Initial occupancy probability
+    
+              for (t in 2:nint){
+            
+                # model likelihood
+                ### modeling dynamics conditional on previous time observed occurrence y
+                
+                muZ[i,t,s] <- y[i,t-1,s] *  phi[i] + ### if occupied, p of not getting extinct/persist in the next time
+                          (1-y[i,t-1,s]) *  gamma[i] ###  if not occupied, p of originate in the next time
+                
+        # realized occurrence
+		    p[i,t,s] ~ dbern(muZ[i,t,s])      # Occupancy model
+		    y[i,t,s] ~ dbern(p[i,t,s])        # Observation model
+    
+        }#t
+      }# spp
+     }#i
+    
+    
+    }## end of the model
+    
+    
+    
+    

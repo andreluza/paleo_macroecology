@@ -1,0 +1,435 @@
+---
+title: "Spatiotemporal dynamics of Cynodontia through end-Paleozoic and Mesozoic eras"
+author: "AL Luza, MG Bender, CS Dambros, F Pretto, L Kerber - Departamento de Ecologia
+  e Evolução, Universidade Federal de Santa Maria"
+date: "2023-07-03"
+output: word_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Supporting Information S1
+
+We made a simulation experiment to test whether the model can effectively estimate origination and extinction probabilities across sites. The simulations were based on simulations of the state-space dynamic model described in Royle & Kery 2021 (AHM Book V2). 
+
+## Single-taxa simulations
+
+We simulated the dynamics in the occurrence of one simulated taxon at twelve sites and 30 intervals of time ('nyears'). The probability of origination ('gamma') in one site over subsequent intervals of time represents both the probability of speciation (by phylogeny branching processes) and colonization (through immigration from other sites). The range of 'gamma' values depict how much this parameter will change over time in the simulations. Origination started at either high or low values depending on whether the site was optimal or not, and tended to drop to zero at the last time.
+
+```{r pressure, echo=T}
+
+# set seed for simulation
+set.seed(123)
+
+nyears <- 30 # number of time bins (stages)
+
+# values of gamma and phi
+# range of values for gamma per site
+# the range of values depict how much gamma will change over time
+gamma <- list(c(0.02,0), # suboptimal site
+              c(0.05,0), # suboptimal site
+              c(0.10,0), # suboptimal site
+              c(0.15,0), # suboptimal site
+              c(0.40,0), # intermediate origination site
+              c(0.45,0), # intermediate origination site
+              c(0.5,0), # intermediate origination site
+              c(0.55,0), # intermediate origination site
+              c(0.75,0), # optimal site 
+              c(0.82,0), # optimal site
+              c(0.9,0), # optimal site
+              c(0.98,0)) # optimal site
+phi <- c(0.1,0.05) # small persistence probability, should decrease over time
+psi1<-0.15 # initial occupancy
+
+```
+
+In this simulation, 'phi' is the probability of persistence over time (note that extinction probability is 1-phi), and 'psi1' is the proportion of occupied sites at t=1. The 'phi' was very low and its values should decrease over time, from 0.1 to 0.05. We choose these values to represent the highly dynamic nature of paleontological datasets.
+
+Then we used these parameters to simulate a dataset per site. We applied the function *lapply* to the *simDynocc* function of the 'AHMbook' package to simulate one dataset per site, for all values of 'gamma'. Note that the dataset was simulated under a condition of perfect detection (range.p = c(1,1)) in a number of surveys equal to 1.
+
+```{r , echo=T,warning=F,message=F,comment=F}
+
+# simulate dataset
+require("AHMbook")
+require(dplyr)
+require(ggplot2)
+
+sim_data <- lapply (gamma, function (i) 
+  
+  
+            simDynocc(nsites= 1, # 1 site each time
+                      nyears=nyears,
+                      nsurveys=1,
+                      mean.psi1=psi1,
+                      range.phi = phi,
+                      range.gamma =i,
+                      range.p=c(1,1), # perfect detection
+                      show.plots = F)
+            )
+```
+
+From the simulation of each site, we extracted the 'z' matrix which depicts the true/realized species occurrence in each site and time interval (thus 'z' has 12 rows and 30 columns). We extracted the 'z' matrix using the function *sapply* applied to the simulated data for each combination of 'gamma'.
+
+```{r , echo=T}
+# melt data
+sim_data <- t(sapply (sim_data, "[[", "z"))
+```
+
+The simulated data produced the following dynamic in site occupancy probability over time:
+
+```{r , echo=T}
+#number of sites occupied over time
+plot (colSums(sim_data)/length(gamma), type="b", ylab = "Proportion of Occupied Sites", xlab = "Time")
+```
+
+The simulations start with a small proportion of occupied sites at interval t=1, varies substantially over time, and then tends to a few number of occupied sites at t=30. Note that the taxon sometimes disappeared (i.e., proportion of occupied sites = 0), and then can originate again through speciation or colonization.
+
+Then we design the dynamic model, bundle data, choose parameters we want to track across the Monte Carlo Markov Chains (MCMC) samples, set MCMC settings, and run the model using JAGS (Bayesian framework to estimate model parameters).
+
+```{r comment='', warning=F}
+cat(readLines('dyn_model_vectorized_no_detection.txt'), sep = '\n')
+```
+
+```{r , echo=T,warning=T,message=T,comment=T}
+
+## bundle data
+str(jags.data <- list(y = sim_data,
+                      nsites = dim(sim_data)[1],
+                      nint= dim(sim_data)[2],
+                      psinit=psi1)
+)
+
+
+## Parameters to monitor
+## long form
+params <- c(
+  
+  "psi1",
+  "gamma", 
+  "phi",
+  "p",
+  "y"
+  
+)
+
+## MCMC settings
+######################
+na <- 1000; nb <- 5000; ni <- 10000; nc <- 3; nt <- 10
+
+# MCMC runs
+# models
+require(jagsUI)
+samples_sims_no_det <- jags (data = jags.data, 
+                             parameters.to.save = params, 
+                             model.file = "dyn_model_vectorized_no_detection.txt", 
+                             inits = NULL, 
+                             n.chains = nc, 
+                             n.thin = nt, 
+                             n.iter = ni, 
+                             n.burnin = nb, 
+                             DIC = T,  
+                             parallel=F
+)
+
+```
+
+The results of this small experiment are shown below. In red we presented the estimates from the model, and in black we show the range of 'gamma' per site. The different sites are presented in the Y axis, and the estimated probabilities (with 95% Credible Intervals (CI)) in the Y axis. 
+
+Overall, estimates of origination probability were uncertain but their 95% CI always included the range of values of 'gamma' which produced the dataset. A similar pattern was found for persistence probability 'phi', for which the range of values generating the dataset (black retangle) was always within the 95% CI of 'phi'.
+
+```{r , echo=T,warning=F}
+
+# plot the data
+df_res <- do.call(rbind,gamma)
+
+# bind estimates
+df_res <- cbind (df_res,
+                 sites = seq(1,nrow(df_res)) ,
+                 gamma = samples_sims_no_det$mean$gamma,
+                 uci = apply(samples_sims_no_det$sims.list$gamma,2,quantile,0.975),
+                lci = apply(samples_sims_no_det$sims.list$gamma,2,quantile,0.025))
+colnames(df_res)[1:2]<-c("inf_range","sup_range")
+
+# plot res simulations
+
+ggplot (data=data.frame (df_res),
+        aes (x=sites,y=gamma)) + 
+  
+  geom_point(col="red", size=2)+
+  
+  geom_errorbar(aes (ymin=lci,ymax= uci),col="red",width=0.2,linewidth=1.3)+
+
+  geom_errorbar(aes (ymax=inf_range,ymin= sup_range),width=0.2)+
+  
+  theme_bw() + 
+  
+  ylab ("Origination probability") + 
+  
+  xlab ("Sites") + 
+  
+  scale_x_continuous(breaks = seq(1, 12, by = 1))
+
+```
+
+```{r , echo=T,warning=F}
+
+# plot res simulations
+# bind estimates
+
+df_res_phi <- cbind (sites = seq(1,nrow(df_res)) ,
+                 phi = samples_sims_no_det$mean$phi,
+                 uci = apply(samples_sims_no_det$sims.list$phi,2,quantile,0.975),
+                 lci = apply(samples_sims_no_det$sims.list$phi,2,quantile,0.025))
+
+# plot
+ggplot (data=data.frame (df_res_phi),
+        aes (x=sites,y=phi)) + 
+  
+  geom_point(col="red", size=3)+
+  
+  geom_errorbar(aes (ymin=lci,ymax= uci),col="red",width=0.2,linewidth=1.3)+
+  
+  #geom_errorbar(aes (ymin= min(phi), ymax=max(phi)),width=0.2)+
+  geom_rect(aes(xmin = 1, xmax = 12, ymin = 0.05, ymax = 0.1),alpha=0.1) +
+
+  theme_bw() + 
+  
+  ylab ("Persistence probability") + 
+  
+  xlab ("Sites") + 
+  
+  scale_x_continuous(breaks = seq(1, 12, by = 1))
+
+```
+
+
+## Multi-taxa simulations
+
+Now, we repeated the simulations using 100 taxa to check whether the estimates of origination and persistence probability become less uncertain. We will use the same values of 'nyears', 'gamma', 'phi', and 'psi1' used in the previous analysis for a single taxon.
+
+
+```{r , echo=T, warning=F, comment=F, message=F,results='hide'}
+
+nspp <- 100 # number of taxa
+
+# simulate data
+sim_data_spp <- lapply (seq (1,nspp), function (k)
+  
+      lapply (gamma, function (i) 
+  
+  
+            simDynocc(nsites= 1, # 1 site each time
+                      nyears=nyears,
+                      nsurveys=1,
+                      mean.psi1=psi1,
+                      range.phi = phi,
+                      range.gamma =i,
+                      range.p=c(1,1), # perfect detection
+                      show.plots = F)
+            )
+
+)
+
+# melt data
+sim_data_spp_z <- lapply (sim_data_spp, function (i)
+
+  t(sapply (i, "[[", "z"))
+  
+  )
+
+```
+
+
+Plot of the proportion of occupied sites per species.
+```{r , echo=T,results='hide'}
+
+#number of sites occupied over time
+plot (colSums(sim_data_spp_z[[1]])/length(gamma), type="b", 
+      ylab = "Proportion of Occupied Sites", xlab = "Time",
+      ylim=c(0,1))
+# plot trend for each spp
+lapply (sim_data_spp_z, function (i)
+
+  lines (seq(1,nyears),
+        colSums(i)/length(gamma),
+  col = rgb (1,1,1,alpha=0.1))
+  
+)
+
+# plot the average
+do.call(rbind, lapply (sim_data_spp_z, function (i)
+  colSums(i)/length(gamma)
+))
+
+
+
+
+```
+
+Now we need to transform the list of 'z' into an array with nsites x nyears x spp. We plotted the trend for each taxon (blue lines), as well the average across taxa (black line).
+
+
+```{r , echo=T,comment=F,  warning=F,message=F,results='hide'}
+# list to array
+array_sim_data_spp_z <- array(as.numeric(unlist(sim_data_spp_z)), 
+                              dim=c(length(gamma), 
+                                    nyears,
+                                    nspp))
+# plot
+plot (colSums(array_sim_data_spp_z[,,1])/length(gamma), type="b", 
+       ylab = "Proportion of Occupied Sites", xlab = "Time",
+       ylim=c(0,1),
+      col="gray")
+
+# each spp
+lapply (seq (1,nspp), function (i)
+
+  lines (seq(1,nyears),
+      colSums(array_sim_data_spp_z[,,i])/length(gamma), type="b", 
+      col = rgb (0,1,1,alpha=0.05) 
+      )
+)
+
+# get the average
+av_occ <- lapply (seq (1,nspp), function (i)
+
+    colSums(array_sim_data_spp_z[,,i])/length(gamma)
+)
+
+# plot
+lines (seq(1,nyears),
+      colMeans(do.call(rbind,av_occ)),
+      col = "black" 
+      )
+
+
+```
+Then draw the model, bundle data, and run the model
+
+```{r comment='', warning=F}
+cat(readLines('dyn_model_vectorized_no_detection_multispp.txt'), sep = '\n')
+```
+
+```{r , echo=T,warning=T,message=T,comment=T}
+
+## bundle data
+str(jags.data <- list(y = array_sim_data_spp_z,
+                      nsites = dim(array_sim_data_spp_z)[1],
+                      nint= dim(array_sim_data_spp_z)[2],
+                      nspp = dim(array_sim_data_spp_z)[3],
+                      psinit=psi1)
+)
+
+
+## Parameters to monitor
+## long form
+params <- c(
+  
+  "psi1",
+  "gamma", 
+  "phi",
+  "p",
+  "y"
+  
+)
+
+## MCMC settings
+######################
+na <- 1000; nb <- 5000; ni <- 10000; nc <- 3; nt <- 10
+
+# MCMC runs
+# models
+# I ran and saved because it tooks a time
+#samples_sims_no_det_spp <- jags (data = jags.data, 
+#                             parameters.to.save = params, 
+#                             model.file = #"dyn_model_vectorized_no_detection_multispp.txt", 
+#                             inits = NULL, 
+#                             n.chains = nc, 
+#                             n.thin = nt, 
+#                             n.iter = ni, 
+#                             n.burnin = nb, 
+#                             DIC = T,  
+#                             parallel=F
+#)
+
+#save (samples_sims_no_det_spp, file = "samples_sims_no_det_spp.RData")
+load (file = "samples_sims_no_det_spp.RData")
+
+```
+Finally plot the results. As expected, running the model across many taxa provide robustness to the estimates (note, compared to the previous plots, the narrower credible intervals in the figures shown below) as 'gamma' and 'phi' are updated while each taxon is analyzed. The model adequately identified suboptimal, intermediate, and optimal sites for taxon origination. All estimates of 'gamma' and 'phi' were within the range of values used in the simulations. Thus, we strength of the approach might be relying on the different taxa to update the dynamic parameters (origination and extinction probabilities) whose balance will produce regional- and global-scale taxonomic diversity.
+
+
+```{r , echo=T,warning=F}
+# plot the data
+df_res_spp <- do.call(rbind,gamma)
+# bind estimates
+df_res_spp <- cbind (df_res_spp,
+                 sites = seq(1,nrow(df_res_spp)) ,
+                 gamma = samples_sims_no_det_spp$mean$gamma,
+                 uci = apply(samples_sims_no_det_spp$sims.list$gamma,2,quantile,0.975),
+                lci = apply(samples_sims_no_det_spp$sims.list$gamma,2,quantile,0.025))
+colnames(df_res_spp)[1:2]<-c("inf_range","sup_range")
+
+# plot res simulations
+
+ggplot (data=data.frame (df_res_spp),
+        aes (x=sites,y=gamma)) + 
+  
+  geom_point(col="red", size=2)+
+  
+  geom_errorbar(aes (ymin=lci,ymax= uci),col="red",width=0.2,linewidth=1.3)+
+
+  geom_errorbar(aes (ymax=inf_range,ymin= sup_range),width=0.2)+
+  
+  theme_bw() + 
+  
+  ylab ("Origination probability") + 
+  
+  xlab ("Sites") + 
+  
+  scale_x_continuous(breaks = seq(1, 12, by = 1))
+
+```
+
+```{r , echo=T,warning=F}
+
+# plot res simulations
+# bind estimates
+
+df_res_phi_spp <- cbind (sites = seq(1,nrow(df_res_spp)) ,
+                 phi = samples_sims_no_det_spp$mean$phi,
+                 uci = apply(samples_sims_no_det_spp$sims.list$phi,2,quantile,0.975),
+                 lci = apply(samples_sims_no_det_spp$sims.list$phi,2,quantile,0.025))
+
+# plot
+ggplot (data=data.frame (df_res_phi_spp),
+        aes (x=sites,y=phi)) + 
+  
+  geom_point(col="red", size=3)+
+  
+  geom_errorbar(aes (ymin=lci,ymax= uci),col="red",width=0.2,linewidth=1.3)+
+  
+  #geom_errorbar(aes (ymin= min(phi), ymax=max(phi)),width=0.2)+
+  geom_rect(aes(xmin = 1, xmax = 12, ymin = 0.05, ymax = 0.1),alpha=0.1) +
+
+  theme_bw() + 
+  
+  ylab ("Persistence probability") + 
+  
+  xlab ("Sites") + 
+  
+  scale_x_continuous(breaks = seq(1, 12, by = 1))
+
+```
+
+
+
+
+

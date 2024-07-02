@@ -32,6 +32,18 @@ intervals <- openxlsx::read.xlsx (here ("data", "periods_intervals_ages.xlsx"))
 #rev_order <- rev(intervals$Interval)
 #intervals <- intervals [match (intervals$Interval, rev_order),]
 
+plot(unlist(
+lapply(seq(1,dim(brick_rasters_paleotemp)[3]), function (i) 
+  mean(values(brick_rasters_paleotemp[[i]]),na.rm=T))
+),type="l"    )    
+
+lines(unlist(
+  lapply(seq(1,dim(temperature_raster)[3]), function (i) 
+    mean(values(temperature_raster[[i]]),na.rm=T))
+),col="red",add=T)    
+
+
+
 # bind missing stages
 # apply to each raster
 raster_imputation <- lapply (list(brick_rasters,
