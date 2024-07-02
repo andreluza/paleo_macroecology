@@ -15,7 +15,9 @@ R/old_codes
 R/Cynodontia/oldScripts
 output
 Manuscript.Rmd
+Manuscript.docx
 *.docx
 garbage
 R/Mammals
+trait_space_*
 
