@@ -13,6 +13,7 @@ processed_data/brick*
 processed_data/Trait_data.csv
 R/old_codes
 R/Cynodontia/oldScripts
+R/TriassicExt
 output
 Manuscript.Rmd
 Manuscript.docx
@@ -20,4 +21,5 @@ Manuscript.docx
 garbage
 R/Mammals
 trait_space_*
+processed_data_TrJ
 
