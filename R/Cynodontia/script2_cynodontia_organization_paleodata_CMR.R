@@ -127,7 +127,6 @@ coll_occ_taxa_perm_cret<-coll_occ_taxa_perm_cret[cf_out==T,] # filter
 
 # --------------------------------------------------------------------
 
-
 # adjust formation and lithology names
 # remove quotes and other characters
 
@@ -195,6 +194,7 @@ coll_occ_taxa_perm_cret <- data.frame (coll_occ_taxa_perm_cret) %>%
 sp1 <- data.frame (matrix(NA,nrow=1,ncol = ncol(coll_occ_taxa_perm_cret),
                           dimnames = list(NA,
                                           colnames(coll_occ_taxa_perm_cret))))
+
 #sp1$unique_name <- "Agudotherium sp."
 sp1$accepted_name <- "Agudotherium gassenae"
 sp1$identified_name <- "Agudotherium gassenae"
@@ -274,6 +274,7 @@ sp2$paleolng2 <- rotate_sp2$p_lng
 
 coll_occ_taxa_perm_cret <- rbind (coll_occ_taxa_perm_cret,
                                   sp1,sp2)
+
 
 
 
@@ -410,6 +411,7 @@ coll_occ_taxa_perm_cret <- coll_occ_taxa_perm_cret[which(coll_occ_taxa_perm_cret
 
 # bind the classification of genera made by hand
 # load taxonomy
+require(openxlsx)
 taxonomy <- read.xlsx (here ("processed_data", "table_taxonomy.xlsx"))
 
 # match
@@ -974,71 +976,6 @@ tapply(coll_occ_taxa_perm_cret$detection,
 
 # the basic table summarizing all detections across intervals and formations
 
-#table_data_basis <- lapply (cells, function (i) {
-#  
-#  
-#  tab_basis <- cast (formula = unique_name ~ bin_assignment,
-#                     data = coll_occ_taxa_perm_cret[which(coll_occ_taxa_perm_cret$lat_bin %in% i),],
-#                     value = "detection", 
-#                     fun.aggregate = sum,
-#                     drop=F,
-#                     fill=0)
-#  
-#  
-#  # order names
-#  rownames(tab_basis) <- tab_basis$unique_name
-#
-#    
-#  # input formations/subcells not in this data
-#  tab_basis <- cbind (tab_basis, 
-#                      matrix (0, 
-#                              nrow = nrow (tab_basis),
-#                              ncol= length(time_bins [which(time_bins  %in% colnames (tab_basis) == F)]), # subcells or formations
-#                              
-#                              dimnames = list (rownames(tab_basis),
-#                                               time_bins [which(time_bins  %in% colnames (tab_basis) == F)]
-#                                               
-#                              )
-#                      )
-#  )
-#  tab_basis <- tab_basis[,-which(colnames(tab_basis) == "unique_name")]
-#  
-#  # input cells not in this data
-#  tab_basis <- rbind (tab_basis, 
-#                      matrix (0, 
-#                              nrow = sum(cynodontia_data %in% rownames (tab_basis) == F),
-#                              ncol= ncol (tab_basis),
-#                              
-#                              dimnames = list (cynodontia_data [which(cynodontia_data  %in% rownames (tab_basis) == F)],
-#                                               colnames(tab_basis)
-#                                               
-#                              )
-#                      )
-#  )
-#  
-#  # order columns and rows
-#  tab_basis <- tab_basis[order (rownames(tab_basis)),
-#                         order(as.numeric(colnames(tab_basis)))]
-#  
-#  ; # return
-#  tab_basis
-#  
-#})
-#
-## checknames
-#colnames(table_data_basis[[1]]) == colnames(table_data_basis[[9]])
-#rownames(table_data_basis[[1]]) == rownames(table_data_basis[[9]])
-#
-#rownames(table_data_basis[[1]]) == genus
-#
-## data to array
-#array_genus_bin_site <- array (unlist (table_data_basis),
-#                               dim = c(length(cynodontia_data),
-#                                       length(time_bins),
-#                                       length(table_data_basis)))
-#
-#array_genus_bin_site[array_genus_bin_site>0]<-1
-
 
 # global scale array
 # tapply option
@@ -1117,6 +1054,7 @@ coll_per_interval[coll_per_interval>0]<-1
 coll_per_interval[is.na(coll_per_interval)]<-0
 coll_per_interval <- data.frame (bin_assignment=colnames(coll_per_interval),
                                  coll_per_interval = apply (coll_per_interval,2,sum))
+
 # save fig
 png(here ("output", "figures","pull_of_the_recent.png"),height=20,width=22,units ="cm",res=300)
 par(mfrow=c(2,1),mar=c(5,5,5,5))

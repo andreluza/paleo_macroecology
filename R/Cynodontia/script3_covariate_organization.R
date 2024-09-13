@@ -35,11 +35,11 @@ intervals <- openxlsx::read.xlsx (here ("data", "periods_intervals_ages.xlsx"))
 plot(unlist(
 lapply(seq(1,dim(brick_rasters_paleotemp)[3]), function (i) 
   mean(values(brick_rasters_paleotemp[[i]]),na.rm=T))
-),type="l"    )    
+),type="p"    )    
 
 lines(unlist(
-  lapply(seq(1,dim(temperature_raster)[3]), function (i) 
-    mean(values(temperature_raster[[i]]),na.rm=T))
+  lapply(seq(1,dim(brick_rasters_paleotemp)[3]), function (i) 
+    mean(values(brick_rasters_paleotemp[[i]]),na.rm=T))
 ),col="red",add=T)    
 
 
@@ -1385,8 +1385,6 @@ list_img <- list_img[match (names(ages),
 a_image<-image_read(list_img)
 animation <-  image_animate(a_image, fps = 1)
 image_write(animation, here ("output","animation_data.gif"))
-
-
 
 
 rm(list=ls())

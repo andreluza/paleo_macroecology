@@ -1,356 +1,355 @@
 "","record_type","group","formation","member","lithology","max_ma","min_ma","cc_list","n_colls","n_occs"
-"1","str","","","","""carbonate"",""limestone"",""limestone""/marl,claystone,claystone/conglomerate,claystone/sandstone,claystone/siltstone,conglomerate,conglomerate/marl,grainstone/rudstone,marl,mudstone,sandstone,sandstone/marl,sandstone/mudstone,siltstone",70.6,66,"BR,CA,DE,FR,IN,KZ,LU,MA,NA,PL,RO,RU,UK,US,ZA",59,152
-"2","str","","","2","claystone/marl",150.8,145,"FR",1,3
-"3","str","","""Berching""","","marl",167.7,164.7,"DE",1,1
-"4","str","","Aguja","","mudstone/sandstone",83.5,70.6,"US",1,3
-"5","str","","Aguja","Upper Shale","conglomerate,conglomerate/sandstone,sandstone/mudstone",83.5,70.6,"US",8,40
-"6","str","","Aitym","","",93.5,86.3,"UZ",1,15
-"7","str","","Alcobaça","","coal",157.3,152.1,"PT",1,42
-"8","str","","Anacleto","","claystone",83.5,70.6,"AR",1,1
-"9","str","","Anoual","Lower Anoual","marl",168.3,166.1,"MA",1,2
+"1","str","","","","""carbonate"",""limestone"",""limestone""/marl,""mixed carbonate-siliciclastic"",claystone,claystone/conglomerate,claystone/sandstone,claystone/siltstone,conglomerate,conglomerate/marl,grainstone/rudstone,marl,mudstone,sandstone,sandstone/marl,sandstone/mudstone,siltstone,siltstone/""limestone""",72.1,66,"BR,CA,DE,FR,IN,KZ,LU,MA,NA,PL,RO,UK,US,ZA",59,152
+"2","str","","","2","claystone/marl",149.2,146.3,"FR",1,3
+"3","str","","""Berching""","","marl",168.2,165.3,"DE",1,1
+"4","str","","Aguja","","mudstone/sandstone",83.6,72.1,"US",1,3
+"5","str","","Aguja","Upper Shale","conglomerate,conglomerate/sandstone,sandstone/mudstone",83.6,72.1,"US",8,40
+"6","str","","Aitym","","",93.9,86.3,"UZ",1,15
+"7","str","","Alcobaça","","coal",154.8,149.2,"PT",1,42
+"8","str","","Anacleto","","claystone",83.6,72.1,"AR",1,1
+"9","str","","Anoual","Lower Anoual","marl",168.2,165.3,"MA",1,2
 "10","str","","Argilas de Aveiro","","conglomerate/lime mudstone",72.1,66,"PT",1,5
-"11","str","","Argiles et Grès à Reptiles","","sandstone",83.5,70.6,"FR",1,1
-"12","str","","Artoles","","sandstone/conglomerate",130,125.45,"ES",1,9
-"13","str","","Bagua","Fundo El Triunfo","""shale""",83.5,66,"PE",1,1
-"14","str","","Balabansai","","""siliciclastic"",claystone,sandstone/siltstone,siltstone",166.1,163.5,"KG",4,16
-"15","str","","Baruungoyot","","mudstone/sandstone,sandstone,sandstone/conglomerate,sandstone/mudstone",83.5,70.6,"MN",12,34
-"16","str","","Batylykh","","sandstone",145,125,"RU",1,5
-"17","str","","Bayan Mandahu","","sandstone",83.6,72.1,"CN",4,4
-"18","str","","Bayangobi","","claystone",125,113,"CN",1,1
-"19","str","","Baynshire","","",100.5,83.6,"MN",1,1
-"20","str","","Bissekty","","sandstone,sandstone/conglomerate",93.5,89.3,"UZ",12,63
-"21","str","","Blesa","Cabezo Gordo","claystone",130,125.45,"ES",1,7
-"22","str","","Bostobe","","claystone,claystone/sandstone",86.3,70.6,"KZ",3,4
-"23","str","","Burgersdorp","","""shale"",sandstone",247.2,242,"ZA",2,2
-"24","str","","Cacheuta","","",237,208.5,"AR",1,1
-"25","str","","Camarillas","","claystone,mudstone/sandstone",130,125.45,"ES",3,9
-"26","str","","Cedar Mountain","Mussentuchit","sandstone",99.6,93.5,"US",2,6
-"27","str","","Chañares","","",235,232,"BR",1,1
-"28","str","","Chico","","""siliciclastic""",83.6,72.1,"US",1,1
-"29","str","","Chinle","","sandstone,siltstone",228,201.3,"US",2,3
-"30","str","","Chinle","Blue Mesa","mudstone/sandstone",228,208.5,"US",2,2
-"31","str","","Chinle","Mesa Redondo","mudstone/claystone",228,208.5,"US",1,1
-"32","str","","Chinle","Monitor Butte","",228,208.5,"US",1,1
-"33","str","","Chinle","Petrified Forest","""carbonate"",mudstone,mudstone/wackestone",221.5,205.6,"US",3,3
-"34","str","","Chorrillo","","claystone,mudstone",70.6,66,"AR",3,5
-"35","str","","Cloverly","Himes","mudstone,mudstone/claystone",109,93.5,"US",9,15
-"36","str","","Cloverly","Little Sheep Mudstone","claystone",125,100.5,"US",2,18
-"37","str","","Coachman","","",83.5,70.6,"US",1,2
-"38","str","","Dabrazhin","","sandstone",83.5,70.6,"KZ",1,6
-"39","str","","Densuş-Ciula","Middle","claystone/marl,claystone/sandstone,mudstone,mudstone/conglomerate",70.6,66,"RO",6,10
-"40","str","","Densuş-Ciula","Upper","sandstone",70.6,66,"RO",1,1
-"41","str","","Djadokhta","","""siliciclastic"",sandstone,sandstone/mudstone",83.5,70.6,"MN",11,30
-"42","str","","Djadokhta","Bayn Dzak","sandstone",83.5,70.6,"MN",5,21
-"43","str","","Djadokhta","Tugrugyin","sandstone",83.5,70.6,"MN",4,7
-"44","str","","Dorotea","","mudstone",83.5,66,"CL",2,3
-"45","str","","Dzunbain","","sandstone/claystone",122.46,109,"MN",1,16
-"46","str","","Eagle","Deadhorse Coulee","",86.3,83.6,"US",2,16
-"47","str","","Ejinhoro","","sandstone",145,100.5,"CN",1,1
-"48","str","","El Castellar","","""carbonate"",claystone,lime mudstone/""siliciclastic"",marl/""siliciclastic""",130,125.45,"ES",5,7
-"49","str","","El Gallo","","",83.5,70.6,"MX",1,4
-"50","str","","Ermaying","upper","",247.2,242,"CN",1,1
-"51","str","","Eutaw","Tombigbee Sand","",85.8,83.5,"US",1,1
-"52","str","","Exter","","""shale""/mudstone",208.5,201.3,"DE",1,1
-"53","str","","Ferris","","",70.6,66,"US",7,13
-"54","str","","Fleming Fjord","Ørsted Dal","""limestone""/mudstone,claystone/sandstone",208.5,201.3,"GL",2,4
-"55","str","","Fremouw","Upper","conglomerate",247.2,242,"AA",1,3
-"56","str","","Frenchman","","""siliciclastic"",claystone/conglomerate,sandstone,sandstone/siltstone,siltstone",70.6,66,"CA",7,55
-"57","str","","Fruitland","","""shale""/sandstone,coal,mudstone/sandstone,sandstone",83.5,70.6,"US",5,15
-"58","str","","Fruitland","Bisti","",83.5,70.6,"US",1,6
-"59","str","","Fruitland","Fossil Forest","conglomerate/sandstone",83.5,70.6,"US",2,2
-"60","str","","Fruitland/Kirtland","","",83.5,70.6,"US",2,9
-"61","str","","Fuxin","","coal/""shale""",125,100.5,"CN",1,1
-"62","str","","Gardner Canyon","","",208.5,190.8,"US",1,1
-"63","str","","Grès à Avicula contorta","","sandstone",208.5,201.3,"FR",1,24
-"64","str","","Grès à Reptiles","","claystone/sandstone",83.5,66,"FR",1,2
-"65","str","","Grès de Boisset","","sandstone/marl",208.5,201.3,"FR",1,2
-"66","str","","Grès de Labarre","","sandstone",70.6,66,"FR",1,1
-"67","str","","Grès de Mortinsart","","conglomerate,sandstone",208.5,201.3,"BE",2,4
-"68","str","","Hampen Marly","","",167.7,164.7,"UK",1,2
-"69","str","","Hanson","","siltstone",199.3,182.7,"AA",1,1
-"70","str","","Hekou","","sandstone",72.1,66,"CN",3,3
-"71","str","","Hell Creek","","""shale"",conglomerate,mudstone,sandstone,sandstone/claystone,sandstone/mudstone,siltstone",70.6,66,"US",84,357
-"72","str","","Hongyanjing","","""shale""",251.2,247.2,"CN",1,1
-"73","str","","Horseshoe Canyon","","",83.5,66,"CA",1,1
-"74","str","","Ifenthal","Schelmenloch","""limestone""",167.7,164.7,"CH",2,2
-"75","str","","Ilek","","sandstone,sandstone/siltstone",125,113,"RU",8,34
-"76","str","","Inalt","","""reef rocks"",breccia/packstone",145,139.8,"TR",3,3
-"77","str","","Infratrappean Beds","","sandstone/claystone",70.6,66,"IN",1,1
-"78","str","","Intertrappean Beds","","mudstone/sandstone",72.1,66,"IN",1,2
-"79","str","","Iron Springs","","sandstone/mudstone",85.8,70.6,"US",5,9
-"80","str","","Ischigualasto","","mudstone",237,208.5,"AR",4,4
-"81","str","","Ischigualasto","Cancha de Bochas","""siliciclastic"",siltstone",237,228,"AR",4,7
-"82","str","","Ischigualasto","La Peña","sandstone/conglomerate",237,228,"AR",1,2
-"83","str","","Itat","Upper","claystone",168.3,166.1,"RU",1,11
-"84","str","","Javkhlant","","sandstone",86.3,72.1,"MN",1,2
-"85","str","","Jiulongshan","","mudstone/sandstone",174.1,163.5,"CN",1,1
-"86","str","","Judith River","","sandstone",83.5,70.6,"US",3,5
-"87","str","","Kaiparowits","","",83.5,70.6,"US",4,50
-"88","str","","Kaiparowits","Lower","",83.5,70.6,"US",1,1
-"89","str","","Kayenta","","sandstone",199.3,182.7,"US",1,1
-"90","str","","Khodzhakul","","sandstone/claystone",99.6,93.5,"UZ",4,12
-"91","str","","Kirtland","Farmington","sandstone",83.5,70.6,"US",1,2
-"92","str","","Kirtland","Hunter Wash","",83.5,70.6,"US",1,14
-"93","str","","Kirtland","Naashoibito","sandstone",70.6,66,"US",2,2
-"94","str","","Klettgau","Gruhalde","marl",208.5,201.3,"CH",1,10
-"95","str","","Koum","Grés de Gaba","sandstone/mudstone",125,100.5,"CM",1,3
-"96","str","","Ksar Metlili","","sandstone",150.8,140.2,"MA",6,52
-"97","str","","Kutuluk","","sandstone/conglomerate",265,252.3,"RU",1,1
-"98","str","","La Amarga","Puesto Antigual","",129.4,122.46,"AR",1,1
-"99","str","","La Colonia","","claystone/siltstone",72.1,66,"AR",6,7
-"100","str","","La Huérguina","","""limestone""/lignite,""limestone""/packstone,siltstone",130,125.45,"ES",3,6
-"101","str","","La Matilde","","sandstone,sandstone/tuff,siltstone/sandstone",166.1,157.3,"AR",3,4
-"102","str","","Lance","","""shale"",claystone/sandstone,marl,mudstone,sandstone,sandstone/""shale"",sandstone/conglomerate",70.6,66,"US",51,333
-"103","str","","Laramie","","mudstone/sandstone,sandstone",70.6,66,"US",6,19
-"104","str","","Lesotho","","sandstone",190.8,174.1,"ZA",1,1
-"105","str","","Los Alamitos","","lime mudstone,siltstone/sandstone",83.5,66,"AR",2,23
-"106","str","","Lourinhã","Praia da Amoreira-Porto Novo","marl/mudstone,mudstone,sandstone/mudstone,siltstone",155.7,145,"PT",4,22
-"107","str","","Lower Monte Bardia","","""carbonate""/breccia",150.8,145,"IT",1,1
-"108","str","","Lufeng","Shawan","claystone,mudstone,sandstone",201.3,199.3,"CN",3,7
-"109","str","","Lufeng","Zhangjia'ao","",199.3,190.8,"CN",8,12
-"110","str","","Luohandong","","sandstone/""siliciclastic""",139.8,130,"CN",1,1
-"111","str","","Maastricht","Valkenburg","",70.6,66,"BE",1,1
-"112","str","","Madumabisa Mudstone","Upper","mudstone",259.9,254.17,"ZM",1,1
-"113","str","","Madygen","Upper Grey-coloured","""shale""",242,228,"KG",1,1
-"114","str","","Maevarano","Anembalemba","sandstone",72.1,66,"MG",8,13
-"115","str","","Maevarano","Lac Kinkony","sandstone",72.1,66,"MG",1,1
-"116","str","","Maleri","","""siliciclastic""",237,208.5,"IN",1,2
-"117","str","","Manda Beds","Lifua","""siliciclastic"",mudstone,sandstone/siltstone",247.2,242,"TZ",10,13
-"118","str","","Mesaverde","","conglomerate/sandstone,sandstone,sandstone/lignite",83.5,70.6,"US",14,45
-"119","str","","Mesaverde","Teapot Sandstone","sandstone",83.5,70.6,"US",7,13
-"120","str","","Milk River","","",85.8,83.5,"CA",1,2
-"121","str","","Milk River","Deadhorse Coulee","sandstone/""shale""",85.8,83.5,"CA",7,54
-"122","str","","Mirambel","","marl",130,125.45,"ES",1,1
-"123","str","","Mizdah","","sandstone",100.5,93.9,"LY",1,1
-"124","str","","Moenkopi","Holbrook","conglomerate",247.2,242,"US",1,1
-"125","str","","Morrison","","claystone,mudstone,mudstone/siltstone,sandstone,sandstone/mudstone,siltstone/sandstone",150.8,145,"US",15,44
-"126","str","","Morrison","Brushy Basin","claystone,mudstone,mudstone/sandstone,sandstone,sandstone/claystone,sandstone/mudstone,sandstone/siltstone,siltstone/sandstone",150.8,145,"US",17,65
-"127","str","","Morrison","Indian Fort","conglomerate,mudstone,sandstone,siltstone",157.3,145,"US",4,7
-"128","str","","Morrison","Lake Como","claystone/sandstone,mudstone",152.1,145,"US",2,13
-"129","str","","Morrison","Salt Wash","mudstone/sandstone",155.7,145,"US",1,1
-"130","str","","Morrison","Talking Rocks","mudstone/sandstone",157.3,145,"US",1,50
-"131","str","","Moskovoretskaya","Meshchera","claystone/sandstone",167.7,164.7,"RU",1,1
-"132","str","","Mugher Mudstone","","mudstone",152.1,145,"ET",1,1
-"133","str","","Murtoi","Mogoito","sandstone",139.8,132.9,"RU",1,2
-"134","str","","Muschelkalk","","wackestone",242,235,"ES",1,1
-"135","str","","Naturita","","mudstone,mudstone/sandstone",99.6,93.5,"US",7,46
-"136","str","","Nemegt","","sandstone,sandstone/mudstone",72.1,66,"MN",4,4
-"137","str","","Nenjiang","","mudstone",83.5,70.6,"CN",1,1
-"138","str","","North Horn","","",70.6,66,"US",3,10
-"139","str","","Ntawere","Lower","mudstone/sandstone,sandstone",247.2,242,"ZM",2,2
-"140","str","","Ntawere","Upper","mudstone",247.2,228,"ZM",2,3
-"141","str","","Ojo Alamo","Naashoibito","",70.6,66,"US",5,19
-"142","str","","Oldman","","",83.5,70.6,"CA",2,16
-"143","str","","Oshih","Cannonball","sandstone",145,132.9,"MN",1,3
-"144","str","","Paluxy","","mudstone/sandstone",113,100.5,"US",1,3
-"145","str","","Panchet","Deoli Sandstone","sandstone",252.17,247.2,"IN",1,1
-"146","str","","Petropavlovka","","sandstone",251.2,247.2,"RU",1,1
-"147","str","","Pictured Cliffs Sandstone","","",83.5,70.6,"US",1,2
-"148","str","","Prince Creek","","sandstone",70.6,66,"US",2,2
-"149","str","","Prince Creek","Kogosukruk Tongue","sandstone",70.6,66,"US",1,3
-"150","str","","Qigu","","siltstone/sandstone",161.2,152.1,"CN",1,7
-"151","str","","Qiupa","","mudstone/conglomerate,siltstone",70.6,66,"CN",3,3
-"152","str","","Quantou","","mudstone/sandstone",125,100.5,"CN",1,1
-"153","str","","Quebrada del Barro","","sandstone",228,208.5,"AR",1,1
-"154","str","","Râul Mare","upper","mudstone/""limestone""",70.6,66,"RO",1,3
-"155","str","","Sables de Mortinsart","","sandstone",208.5,201.3,"BE",1,7
-"156","str","","Salarevo","","",265,252.3,"RU",1,2
-"157","str","","Santa Maria","","sandstone",228,208.5,"BR",2,2
-"158","str","","Santa Maria","Alemoa","mudstone/sandstone",242,228,"BR",1,2
-"159","str","","Santibañez del Val","Calizas de Lychnus","lime mudstone",70.6,66,"ES",1,4
-"160","str","","Şard","","claystone,claystone/""limestone""",70.6,66,"RO",2,2
-"161","str","","Scollard","","claystone,claystone/siltstone,siltstone",70.6,66,"CA",9,59
-"162","str","","Sebeş","","""siliciclastic"",claystone,mudstone/sandstone",70.6,66,"RO",3,3
-"163","str","","Shahai","","mudstone/coal,mudstone/conglomerate,not reported/coal",122.46,100.5,"CN",3,8
-"164","str","","Shangshihezi","","sandstone/mudstone",259.9,254.17,"CN",1,1
-"165","str","","Shar Teg","","claystone,sandstone",163.5,145,"MN",2,2
-"166","str","","Shaximiao","Lower","sandstone/mudstone",170.3,157.3,"CN",1,2
-"167","str","","Shishugou","","",163.5,157.3,"CN",1,1
-"168","str","","Shishugou","Lower","",166.1,163.5,"CN",1,1
-"169","str","","Shishugou","Upper","mudstone",163.5,157.3,"CN",3,4
-"170","str","","Sînpetru","","mudstone,mudstone/sandstone,sandstone",70.6,66,"RO",3,5
-"171","str","","Sînpetru","lower","sandstone",70.6,66,"RO",1,1
-"172","str","","Sînpetru","upper","claystone/sandstone",70.6,66,"RO",1,3
-"173","str","","Slivnitsa","","""limestone""",155.7,150.8,"BG",1,1
-"174","str","","St. Mary River","","claystone/sandstone,mudstone",70.6,66,"CA,US",4,24
-"175","str","","Straight Cliffs","John Henry","mudstone",89.8,83.6,"US",3,10
-"176","str","","Straight Cliffs","Smoky Hollow","claystone,mudstone/claystone",93.5,89.3,"US",4,31
-"177","str","","Straight Cliffs","Tibbet Canyon","",93.5,89.3,"US",1,1
-"178","str","","Süntel","","framestone/marl,mudstone",155.7,150.8,"DE",2,4
-"179","str","","Takli","","claystone/marl",70.6,66,"IN",1,1
-"180","str","","Tendaguru","Middle Dinosaur","siltstone",155.7,150.8,"TZ",1,4
-"181","str","","Tendaguru","Upper Dinosaur","",152.1,145,"TZ",1,1
-"182","str","","Tiaojishan","","""shale"",""shale""/tuff,sandstone/mudstone",163.5,150.8,"CN",6,16
-"183","str","","Tiki","","mudstone",237,228,"IN",1,1
-"184","str","","Tiki","Lower Tiki","mudstone,mudstone/claystone",237,228,"IN",2,2
-"185","str","","Ulan Malgait","","",152.1,145,"MN",1,3
-"186","str","","Ulansuhai","","conglomerate",83.6,66,"CN",1,1
-"187","str","","Villanueva de Huerva","Section B","claystone",139.8,129.4,"ES",1,1
-"188","str","","Vitoria","","sandstone/siltstone",83.5,70.6,"ES",1,7
-"189","str","","Wahweap","","mudstone,mudstone/sandstone",83.5,70.6,"US",8,61
-"190","str","","Wahweap","Reynolds Point","mudstone/sandstone",83.5,70.6,"US",1,26
-"191","str","","Wapiti","","sandstone",83.5,70.6,"CA",1,2
-"192","str","","Wapiti","Unit 3","sandstone",83.5,70.6,"CA",1,2
-"193","str","","Wapiti","Unit 4","sandstone/mudstone",83.5,70.6,"CA",1,1
-"194","str","","Wayan","","sandstone",105.3,93.5,"US",1,6
-"195","str","","Williams Fork","","mudstone/sandstone",83.5,66,"US",2,2
-"196","str","","Xujiahe","3","",208.5,201.3,"CN",1,1
-"197","str","","Yalovach","","",85.8,83.5,"TJ",1,1
-"198","str","","Zagaje","","wackestone",201.3,196.5,"PL",1,1
-"199","str","","Zebbag","Kerker","sandstone/""limestone""",99.6,93.5,"TN",1,1
-"200","str","Agua de la Peña","Chañares","","claystone",242,237,"AR",9,13
-"201","str","Agua de la Peña","Los Colorados","","""siliciclastic"",mudstone",228,208.5,"AR",4,4
-"202","str","Ausseing","Marnes d'Auzas","","marl",70.6,66,"FR",1,1
-"203","str","Bauru","Adamantina","","sandstone",83.5,66,"BR",3,3
-"204","str","Beacon","Fremouw","","claystone,sandstone/mudstone",252.17,247.2,"AA",2,3
-"205","str","Beaufort","","","""siliciclastic""",247.2,242,"ZA",22,28
-"206","str","Beaufort","Balfour","","""siliciclastic"",mudstone",259.9,252.17,"ZA",7,10
-"207","str","Beaufort","Balfour","Palingkloof","siltstone/sandstone",252.17,251.2,"ZA",1,1
-"208","str","Beaufort","Burgersdorp","","""siliciclastic"",mudstone/""siliciclastic"",sandstone",247.2,242,"ZA",25,50
-"209","str","Beaufort","Katberg","","""siliciclastic""",252.17,247.2,"ZA",3,4
-"210","str","Beaufort","Normandien","Harrismith","""siliciclastic""",252.17,247.2,"ZA",2,7
-"211","str","Beaufort","Teekloof","","",254.17,252.17,"ZA",1,1
-"212","str","Beaufort","Teekloof","Hoedemaker","claystone/siltstone,mudstone/siltstone,siltstone/mudstone",259.9,254.17,"ZA",3,3
-"213","str","Beaufort","Teekloof","Oukloof","",259.9,254.17,"ZA",1,1
-"214","str","Belly River","Dinosaur Park","","mudstone,sandstone,sandstone/claystone,sandstone/mudstone,sandstone/siltstone,siltstone/sandstone",83.5,70.6,"CA",44,85
-"215","str","Belly River","Foremost","","sandstone,sandstone/""shale"",sandstone/mudstone",83.5,70.6,"CA",3,15
-"216","str","Belly River","Oldman","","sandstone,sandstone/siltstone",83.5,70.6,"CA",11,35
-"217","str","Belly River","Oldman","Lower","sandstone,sandstone/mudstone,sandstone/siltstone",83.5,70.6,"CA",5,23
-"218","str","Belly River","Oldman","Middle","sandstone,sandstone/siltstone",83.5,70.6,"CA",2,5
-"219","str","Belly River","Oldman","Upper","sandstone,sandstone/siltstone,siltstone",83.5,70.6,"CA",7,39
-"220","str","Black Creek","Tar Heel","","sandstone",83.5,70.6,"US",1,1
-"221","str","Bullhead Mountain","Gething","","sandstone/claystone,siltstone",113,100.5,"CA",2,2
-"222","str","Caiuá","","","sandstone",100.5,66,"BR",1,1
-"223","str","Caiuá","Rio Paraná","","sandstone",89.8,66,"BR",1,1
-"224","str","Chatham","Cumnock","","mudstone/siltstone",228,208.5,"US",2,5
-"225","str","Chatham","Pekin","","",237,228,"US",1,1
-"226","str","Chatham","Wolfville","","conglomerate,sandstone",237,228,"CA",3,3
-"227","str","Chesterfield","Vinita","Tomahawk Creek","mudstone",237,228,"US",1,2
-"228","str","Chinle","Redonda","Duke Ranch","conglomerate",228,208.5,"US",1,1
-"229","str","Chinle","Redonda","San Jon Creek","""limestone""/siltstone",228,208.5,"US",1,1
-"230","str","Chinle","Tecovas","","sandstone/conglomerate",228,208.5,"US",1,4
-"231","str","Chongqing","Shaximiao","Upper","breccia/mudstone",168.3,163.5,"CN",1,2
-"232","str","Dakota","Cedar Mountain","Mussentuchit","claystone,mudstone,sandstone,siltstone/mudstone",99.6,93.5,"US",16,114
-"233","str","Dakota","Cedar Mountain","Yellow Cat","sandstone",139.8,132.9,"US",1,2
-"234","str","Difunta","Cerro del Pueblo","","""shale""",83.5,70.6,"MX",2,5
-"235","str","Dockum","Bull Canyon","","siltstone/mudstone",228,208.5,"US",1,1
-"236","str","Dockum","Cooper Canyon","","mudstone/sandstone",228,208.5,"US",1,1
-"237","str","Dockum","Tecovas","","siltstone/conglomerate",228,208.5,"US",1,3
-"238","str","Drakensberg","","","""volcaniclastic""",190.8,182.7,"LS",1,3
-"239","str","Edmonton","","","sandstone",83.5,66,"CA",1,1
-"240","str","Edmonton","Horseshoe Canyon","","""shale""/ironstone",70.6,66,"CA",1,2
-"241","str","Edmonton","Horseshoe Canyon","Drumheller","",83.5,70.6,"CA",2,2
-"242","str","Edmonton","Horseshoe Canyon","Morrin/Tolman","",70.6,66,"CA",1,1
-"243","str","Edmonton","Horseshoe Canyon","Tolman","""siliciclastic"",sandstone",70.6,66,"CA",2,2
-"244","str","Edmonton","Scollard","","sandstone/""shale""",70.6,66,"CA",1,3
-"245","str","Glen Canyon","Kayenta","","sandstone,siltstone/sandstone",199.3,182.7,"US",4,5
-"246","str","Glen Canyon","Kayenta","Silty Facies","claystone,sandstone,siltstone,siltstone/""shale"",siltstone/sandstone",199.3,182.7,"US",13,26
-"247","str","Glen Canyon","Moenave","Dinosaur Canyon","sandstone",201.3,199.3,"US",1,1
-"248","str","Glen Canyon","Navajo Sandstone","","sandstone",190.8,174.1,"US",1,1
-"249","str","Gondwana","Kota","Upper","mudstone/""limestone"",siltstone/sandstone",182.7,170.3,"IN",2,10
-"250","str","Gondwana","Lower Maleri","","claystone",237,208.5,"IN",1,1
-"251","str","Gondwana","Tiki","","claystone",237,228,"IN",1,1
-"252","str","Gondwana","Tiki","Lower Tiki","mudstone",237,228,"IN",1,4
-"253","str","Great Estuarine","Kilmaluag","","marl",168.3,166.1,"UK",1,6
-"254","str","Great Oolite","","","claystone",168.3,166.1,"UK",1,4
-"255","str","Great Oolite","Chipping Norton Limestone","","claystone",167.7,164.7,"UK",1,7
-"256","str","Great Oolite","Forest Marble","","""limestone"",""mixed carbonate-siliciclastic"",marl",167.7,164.7,"UK",6,58
-"257","str","Great Oolite","Forest Marble","Wytchwood Beds","""limestone""",167.7,164.7,"UK",1,1
-"258","str","Great Oolite","Taynton Limestone","Stonesfield Slates","sandstone",167.7,164.7,"UK",1,6
-"259","str","Great Oolite","White Limestone","Bladon","claystone",167.7,164.7,"UK",1,13
-"260","str","Huizachal","La Boca","","mudstone,siltstone",190.8,182.7,"MX",5,6
-"261","str","Inyan Kara","Lakota","Chilson","mudstone/sandstone",145,136.4,"US",1,4
-"262","str","Inyan Kara","Lakota","Fuson","sandstone",140.2,125.45,"US",1,5
-"263","str","Isalo","Isalo II","Lower","claystone/sandstone",242,228,"MG",4,8
-"264","str","Isalo","Isalo IIIb","","",168.3,166.1,"MG",1,1
-"265","str","Jehol","Fuxin","","coal",125,100.5,"CN",1,8
-"266","str","Jehol","Jiufotang","","siltstone",125,113,"CN",1,1
-"267","str","Jehol","Jiufotang","2","sandstone/mudstone",125,113,"CN",1,1
-"268","str","Jehol","Yixian","","siltstone",130,122.46,"CN",3,3
-"269","str","Jehol","Yixian","Dawangzhangzi","""shale""",130,122.46,"CN",1,5
-"270","str","Jehol","Yixian","Jianshangou","""shale"",""shale""/siltstone,siltstone/mudstone",130,122.46,"CN",4,4
-"271","str","Jehol","Yixian","Lujiatun","tuff",130,122.46,"CN",3,8
-"272","str","Kalahari","Calonda","","mudstone",122.46,112.03,"AO",1,1
-"273","str","Karoo","Omingonde","","""shale""",247.2,237,NA,2,2
-"274","str","Karoo","Omingonde","Upper","""shale"",conglomerate,sandstone,siltstone",247.2,237,NA,12,12
-"275","str","Karoo","Pebbly Arkose","","siltstone/mudstone",237,228,"ZW",2,2
-"276","str","Keuper","Erfurt","Sandige Pflanzenschiefer","marl",242,235,"DE",1,1
-"277","str","Keuper","Erfurt","Upper Lettenkeuper","marl/dolomite",242,235,"DE",1,1
-"278","str","Keuper","Exter","","""siliciclastic"",sandstone",208.5,201.3,"DE",3,15
-"279","str","Keuper","Klettgau","Gruhalde","marl",228,208.5,"CH",1,1
-"280","str","Keuper","Trossingen","Knollenmergel","claystone/sandstone",208.5,201.3,"DE",1,1
-"281","str","Keuper","Weser","Lehrberg Beds","dolomite",237,228,"DE",1,1
-"282","str","Los Menucos","Vera","","sandstone",259.9,247.2,"AR",1,1
-"283","str","Malargüe","Allen","Lower","sandstone/siltstone",83.5,66,"AR",1,5
-"284","str","Marayes","Quebrada del Barro","","sandstone",228,208.5,"AR",1,2
-"285","str","Matawan","Marshalltown","","sandstone",83.5,70.6,"US",1,4
-"286","str","Mercia Mudstone","Blue Anchor","","marl",208.5,201.3,"UK",1,1
-"287","str","Meriden","McCoy Brook","","sandstone,sandstone/mudstone",201.3,196.5,"CA",3,3
-"288","str","Meriden","Towaco","A","siltstone/sandstone",201.3,199.3,"US",1,1
-"289","str","Mesaverde","Williams Fork","","sandstone",83.5,66,"US",1,4
-"290","str","Mifune","Jobu","","mudstone",99.6,89.3,"JP",1,1
-"291","str","Monmouth","Mount Laurel","upper","",83.5,66,"US",1,1
-"292","str","Montana","Fox Hills","Iron Lightning","sandstone",70.6,66,"US",1,4
-"293","str","Montana","Fox Hills","Stoneville","",70.6,66,"US",1,14
-"294","str","Montana","Hell Creek","","mudstone,sandstone,sandstone/conglomerate,sandstone/mudstone,siltstone,siltstone/sandstone",70.6,66,"US",14,63
-"295","str","Montana","Hell Creek","Little Beaver Creek","mudstone",70.6,66,"US",1,4
-"296","str","Montana","Hell Creek","Upper","sandstone",70.6,66,"US",11,74
-"297","str","Montana","Judith River","","claystone,mudstone,sandstone,sandstone/claystone,sandstone/siltstone",83.5,70.6,"US",20,84
-"298","str","Montana","Judith River","Coal Ridge","siltstone",83.5,70.6,"CA,US",3,4
-"299","str","Montana","Judith River","McClelland Ferry","mudstone/coal,sandstone",83.5,70.6,"US",2,16
-"300","str","Montana","Two Medicine","","""carbonate"",claystone,mudstone",83.5,70.6,"US",3,6
-"301","str","Neuquén","","","",86.3,70.6,"AR",1,1
-"302","str","Neuquén","Anacleto","","sandstone",83.5,70.6,"AR",1,1
-"303","str","Neuquén","Candeleros","Upper","sandstone",99.6,93.5,"AR",1,1
-"304","str","Nyker","Rabekke","Skyttegaard","siltstone/claystone",145,140.2,"DK",1,1
-"305","str","Otway","Eumeralla","","sandstone,sandstone/mudstone",112.03,109,"AU",2,5
-"306","str","Potomac","Arundel Clay","","claystone",122.46,112.03,"US",1,2
-"307","str","Potomac","Patuxent","","sandstone/claystone",125,113,"US",1,3
-"308","str","Puca","El Molino","Lower","sandstone",70.6,66,"BO",1,3
-"309","str","Puesto Viejo","Rio Seco de la Quebrada","","",237,228,"AR",1,3
-"310","str","Purbeck","","","lime mudstone/marl",145,139.8,"UK",1,2
-"311","str","Purbeck","Durlston","","packstone",145,140.2,"UK",1,1
-"312","str","Purbeck","Durlston","Intermarine","",145,140.2,"UK",1,1
-"313","str","Purbeck","Lulworth","","""limestone""",145,140.2,"UK",1,1
-"314","str","Purbeck","Lulworth","Worbarrow Tout","""limestone""/claystone,""shale"",claystone",145,140.2,"UK",6,67
-"315","str","Red Sandstone","Galula","Namba","sandstone/mudstone",100.5,72.1,"TZ",1,1
-"316","str","Rolling Downs","Griman Creek","","claystone",99.6,93.5,"AU",1,1
-"317","str","Rolling Downs","Griman Creek","Wallangulla Sandstone","claystone",99.6,93.5,"AU",2,3
-"318","str","Rolling Downs","Toolebuc","","""limestone"",""limestone""/""shale""",105.3,99.6,"AU",2,2
-"319","str","Rolling Downs","Winton","","sandstone/siltstone",99.6,89.3,"AU",1,1
-"320","str","Rosário do Sul","Caturrita","","sandstone,sandstone/siltstone,siltstone/sandstone",228,208.5,"BR",5,14
-"321","str","Rosário do Sul","Sanga do Cabral","","conglomerate,sandstone/conglomerate",252.17,247.2,"BR",4,4
-"322","str","Rosário do Sul","Santa Maria","","mudstone,mudstone/sandstone,sandstone/mudstone",232,221.5,"BR",20,37
-"323","str","Rosário do Sul","Santa Maria","Alemoa","mudstone,mudstone/sandstone,siltstone",237,208.5,"BR",7,12
-"324","str","Santa Maria","Candelária","","sandstone/mudstone",237,228,"BR",1,3
-"325","str","São Bento","Botucatu","","sandstone",125,113,"BR",2,3
-"326","str","Sasayama","Ohyamashimo","","siltstone",112.03,109,"JP",1,1
-"327","str","Scoresby Land","Fleming Fjord","Ørsted Dal","dolomite",208.5,201.3,"GL",2,2
-"328","str","Shindong","Jinju","","",113,100.5,"KR",1,1
-"329","str","Sierra de Olte","Cañadón Asfalto","","mudstone",182,175.6,"AR",1,4
-"330","str","Songea","Manda Beds","Lifua","sandstone",247.2,242,"TZ",2,2
-"331","str","Songea","Usili","","",259.9,254.17,"TZ",2,3
-"332","str","Steinmergel","","","dolomite",215.56,212,"LU",1,4
-"333","str","Stormberg","Clarens","","sandstone",190.8,182.7,"LS,ZA",2,2
-"334","str","Stormberg","Elliot","","",208.5,199.3,"ZA",1,1
-"335","str","Stormberg","Elliot","Lower","""shale""/mudstone,""siliciclastic""",228,201.3,"LS,ZA",4,4
-"336","str","Stormberg","Elliot","Upper","""siliciclastic"",mudstone,sandstone,siltstone",201.3,190.8,"LS,ZA",24,32
-"337","str","Strzelecki","Wonthaggi","","sandstone/conglomerate",122.46,112.03,"AU",1,7
-"338","str","Tegama","Elrhaz","","",113,100.5,"NE",1,1
-"339","str","Tetori","Itsuki","","mudstone/sandstone",129.4,125,"JP",1,1
-"340","str","Tetori","Kitadani","","sandstone/""shale""",125,113,"JP",2,3
-"341","str","Tetori","Kuwajima","","mudstone/sandstone,sandstone/coal,sandstone/mudstone",129.4,125,"JP",3,7
-"342","str","Trinity","Antlers","","""siliciclastic""",113,100.5,"US",2,14
-"343","str","Trinity","Antlers","middle","claystone,claystone/sandstone",122.46,109,"US",3,20
-"344","str","Trinity","Holly Creek","","mudstone/sandstone",113,100.5,"US",1,2
-"345","str","Trinity","Paluxy","Middle","claystone",113,100.5,"US",1,1
-"346","str","Trinity","Paluxy","Upper","claystone",113,100.5,"US",1,1
-"347","str","Trinity","Twin Mountains","","siltstone",122.46,112.03,"US",1,2
-"348","str","Tsagayan","Udurchukan","","claystone",70.6,66,"RU",1,1
-"349","str","Uspallata","Cerro de Las Cabras","","siltstone",247.2,242,"AR",2,3
-"350","str","Wealden","Tunbridge Wells Sand","Grinstead Clay","""limestone""",140.2,136.4,"UK",1,3
-"351","str","Wealden","Vectis","","",130,122.46,"UK",1,1
-"352","str","Wealden","Wadhurst Clay","","conglomerate",140.2,136.4,"UK",3,7
-"353","str","Wealden","Wessex","","conglomerate",129.4,125,"UK",4,8
-"354","str","Woodbine","Lewisville","","""shale""/sandstone,siltstone",99.6,93.5,"US",3,4
-"355","str","Zechstein","Werra","","mudstone",259.9,254.17,"DE",1,1
+"11","str","","Argiles et Grès à Reptiles","","sandstone",83.6,72.1,"FR",1,1
+"12","str","","Artoles","","sandstone/conglomerate",125.77,121.4,"ES",1,9
+"13","str","","Bagua","Fundo El Triunfo","""shale""",83.6,66,"PE",1,1
+"14","str","","Balabansai","","""siliciclastic"",claystone,sandstone/siltstone,siltstone",165.3,161.5,"KG",4,16
+"15","str","","Baruungoyot","","mudstone/sandstone,sandstone,sandstone/conglomerate,sandstone/mudstone",83.6,72.1,"MN",12,34
+"16","str","","Bayan Mandahu","","sandstone",83.6,72.1,"CN",4,4
+"17","str","","Bayangobi","","claystone",121.4,113,"CN",1,1
+"18","str","","Baynshire","","",100.5,83.6,"MN",1,1
+"19","str","","Bissekty","","sandstone,sandstone/conglomerate",93.9,89.8,"UZ",12,63
+"20","str","","Blesa","Cabezo Gordo","claystone",125.77,121.4,"ES",1,7
+"21","str","","Bostobe","","claystone,claystone/sandstone",86.3,72.1,"KZ",3,4
+"22","str","","Burgersdorp","","""shale"",sandstone",247.2,242,"ZA",2,2
+"23","str","","Cacheuta","","",237,208.5,"AR",1,1
+"24","str","","Camarillas","","claystone,mudstone/sandstone",125.77,121.4,"ES",3,9
+"25","str","","Cedar Mountain","Mussentuchit","sandstone",100.5,93.9,"US",2,6
+"26","str","","Chañares","","",237,233.4,"BR",1,1
+"27","str","","Chico","","""siliciclastic""",83.6,72.1,"US",1,1
+"28","str","","Chinle","","sandstone,siltstone",227,201.4,"US",2,3
+"29","str","","Chinle","Blue Mesa","mudstone/sandstone",227,208.5,"US",2,2
+"30","str","","Chinle","Mesa Redondo","mudstone/claystone",227,208.5,"US",1,1
+"31","str","","Chinle","Monitor Butte","",227,208.5,"US",1,1
+"32","str","","Chinle","Petrified Forest","""carbonate"",mudstone,mudstone/wackestone",227,208.5,"US",3,3
+"33","str","","Chorrillo","","claystone,mudstone",72.1,66,"AR",3,6
+"34","str","","Cloverly","Himes","mudstone,mudstone/claystone",109.9,93.9,"US",9,15
+"35","str","","Cloverly","Little Sheep Mudstone","claystone",121.4,100.5,"US",2,18
+"36","str","","Coachman","","",83.6,72.1,"US",1,2
+"37","str","","Dabrazhin","","sandstone",83.6,72.1,"KZ",1,6
+"38","str","","Densuş-Ciula","Middle","claystone/marl,claystone/sandstone,mudstone,mudstone/conglomerate",72.1,66,"RO",6,10
+"39","str","","Densuş-Ciula","Upper","sandstone",72.1,66,"RO",1,1
+"40","str","","Djadokhta","","""siliciclastic"",sandstone,sandstone/mudstone",83.6,72.1,"MN",11,30
+"41","str","","Djadokhta","Bayn Dzak","sandstone",83.6,72.1,"MN",5,21
+"42","str","","Djadokhta","Tugrugyin","sandstone",83.6,72.1,"MN",4,7
+"43","str","","Dorotea","","mudstone",83.6,66,"CL",2,3
+"44","str","","Dzunbain","","sandstone/claystone",119.5,109.9,"MN",1,16
+"45","str","","Eagle","Deadhorse Coulee","",86.3,83.6,"US",2,16
+"46","str","","Ejinhoro","","sandstone",145,100.5,"CN",1,1
+"47","str","","El Castellar","","""carbonate"",claystone,lime mudstone/""siliciclastic"",marl/""siliciclastic""",125.77,121.4,"ES",5,7
+"48","str","","El Gallo","","",83.6,72.1,"MX",1,4
+"49","str","","Ermaying","upper","",247.2,242,"CN",1,1
+"50","str","","Eutaw","Tombigbee Sand","",86.3,83.6,"US",1,1
+"51","str","","Exter","","""shale""/mudstone",208.5,201.4,"DE",1,1
+"52","str","","Ferris","","",72.1,66,"US",7,13
+"53","str","","Fleming Fjord","Ørsted Dal","""limestone""/mudstone,claystone/sandstone",208.5,201.4,"GL",2,4
+"54","str","","Fremouw","Upper","conglomerate",247.2,242,"AA",1,3
+"55","str","","Frenchman","","""siliciclastic"",claystone/conglomerate,sandstone,sandstone/siltstone,siltstone",72.1,66,"CA",7,55
+"56","str","","Fruitland","","""shale""/sandstone,coal,mudstone/sandstone,sandstone",83.6,72.1,"US",5,15
+"57","str","","Fruitland","Bisti","",83.6,72.1,"US",1,6
+"58","str","","Fruitland","Fossil Forest","conglomerate/sandstone",83.6,72.1,"US",2,2
+"59","str","","Fruitland/Kirtland","","",83.6,72.1,"US",2,9
+"60","str","","Fuxin","","coal/""shale""",121.4,100.5,"CN",1,1
+"61","str","","Gardner Canyon","","",208.5,192.9,"US",1,1
+"62","str","","Grès à Avicula contorta","","sandstone",208.5,201.4,"FR",1,24
+"63","str","","Grès à Reptiles","","claystone/sandstone",83.6,66,"FR",1,2
+"64","str","","Grès de Boisset","","sandstone/marl",208.5,201.4,"FR",1,2
+"65","str","","Grès de Labarre","","sandstone",72.1,66,"FR",1,1
+"66","str","","Grès de Mortinsart","","conglomerate,sandstone",208.5,201.4,"BE",2,4
+"67","str","","Hampen Marly","","",168.2,165.3,"UK",1,2
+"68","str","","Hanson","","siltstone",199.5,184.2,"AA",1,1
+"69","str","","Hekou","","sandstone",72.1,66,"CN",3,3
+"70","str","","Hell Creek","","""shale"",conglomerate,mudstone,sandstone,sandstone/claystone,sandstone/mudstone,siltstone",72.1,66,"US",84,357
+"71","str","","Hongyanjing","","""shale""",251.2,247.2,"CN",1,1
+"72","str","","Horseshoe Canyon","","",83.6,66,"CA",1,1
+"73","str","","Ifenthal","Schelmenloch","""limestone""",168.2,165.3,"CH",2,2
+"74","str","","Ilek","","sandstone,sandstone/siltstone",121.4,113,"RU",9,37
+"75","str","","Inalt","","""reef rocks"",breccia/packstone",145,139.8,"TR",3,3
+"76","str","","Infratrappean Beds","","sandstone/claystone",72.1,66,"IN",1,1
+"77","str","","Intertrappean Beds","","mudstone/sandstone",72.1,66,"IN",1,2
+"78","str","","Iron Springs","","sandstone/mudstone",86.3,72.1,"US",5,9
+"79","str","","Ischigualasto","","mudstone",237,208.5,"AR",4,4
+"80","str","","Ischigualasto","Cancha de Bochas","""siliciclastic"",siltstone",237,227,"AR",4,7
+"81","str","","Ischigualasto","La Peña","sandstone/conglomerate",237,227,"AR",1,2
+"82","str","","Itat","Upper","claystone",168.2,165.3,"RU",1,11
+"83","str","","Javkhlant","","sandstone",86.3,72.1,"MN",1,2
+"84","str","","Jiulongshan","","mudstone/sandstone",174.7,161.5,"CN",1,1
+"85","str","","Judith River","","sandstone",83.6,72.1,"US",3,5
+"86","str","","Kaiparowits","","",83.6,72.1,"US",4,50
+"87","str","","Kaiparowits","Lower","",83.6,72.1,"US",1,1
+"88","str","","Kayenta","","sandstone",199.5,184.2,"US",1,1
+"89","str","","Khodzhakul","","sandstone/claystone",100.5,93.9,"UZ",4,12
+"90","str","","Kirtland","Farmington","sandstone",83.6,72.1,"US",1,2
+"91","str","","Kirtland","Hunter Wash","",83.6,72.1,"US",1,14
+"92","str","","Kirtland","Naashoibito","sandstone",72.1,66,"US",2,2
+"93","str","","Klettgau","Gruhalde","marl",208.5,201.4,"CH",1,10
+"94","str","","Koum","Grés de Gaba","sandstone/mudstone",121.4,100.5,"CM",1,3
+"95","str","","Ksar Metlili","","sandstone",146.3,142.7,"MA",6,52
+"96","str","","La Amarga","Puesto Antigual","",125.77,119.5,"AR",1,1
+"97","str","","La Colonia","","claystone/siltstone",72.1,66,"AR",6,7
+"98","str","","La Huérguina","","""limestone""/lignite,""limestone""/packstone,siltstone",125.77,121.4,"ES",3,6
+"99","str","","La Matilde","","sandstone,sandstone/tuff,siltstone/sandstone",165.3,154.8,"AR",3,4
+"100","str","","Lance","","""shale"",claystone/sandstone,marl,mudstone,sandstone,sandstone/""shale"",sandstone/conglomerate",72.1,66,"US",51,333
+"101","str","","Laramie","","mudstone/sandstone,sandstone",72.1,66,"US",6,19
+"102","str","","Lesotho","","sandstone",192.9,174.7,"ZA",1,1
+"103","str","","Los Alamitos","","lime mudstone,siltstone/sandstone",83.6,66,"AR",2,23
+"104","str","","Lourinhã","Praia da Amoreira-Porto Novo","marl/mudstone,mudstone,mudstone/sandstone,sandstone/mudstone,siltstone",152.2,146.3,"PT",5,24
+"105","str","","Lower Monte Bardia","","""carbonate""/breccia",146.3,145,"IT",1,1
+"106","str","","Lufeng","Shawan","claystone,mudstone,sandstone",201.4,199.5,"CN",3,7
+"107","str","","Lufeng","Zhangjia'ao","",199.5,192.9,"CN",8,12
+"108","str","","Luohandong","","sandstone/""siliciclastic""",139.8,125.77,"CN",1,1
+"109","str","","Maastricht","Valkenburg","",72.1,66,"BE",1,1
+"110","str","","Madumabisa Mudstone","Upper","mudstone",259.51,254.14,"ZM",1,1
+"111","str","","Madygen","Upper Grey-coloured","""shale""",242,227,"KG",1,1
+"112","str","","Maevarano","Anembalemba","sandstone",72.1,66,"MG",8,13
+"113","str","","Maevarano","Lac Kinkony","sandstone",72.1,66,"MG",1,1
+"114","str","","Maleri","","""siliciclastic""",237,208.5,"IN",1,2
+"115","str","","Manda Beds","Lifua","""siliciclastic"",mudstone,sandstone/siltstone",247.2,242,"TZ",10,13
+"116","str","","Mesaverde","","conglomerate/sandstone,sandstone,sandstone/lignite",83.6,72.1,"US",14,45
+"117","str","","Mesaverde","Teapot Sandstone","sandstone",83.6,72.1,"US",7,13
+"118","str","","Milk River","","",86.3,83.6,"CA",1,2
+"119","str","","Milk River","Deadhorse Coulee","sandstone/""shale""",86.3,83.6,"CA",7,54
+"120","str","","Mirambel","","marl",125.77,121.4,"ES",1,1
+"121","str","","Mizdah","","sandstone",100.5,93.9,"LY",1,1
+"122","str","","Moenkopi","Holbrook","conglomerate",247.2,244.7,"US",1,1
+"123","str","","Morrison","","claystone,mudstone,mudstone/siltstone,sandstone,sandstone/mudstone,siltstone/sandstone",149.2,145,"US",15,44
+"124","str","","Morrison","Brushy Basin","claystone,mudstone,mudstone/sandstone,sandstone,sandstone/claystone,sandstone/mudstone,sandstone/siltstone,siltstone/sandstone",149.2,145,"US",17,65
+"125","str","","Morrison","Indian Fort","conglomerate,mudstone,sandstone,siltstone",154.8,145,"US",4,7
+"126","str","","Morrison","Lake Como","claystone/sandstone,mudstone",149.2,145,"US",2,13
+"127","str","","Morrison","Salt Wash","mudstone/sandstone",152.2,146.3,"US",1,1
+"128","str","","Morrison","Talking Rocks","mudstone/sandstone",154.8,145,"US",1,50
+"129","str","","Moskovoretskaya","Meshchera","claystone/sandstone",168.2,165.3,"RU",1,1
+"130","str","","Mugher Mudstone","","mudstone",149.2,145,"ET",1,1
+"131","str","","Murtoi","Mogoito","sandstone",139.8,132.6,"RU",1,2
+"132","str","","Muschelkalk","","wackestone",239.7,237,"ES",1,1
+"133","str","","Naturita","","mudstone,mudstone/sandstone",100.5,93.9,"US",7,46
+"134","str","","Nemegt","","sandstone,sandstone/mudstone",72.1,66,"MN",4,4
+"135","str","","Nenjiang","","mudstone",83.6,72.1,"CN",1,1
+"136","str","","North Horn","","",72.1,66,"US",3,10
+"137","str","","Ntawere","Lower","mudstone/sandstone,sandstone",247.2,242,"ZM",2,2
+"138","str","","Ntawere","Upper","mudstone",247.2,227,"ZM",2,3
+"139","str","","Ojo Alamo","Naashoibito","",72.1,66,"US",5,19
+"140","str","","Oldman","","",83.6,72.1,"CA",2,16
+"141","str","","Oshih","Cannonball","sandstone",145,132.6,"MN",1,3
+"142","str","","Paluxy","","mudstone/sandstone",113,100.5,"US",1,3
+"143","str","","Panchet","Deoli Sandstone","sandstone",251.902,248.9,"IN",1,1
+"144","str","","Petropavlovka","","sandstone",251.2,247.2,"RU",1,1
+"145","str","","Pictured Cliffs Sandstone","","",83.6,72.1,"US",1,2
+"146","str","","Prince Creek","","sandstone",72.1,66,"US",2,2
+"147","str","","Prince Creek","Kogosukruk Tongue","sandstone",72.1,66,"US",1,3
+"148","str","","Qigu","","siltstone/sandstone",157.9,149.2,"CN",1,7
+"149","str","","Qiupa","","mudstone/conglomerate,siltstone",72.1,66,"CN",3,3
+"150","str","","Quantou","","mudstone/sandstone",121.4,100.5,"CN",1,1
+"151","str","","Quebrada del Barro","","sandstone",227,208.5,"AR",1,1
+"152","str","","Râul Mare","upper","mudstone/""limestone""",72.1,66,"RO",1,3
+"153","str","","Sables de Mortinsart","","sandstone",208.5,201.4,"BE",1,7
+"154","str","","Sânpetru","lower","sandstone",72.1,66,"RO",1,1
+"155","str","","Santa Maria","","sandstone",227,208.5,"BR",2,2
+"156","str","","Santa Maria","Alemoa","mudstone/sandstone",242,227,"BR",1,3
+"157","str","","Santibañez del Val","Calizas de Lychnus","lime mudstone",72.1,66,"ES",1,4
+"158","str","","Şard","","claystone,claystone/""limestone""",72.1,66,"RO",2,2
+"159","str","","Scollard","","claystone,claystone/siltstone,siltstone",72.1,66,"CA",9,59
+"160","str","","Sebeş","","""siliciclastic"",claystone,mudstone/sandstone",72.1,66,"RO",3,3
+"161","str","","Shahai","","mudstone/coal,mudstone/conglomerate,not reported/coal",119.5,100.5,"CN",3,8
+"162","str","","Shangshihezi","","sandstone/mudstone",259.51,254.14,"CN",1,1
+"163","str","","Shar Teg","","claystone,sandstone",161.5,145,"MN",2,2
+"164","str","","Shaximiao","Lower","sandstone/mudstone",170.9,154.8,"CN",1,2
+"165","str","","Shishugou","","",161.5,154.8,"CN",1,1
+"166","str","","Shishugou","Lower","",165.3,161.5,"CN",1,1
+"167","str","","Shishugou","Upper","mudstone",161.5,154.8,"CN",3,4
+"168","str","","Sînpetru","","mudstone,mudstone/sandstone,sandstone",72.1,66,"RO",3,5
+"169","str","","Sînpetru","upper","claystone/sandstone",72.1,66,"RO",1,3
+"170","str","","Slivnitsa","","""limestone""",152.2,149.2,"BG",1,1
+"171","str","","St. Mary River","","claystone/sandstone,mudstone",72.1,66,"CA,US",4,24
+"172","str","","Straight Cliffs","John Henry","mudstone",89.8,83.6,"US",3,10
+"173","str","","Straight Cliffs","Smoky Hollow","claystone,mudstone/claystone",93.9,89.8,"US",4,31
+"174","str","","Straight Cliffs","Tibbet Canyon","",93.9,89.8,"US",1,1
+"175","str","","Süntel","","framestone/marl,mudstone",152.2,149.2,"DE",2,4
+"176","str","","Takli","","claystone/marl",72.1,66,"IN",1,1
+"177","str","","Tendaguru","Middle Dinosaur","siltstone",152.2,149.2,"TZ",1,4
+"178","str","","Tendaguru","Upper Dinosaur","",149.2,145,"TZ",1,1
+"179","str","","Tiaojishan","","""shale"",""shale""/tuff,sandstone/mudstone",161.5,152.2,"CN",6,16
+"180","str","","Tiki","","mudstone",237,227,"IN",1,1
+"181","str","","Tiki","Lower Tiki","mudstone,mudstone/claystone",237,227,"IN",2,2
+"182","str","","Ulan Malgait","","",149.2,145,"MN",1,3
+"183","str","","Ulansuhai","","conglomerate",83.6,66,"CN",1,1
+"184","str","","Villanueva de Huerva","Section B","claystone",139.8,125.77,"ES",1,1
+"185","str","","Vitoria","","sandstone/siltstone",83.6,72.1,"ES",1,7
+"186","str","","Wahweap","","mudstone,mudstone/sandstone",83.6,72.1,"US",8,61
+"187","str","","Wahweap","Reynolds Point","mudstone/sandstone",83.6,72.1,"US",1,26
+"188","str","","Wapiti","","sandstone",83.6,72.1,"CA",1,2
+"189","str","","Wapiti","Unit 3","sandstone",83.6,72.1,"CA",1,2
+"190","str","","Wapiti","Unit 4","sandstone/mudstone",83.6,72.1,"CA",1,1
+"191","str","","Wayan","","sandstone",106.2,93.9,"US",1,6
+"192","str","","Williams Fork","","mudstone/sandstone",83.6,66,"US",2,2
+"193","str","","Xujiahe","3","",208.5,201.4,"CN",1,1
+"194","str","","Yalovach","","",86.3,83.6,"TJ",1,1
+"195","str","","Zagaje","","wackestone",201.4,199.5,"PL",1,1
+"196","str","","Zebbag","Kerker","sandstone/""limestone""",100.5,93.9,"TN",1,1
+"197","str","Agua de la Peña","Chañares","","claystone,sandstone",242,227,"AR",10,14
+"198","str","Agua de la Peña","Los Colorados","","""siliciclastic"",mudstone",227,208.5,"AR",4,4
+"199","str","Ausseing","Marnes d'Auzas","","marl",72.1,66,"FR",1,1
+"200","str","Bauru","Adamantina","","sandstone",83.6,66,"BR",3,3
+"201","str","Beacon","Fremouw","","claystone,sandstone/mudstone",251.902,247.2,"AA",2,3
+"202","str","Beaufort","","","""siliciclastic""",247.2,242,"ZA",22,28
+"203","str","Beaufort","Balfour","","""siliciclastic"",mudstone",259.51,251.902,"ZA",7,10
+"204","str","Beaufort","Balfour","Palingkloof","siltstone/sandstone",251.902,251.2,"ZA",1,1
+"205","str","Beaufort","Burgersdorp","","""siliciclastic"",mudstone/""siliciclastic"",sandstone",247.2,242,"ZA",25,50
+"206","str","Beaufort","Katberg","","""siliciclastic""",251.902,247.2,"ZA",3,4
+"207","str","Beaufort","Normandien","Harrismith","""siliciclastic""",251.902,247.2,"ZA",2,7
+"208","str","Beaufort","Teekloof","","",254.14,251.902,"ZA",1,1
+"209","str","Beaufort","Teekloof","Hoedemaker","claystone/siltstone,mudstone/siltstone,siltstone/mudstone",259.51,254.14,"ZA",3,3
+"210","str","Beaufort","Teekloof","Oukloof","",259.51,254.14,"ZA",1,1
+"211","str","Belly River","Dinosaur Park","","mudstone,sandstone,sandstone/claystone,sandstone/mudstone,sandstone/siltstone,siltstone/sandstone",83.6,72.1,"CA",44,85
+"212","str","Belly River","Foremost","","sandstone,sandstone/""shale"",sandstone/mudstone",83.6,72.1,"CA",3,15
+"213","str","Belly River","Horseshoe Canyon","Horsethief","mudstone",72.1,66,"CA",1,1
+"214","str","Belly River","Oldman","","sandstone,sandstone/siltstone",83.6,72.1,"CA",11,35
+"215","str","Belly River","Oldman","Lower","sandstone,sandstone/mudstone,sandstone/siltstone",83.6,72.1,"CA",5,23
+"216","str","Belly River","Oldman","Middle","sandstone,sandstone/siltstone",83.6,72.1,"CA",2,5
+"217","str","Belly River","Oldman","Upper","sandstone,sandstone/siltstone,siltstone",83.6,72.1,"CA",7,39
+"218","str","Black Creek","Tar Heel","","sandstone",83.6,72.1,"US",1,1
+"219","str","Bullhead Mountain","Gething","","sandstone/claystone,siltstone",113,100.5,"CA",2,2
+"220","str","Caiuá","","","sandstone",100.5,66,"BR",1,1
+"221","str","Caiuá","Rio Paraná","","sandstone",89.8,66,"BR",1,1
+"222","str","Chatham","Cumnock","","mudstone/siltstone",227,208.5,"US",2,5
+"223","str","Chatham","Pekin","","",237,227,"US",1,1
+"224","str","Chatham","Wolfville","","conglomerate,sandstone",237,227,"CA",3,3
+"225","str","Chesterfield","Vinita","Tomahawk Creek","mudstone",237,227,"US",1,2
+"226","str","Chinle","Redonda","Duke Ranch","conglomerate",227,208.5,"US",1,1
+"227","str","Chinle","Redonda","San Jon Creek","""limestone""/siltstone",227,208.5,"US",1,1
+"228","str","Chinle","Tecovas","","sandstone/conglomerate",227,208.5,"US",1,4
+"229","str","Chongqing","Shaximiao","Upper","breccia/mudstone",168.2,161.5,"CN",1,2
+"230","str","Dakota","Cedar Mountain","Mussentuchit","claystone,mudstone,sandstone,siltstone/mudstone",100.5,93.9,"US",16,114
+"231","str","Dakota","Cedar Mountain","Yellow Cat","sandstone",139.8,132.6,"US",1,2
+"232","str","Difunta","Cerro del Pueblo","","""shale""",83.6,72.1,"MX",2,5
+"233","str","Dockum","Bull Canyon","","siltstone/mudstone",227,208.5,"US",1,1
+"234","str","Dockum","Cooper Canyon","","mudstone/sandstone",227,208.5,"US",1,1
+"235","str","Dockum","Tecovas","","siltstone/conglomerate",227,208.5,"US",1,3
+"236","str","Drakensberg","","","""volcaniclastic""",192.9,184.2,"LS",1,3
+"237","str","Edmonton","","","sandstone",83.6,66,"CA",1,1
+"238","str","Edmonton","Horseshoe Canyon","","""shale""/ironstone",72.1,66,"CA",1,2
+"239","str","Edmonton","Horseshoe Canyon","Drumheller","",83.6,72.1,"CA",2,2
+"240","str","Edmonton","Horseshoe Canyon","Morrin/Tolman","",72.1,66,"CA",1,1
+"241","str","Edmonton","Horseshoe Canyon","Tolman","""siliciclastic"",sandstone",72.1,66,"CA",2,2
+"242","str","Edmonton","Scollard","","sandstone/""shale""",72.1,66,"CA",1,3
+"243","str","Glen Canyon","Kayenta","","sandstone,siltstone/sandstone",199.5,184.2,"US",4,5
+"244","str","Glen Canyon","Kayenta","Silty Facies","claystone,sandstone,siltstone,siltstone/""shale"",siltstone/sandstone",199.5,184.2,"US",13,26
+"245","str","Glen Canyon","Moenave","Dinosaur Canyon","sandstone",201.4,199.5,"US",1,1
+"246","str","Glen Canyon","Navajo Sandstone","","sandstone",192.9,174.7,"US",1,1
+"247","str","Gondwana","Kota","Upper","mudstone/""limestone"",siltstone/sandstone",184.2,170.9,"IN",2,10
+"248","str","Gondwana","Lower Maleri","","claystone",237,208.5,"IN",1,1
+"249","str","Gondwana","Tiki","","claystone",237,227,"IN",1,1
+"250","str","Gondwana","Tiki","Lower Tiki","mudstone",237,227,"IN",1,4
+"251","str","Great Estuarine","Kilmaluag","","marl",168.2,165.3,"UK",1,6
+"252","str","Great Oolite","","","claystone",168.2,165.3,"UK",1,4
+"253","str","Great Oolite","Chipping Norton Limestone","","claystone",168.2,165.3,"UK",1,7
+"254","str","Great Oolite","Forest Marble","","""limestone"",""mixed carbonate-siliciclastic"",marl",168.2,165.3,"UK",6,59
+"255","str","Great Oolite","Forest Marble","Wytchwood Beds","""limestone""",168.2,165.3,"UK",1,1
+"256","str","Great Oolite","Taynton Limestone","Stonesfield Slates","sandstone",168.2,165.3,"UK",1,6
+"257","str","Great Oolite","White Limestone","Bladon","claystone",168.2,165.3,"UK",1,16
+"258","str","Huizachal","La Boca","","mudstone,siltstone",192.9,184.2,"MX",5,6
+"259","str","Inyan Kara","Lakota","Chilson","mudstone/sandstone",140.6,132.6,"US",1,4
+"260","str","Inyan Kara","Lakota","Fuson","sandstone",139.8,121.4,"US",1,5
+"261","str","Isalo","Isalo II","Lower","claystone/sandstone",242,227,"MG",4,8
+"262","str","Isalo","Isalo IIIb","","",168.2,165.3,"MG",1,1
+"263","str","Jehol","Fuxin","","coal",121.4,100.5,"CN",1,8
+"264","str","Jehol","Jiufotang","","siltstone",121.4,113,"CN",1,1
+"265","str","Jehol","Jiufotang","2","sandstone/mudstone",121.4,113,"CN",1,1
+"266","str","Jehol","Yixian","","siltstone",125.77,119.5,"CN",3,3
+"267","str","Jehol","Yixian","Dawangzhangzi","""shale""",125.77,119.5,"CN",1,5
+"268","str","Jehol","Yixian","Jianshangou","""shale"",""shale""/siltstone,siltstone/mudstone",125.77,119.5,"CN",4,4
+"269","str","Jehol","Yixian","Lujiatun","mudstone/tuff,tuff",125.77,119.5,"CN",4,9
+"270","str","Kalahari","Calonda","","mudstone",119.5,113,"AO",1,1
+"271","str","Karoo","Omingonde","","""shale""",247.2,237,NA,2,2
+"272","str","Karoo","Omingonde","Upper","""shale"",conglomerate,sandstone,siltstone",247.2,237,NA,12,12
+"273","str","Karoo","Pebbly Arkose","","siltstone/mudstone",237,227,"ZW",2,2
+"274","str","Keuper","Erfurt","Sandige Pflanzenschiefer","marl",239.7,237,"DE",1,1
+"275","str","Keuper","Erfurt","Upper Lettenkeuper","marl/dolomite",239.7,237,"DE",1,1
+"276","str","Keuper","Exter","","""siliciclastic"",sandstone",208.5,201.4,"DE",3,15
+"277","str","Keuper","Klettgau","Gruhalde","marl",227,208.5,"CH",1,1
+"278","str","Keuper","Trossingen","Knollenmergel","claystone/sandstone",208.5,201.4,"DE",1,1
+"279","str","Keuper","Weser","Lehrberg Beds","dolomite",237,227,"DE",1,1
+"280","str","Los Menucos","Vera","","sandstone",259.51,247.2,"AR",1,1
+"281","str","Malargüe","Allen","Lower","sandstone/mudstone,sandstone/siltstone",83.6,66,"AR",2,9
+"282","str","Marayes","Quebrada del Barro","","sandstone",227,208.5,"AR",1,2
+"283","str","Matawan","Marshalltown","","sandstone",83.6,72.1,"US",1,4
+"284","str","Mercia Mudstone","Blue Anchor","","marl",208.5,201.4,"UK",1,1
+"285","str","Meriden","McCoy Brook","","sandstone,sandstone/mudstone",201.4,199.5,"CA",3,3
+"286","str","Meriden","Towaco","A","siltstone/sandstone",201.4,199.5,"US",1,1
+"287","str","Mesaverde","Williams Fork","","sandstone",83.6,66,"US",1,4
+"288","str","Mifune","Jobu","","mudstone",100.5,89.8,"JP",1,1
+"289","str","Monmouth","Mount Laurel","upper","",83.6,66,"US",1,1
+"290","str","Montana","Fox Hills","Iron Lightning","sandstone",72.1,66,"US",1,4
+"291","str","Montana","Fox Hills","Stoneville","",72.1,66,"US",1,14
+"292","str","Montana","Hell Creek","","mudstone,sandstone,sandstone/conglomerate,sandstone/mudstone,siltstone,siltstone/sandstone",72.1,66,"US",14,63
+"293","str","Montana","Hell Creek","Little Beaver Creek","mudstone",72.1,66,"US",1,4
+"294","str","Montana","Hell Creek","Upper","sandstone",72.1,66,"US",11,74
+"295","str","Montana","Judith River","","claystone,mudstone,sandstone,sandstone/claystone,sandstone/siltstone",83.6,72.1,"US",20,84
+"296","str","Montana","Judith River","Coal Ridge","siltstone",83.6,72.1,"CA,US",3,4
+"297","str","Montana","Judith River","McClelland Ferry","mudstone/coal,sandstone",83.6,72.1,"US",2,16
+"298","str","Montana","Two Medicine","","""carbonate"",claystone,mudstone",83.6,72.1,"US",3,6
+"299","str","Neuquén","","","",86.3,72.1,"AR",1,1
+"300","str","Neuquén","Anacleto","","sandstone",83.6,72.1,"AR",1,1
+"301","str","Neuquén","Candeleros","Upper","sandstone",100.5,93.9,"AR",1,1
+"302","str","Nyker","Rabekke","Skyttegaard","siltstone/claystone",145,142.7,"DK",1,1
+"303","str","Otway","Eumeralla","","sandstone,sandstone/mudstone",113,109.9,"AU",2,5
+"304","str","Potomac","Arundel Clay","","claystone",119.5,113,"US",1,2
+"305","str","Potomac","Patuxent","","sandstone/claystone",121.4,113,"US",1,3
+"306","str","Puca","El Molino","Lower","sandstone",72.1,66,"BO",1,3
+"307","str","Puesto Viejo","Rio Seco de la Quebrada","","",237,227,"AR",1,3
+"308","str","Purbeck","","","lime mudstone/marl",145,139.8,"UK",1,2
+"309","str","Purbeck","Durlston","","packstone",140.6,139.8,"UK",1,1
+"310","str","Purbeck","Durlston","Intermarine","",140.6,139.8,"UK",1,1
+"311","str","Purbeck","Lulworth","","""limestone""",145,142.7,"UK",1,1
+"312","str","Purbeck","Lulworth","Worbarrow Tout","""limestone""/claystone,""shale"",claystone",142.7,140.6,"UK",6,67
+"313","str","Red Sandstone","Galula","Namba","sandstone/mudstone",100.5,72.1,"TZ",1,1
+"314","str","Rolling Downs","Griman Creek","","claystone",100.5,93.9,"AU",1,1
+"315","str","Rolling Downs","Griman Creek","Wallangulla Sandstone","claystone,siltstone",100.5,93.9,"AU",2,3
+"316","str","Rolling Downs","Toolebuc","","""limestone"",""limestone""/""shale""",106.2,100.5,"AU",2,2
+"317","str","Rolling Downs","Winton","","sandstone/siltstone",100.5,89.8,"AU",1,1
+"318","str","Rosário do Sul","Caturrita","","sandstone,sandstone/siltstone,siltstone/sandstone",227,208.5,"BR",5,14
+"319","str","Rosário do Sul","Sanga do Cabral","","conglomerate,sandstone/conglomerate",251.902,247.2,"BR",4,4
+"320","str","Rosário do Sul","Santa Maria","","mudstone,mudstone/sandstone,sandstone/mudstone",233.4,227,"BR",20,37
+"321","str","Rosário do Sul","Santa Maria","Alemoa","mudstone,mudstone/sandstone,siltstone",237,208.5,"BR",7,12
+"322","str","Sangar","Batylykh","","sandstone",145,121.4,"RU",1,5
+"323","str","Santa Maria","Candelária","","sandstone/mudstone",237,227,"BR",1,3
+"324","str","São Bento","Botucatu","","sandstone",121.4,113,"BR",2,3
+"325","str","Sasayama","Ohyamashimo","","siltstone",113,109.9,"JP",1,1
+"326","str","Scoresby Land","Fleming Fjord","Ørsted Dal","dolomite",208.5,201.4,"GL",2,2
+"327","str","Shindong","Jinju","","",113,100.5,"KR",1,1
+"328","str","Sierra de Olte","Cañadón Asfalto","","mudstone",182.9,174.7,"AR",1,4
+"329","str","Songea","Manda Beds","Lifua","sandstone",247.2,242,"TZ",2,2
+"330","str","Songea","Usili","","",259.51,254.14,"TZ",2,3
+"331","str","Steinmergel","","","dolomite",216.7,213.2,"LU",1,4
+"332","str","Stormberg","Clarens","","sandstone",192.9,184.2,"LS,ZA",2,2
+"333","str","Stormberg","Elliot","","",208.5,199.5,"ZA",1,1
+"334","str","Stormberg","Elliot","Lower","""shale""/mudstone,""siliciclastic""",227,201.4,"LS,ZA",4,4
+"335","str","Stormberg","Elliot","Upper","""siliciclastic"",mudstone,sandstone,siltstone",201.4,192.9,"LS,ZA",41,52
+"336","str","Strzelecki","Wonthaggi","","sandstone/conglomerate",119.5,113,"AU",1,7
+"337","str","Tegama","Elrhaz","","",113,100.5,"NE",1,1
+"338","str","Tetori","Itsuki","","mudstone/sandstone",125.77,121.4,"JP",1,1
+"339","str","Tetori","Kitadani","","sandstone/""shale""",121.4,113,"JP",2,3
+"340","str","Tetori","Kuwajima","","mudstone/sandstone,sandstone/coal,sandstone/mudstone",125.77,121.4,"JP",3,7
+"341","str","Trinity","Antlers","","""siliciclastic""",113,100.5,"US",2,14
+"342","str","Trinity","Antlers","middle","claystone,claystone/sandstone",119.5,109.9,"US",3,20
+"343","str","Trinity","Holly Creek","","mudstone/sandstone",113,100.5,"US",1,2
+"344","str","Trinity","Paluxy","Middle","claystone",113,100.5,"US",1,1
+"345","str","Trinity","Paluxy","Upper","claystone",113,100.5,"US",1,1
+"346","str","Trinity","Twin Mountains","","siltstone",119.5,113,"US",1,2
+"347","str","Tsagayan","Udurchukan","","claystone",72.1,66,"RU",1,1
+"348","str","Uspallata","Cerro de Las Cabras","","siltstone",247.2,242,"AR",2,3
+"349","str","Wealden","Tunbridge Wells Sand","Grinstead Clay","""limestone""",139.8,132.6,"UK",1,3
+"350","str","Wealden","Vectis","","",125.77,119.5,"UK",1,1
+"351","str","Wealden","Wadhurst Clay","","conglomerate",139.8,132.6,"UK",3,7
+"352","str","Wealden","Wessex","","conglomerate",125.77,121.4,"UK",4,8
+"353","str","Woodbine","Lewisville","","""shale""/sandstone,siltstone",100.5,93.9,"US",3,4
+"354","str","Zechstein","Werra","","mudstone",259.51,254.14,"DE",1,1
