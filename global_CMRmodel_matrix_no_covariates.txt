@@ -12,7 +12,8 @@
       #############################################################
       
       # prior to describe the full community size
-      omega~dunif(0,1)
+      #omega~dunif(0,1)
+      omega ~ dbeta(0.001,1)
       
       # superpopulation process
       for (g in 1:ngen) {
@@ -24,7 +25,7 @@
        # Site Occupancy Dynamics (Priors)
        # intercepts
        # gamma
-       for (t in 2:nint) {
+       for(t in 1:(nint-1)){
        
          phi[t]~dunif(0,1)
          gamma[t]~dunif(0,1)
@@ -47,8 +48,8 @@
       
                   # model likelihood
                   ### modeling dynamics conditional on previous time realized occurrence z
-                  muZ[g,t] <- z[g,t-1] *  phi[t] + ### if occupied, p of not getting extinct/persist in the next time
-                              (1-z[g,t-1]) *  gamma[t] ###  if not occupied, p of originate in the next time
+                  muZ[g,t] <- z[g,t-1] *  phi[t-1] + ### if occupied, p of not getting extinct/persist in the next time
+                              (1-z[g,t-1]) *  gamma[t-1] ###  if not occupied, p of originate in the next time
                   
                  # realized occurrence
                  muZW[g,t] <- muZ[g,t]*w[g]

@@ -9,7 +9,8 @@
       #############################################################
       
       # prior to describe the full community size
-      omega~dunif(0,1)
+      #omega~dunif(0,1)
+      omega ~ dbeta(0.001,1)
       
       # superpopulation process
       for (g in 1:ngen) {
@@ -28,14 +29,14 @@
         gamma.u ~ dunif(0,1) # range origination
         intercept.gamma <- logit(gamma.u) # intercept origination
         # regression coeff
-        beta.gamma.prec ~ dnorm(0,1/3^2)# precipitation
-        beta.gamma.temp ~ dnorm(0,1/3^2)# temperature
-        beta.gamma.area ~ dnorm(0,1/3^2) # area
-        beta.gamma.coast ~ dnorm(0,1/3^2) # area
+        beta.gamma.prec ~ dunif(-20,20)# dnorm(0,1/3^2)# precipitation
+        beta.gamma.temp ~ dunif(-20,20)#dnorm(0,1/3^2)# temperature
+        beta.gamma.area ~ dunif(-20,20)#dnorm(0,1/3^2) # area
+        beta.gamma.coast ~ dunif(-20,20)#dnorm(0,1/3^2) # area
         
         # tropics
-        beta.gamma.area.t ~ dnorm(0,1/3^2) # area
-        beta.gamma.coast.t ~ dnorm(0,1/3^2) # area
+        beta.gamma.area.t ~ dunif(-20,20)#dnorm(0,1/3^2) # area
+        beta.gamma.coast.t ~ dunif(-20,20)#dnorm(0,1/3^2) # area
      
         # ----------------------
         #     Phi (persistence)
@@ -44,14 +45,14 @@
         phi.u ~ dunif(0,1) # range persistence
         intercept.phi <- logit(phi.u) # intercept persistence
         # regression coeff
-        beta.phi.prec ~ dnorm(0,1/3^2)# precipitation
-        beta.phi.temp ~ dnorm(0,1/3^2)# temperature
-        beta.phi.area ~ dnorm(0,1/3^2) # area
-        beta.phi.coast ~ dnorm(0,1/3^2) # area
+        beta.phi.prec ~ dunif(-20,20)#dnorm(0,1/3^2)# precipitation
+        beta.phi.temp ~ dunif(-20,20)#dnorm(0,1/3^2)# temperature
+        beta.phi.area ~ dunif(-20,20)#dnorm(0,1/3^2) # area
+        beta.phi.coast ~ dunif(-20,20)#dnorm(0,1/3^2) # area
         
         # tropics
-        beta.phi.area.t ~ dnorm(0,1/3^2) # area
-        beta.phi.coast.t ~ dnorm(0,1/3^2) # area
+        beta.phi.area.t ~ dunif(-20,20)#dnorm(0,1/3^2) # area
+        beta.phi.coast.t ~ dunif(-20,20)#dnorm(0,1/3^2) # area
         
         ## set initial conditions for occupancy of each genus
         psi1 ~ dunif(0,1)
@@ -62,16 +63,17 @@
        # model for phi and gamma
        ### model dynamic parameters
         
-        for (t in 2:nint){
-      
+        #for (t in 2:nint){
+        for(t in 1:(nint-1)){
+        
              # speciation
              logit(gamma[t]) <-  intercept.gamma + 
-                                   beta.gamma.prec*precipitation[t]+
+                                   #beta.gamma.prec*precipitation[t]+
                                    beta.gamma.temp*temperature[t]+
                                    beta.gamma.area*area[t]+
-                                   beta.gamma.coast*coast[t]+
-                                   beta.gamma.area.t*area.t[t]+
-                                   beta.gamma.coast.t*coast.t[t]
+                                   #beta.gamma.coast*coast[t]+
+                                   beta.gamma.area.t*area.t[t]#+
+                                   #beta.gamma.coast.t*coast.t[t]
                                    
                                    
                                          
@@ -97,8 +99,8 @@
               
                   # model likelihood
                   ### modeling dynamics conditional on previous time realized occurrence z
-                  muZ[g,t] <- z[g,t-1] *  phi[t] + ### if occupied, p of not getting extinct/persist in the next time
-                                (1-z[g,t-1]) *  gamma[t] ###  if not occupied, p of originate in the next time
+                  muZ[g,t] <- z[g,t-1] *  phi[t-1] + ### if occupied, p of not getting extinct/persist in the next time
+                                (1-z[g,t-1]) *  gamma[t-1] ###  if not occupied, p of originate in the next time
                   
                  # realized occurrence
                  muZW[g,t] <- muZ[g,t]*w[g]
@@ -120,10 +122,10 @@
     p.u ~ dunif(0,1) # range origination
     intercept.p <- logit(p.u) # intercept origination
     # regression coef
-    beta.p.lat ~ dnorm(0,1/3^2)
-    beta.p.range ~ dnorm(0,1/3^2)
-    beta.p.time ~ dnorm(0,1/3^2)
-    beta.p.temp ~ dnorm(0,1/3^2)
+    beta.p.lat ~ dunif(-20,20)#dnorm(0,1/3^2)
+    beta.p.range ~ dunif(-20,20)#dnorm(0,1/3^2)
+    beta.p.time ~ dunif(-20,20)#dnorm(0,1/3^2)
+    beta.p.temp ~ dunif(-20,20)#dnorm(0,1/3^2)
      
     # observation submodel
     for (g in 1:ngen) { ## loop over observations 
