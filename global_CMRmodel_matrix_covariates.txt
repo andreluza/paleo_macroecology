@@ -68,12 +68,12 @@
         
              # speciation
              logit(gamma[t]) <-  intercept.gamma + 
-                                   #beta.gamma.prec*precipitation[t]+
+                                   beta.gamma.prec*precipitation[t]+
                                    beta.gamma.temp*temperature[t]+
                                    beta.gamma.area*area[t]+
-                                   #beta.gamma.coast*coast[t]+
-                                   beta.gamma.area.t*area.t[t]#+
-                                   #beta.gamma.coast.t*coast.t[t]
+                                   beta.gamma.coast*coast[t]+
+                                   beta.gamma.area.t*area.t[t]+
+                                   beta.gamma.coast.t*coast.t[t]
                                    
                                    
                                          
