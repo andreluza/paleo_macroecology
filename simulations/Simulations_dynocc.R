@@ -4,93 +4,11 @@
 # Simulation study
 
 # Can the same set of covarites be included in the origination and extinction models??
-
 # global - scale analysis ( so the species are in the rows of the detection table )
+# around 3 hours per run
 
 # ----------------------------------------
 
-
-# Load necessary libraries
-library(rjags)
-
-# Set parameters
-set.seed(42)
-n_spp <- 500  # Number of sites
-n_years <- 30   # Number of years (time bins)
-n_surveys <- 6  # Number of surveys (geological formations) per year
-initial_psi <- 0.6  # Initial occupancy probability
-
-# covariate effect on origination
-beta_gamma1 <- 0.5
-beta_gamma2 <- 2
-beta_gamma3 <- -0.5
-
-# covariate effect on extinction
-beta_epsilon1 <- 0.5
-beta_epsilon2 <- 2
-beta_epsilon3 <- -0.5
-
-# covariates
-X1 <- rnorm (n_years, 0, 1) 
-X2 <- rnorm (n_years, 0, 1) 
-X3 <- rnorm (n_years, 0, 1) 
-cor(cbind(X1,X2,X3))
-
-# Origination probability
-intercept_gamma <- qlogis(0.1)  
-gamma <- intercept_gamma+beta_gamma1+X1+
-                          beta_gamma2+X2+
-                          beta_gamma3+X3
-gamma <- plogis(gamma) # back to prob scale
-
-# Extinction probability
-intercept_epsilon <- qlogis(0.7)  
-epsilon <- intercept_epsilon+beta_epsilon1+X1+
-                            beta_epsilon2+X2+
-                            beta_epsilon3+X3
-epsilon <- plogis(epsilon) # back to prob scale
-
-# Detection probability
-p <- 0.7  
-
-# Simulate occupancy states
-z <- array(0, dim = c(n_spp, n_years))
-z[, 1] <- rbinom(n_spp, 1, initial_psi)
-
-for (t in 2:n_years) {
-  for (i in 1:n_spp) {
-    z[i, t] <- rbinom(1, 1, z[i, t - 1] * (1 - epsilon[t]) + (1 - z[i, t - 1]) * gamma[t])
-  }
-}
-
-# Simulate detections
-y <- array(0, dim = c(n_spp, n_years))
-for (i in 1:n_spp) {
-  for (t in 1:n_years) {
-    
-      y[i, t] <- rbinom(1, n_surveys, z[i, t] * p)
-    
-  }
-}
-
-# Prepare data for JAGS
-jags_data <- list(
-  y = y,
-  n_spp = n_spp,
-  n_years = n_years,
-  n_surveys = rep(n_surveys,n_years),
-  X1=X1,
-  X2=X2,
-  X3=X3
-)
-
-# Initial values for the latent states
-init_values <- function() {
-  list(z = matrix(1, n_spp, n_years))
-}
-
-# Parameters to monitor
-parameters <- c("psi", "gamma", "epsilon", "p")
 
 # Write the JAGS model
 model_string <- "
@@ -107,9 +25,9 @@ model {
         gamma.u ~ dunif(0,1) # range origination
         intercept.gamma <- logit(gamma.u) # intercept origination
         # regression coeff
-        beta_gamma1 ~ dnorm(0,1/3^2)# precipitation
-        beta_gamma2 ~ dnorm(0,1/3^2)# temperature
-        beta_gamma3 ~ dnorm(0,1/3^2) # area
+        beta_gamma1 ~ dunif(-20,20)
+        beta_gamma2 ~ dunif(-20,20)
+        beta_gamma3 ~ dunif(-20,20)
         
         # ----------------------
         #     Phi (persistence)
@@ -118,9 +36,9 @@ model {
         phi.u ~ dunif(0,1) # range persistence
         intercept.phi <- logit(phi.u) # intercept persistence
         # regression coeff
-        beta_epsilon1 ~ dnorm(0,1/3^2)# precipitation
-        beta_epsilon2 ~ dnorm(0,1/3^2)# precipitation
-        beta_epsilon3 ~ dnorm(0,1/3^2)# precipitation
+        beta_phi1 ~ dunif(-20,20)
+        beta_phi2 ~ dunif(-20,20)
+        beta_phi3 ~ dunif(-20,20)
         
         
         ## set initial conditions for occupancy of each genus
@@ -132,7 +50,7 @@ model {
        # model for phi and gamma
        ### model dynamic parameters
         
-        for (t in 2:n_years){
+        for (t in 1:(n_years-1)){
       
              # speciation
              logit(gamma[t]) <-  intercept.gamma + 
@@ -142,9 +60,9 @@ model {
                                    
               # persistence
               logit(phi[t]) <-  intercept.phi + 
-                                  beta_epsilon1*X1[t]+
-                                  beta_epsilon2*X2[t]+
-                                  beta_epsilon3*X3[t]
+                                  beta_phi1*X1[t]+
+                                  beta_phi2*X2[t]+
+                                  beta_phi3*X3[t]
                                   
                                   
         }
@@ -161,8 +79,8 @@ model {
               
                   # model likelihood
                   ### modeling dynamics conditional on previous time realized occurrence z
-                  muZ[g,t] <- z[g,t-1] *  phi[t] + ### if occupied, p of not getting extinct/persist in the next time
-                                (1-z[g,t-1]) *  gamma[t] ###  if not occupied, p of originate in the next time
+                  muZ[g,t] <- z[g,t-1] *  phi[t-1] + ### if occupied, p of not getting extinct/persist in the next time
+                                (1-z[g,t-1]) *  gamma[t-1] ###  if not occupied, p of originate in the next time
                   
                  # realized occurrence
                  muZW[g,t] <- muZ[g,t]
@@ -202,18 +120,120 @@ model {
 
 "
 
-# Run JAGS model
-jags_model <- jags.model(textConnection(model_string), data = jags_data, inits = init_values, n.chains = 3, n.adapt = 500)
-update(jags_model, n.iter = 500)
-samples <- coda.samples(jags_model, variable.names = parameters, n.iter = 1000, thin = 2)
 
-# Print results
-print(summary(samples))
+# Load necessary libraries
+library(rjags)
+library(here)
 
-samples <- do.call(rbind,samples)
+# Set parameters
+set.seed(42)
+n_spp <- 500  # Number of sites
+n_years <- 30   # Number of time bins
+n_surveys <- 6  # Number of surveys (geological formations) per time bin
+initial_psi <- 0.6  # Initial occupancy probability
 
-plot(gamma,
-     colMeans(samples[grep("gamma\\[",colnames(samples)),]))
+# covariate effect on origination
+beta_gamma1 <- 0.5
+beta_gamma2 <- 2
+beta_gamma3 <- -0.5
 
-plot(epsilon,
-     colMeans(samples[grep("epsilon\\[",colnames(samples)),]))
+# covariate effect on extinction
+beta_phi1 <- 0.5
+beta_phi2 <- 2
+beta_phi3 <- -0.5
+
+# covariates
+# PS: we repeated the generation of variables up to a point in which one correlation was of intermediate strength rho ~ 0.5
+#X1 <- rnorm (n_years-1, 0, 1) 
+#X2 <- rnorm (n_years-1, 0, 1) 
+#X3 <- rnorm (n_years-1, 0, 1) 
+
+#save(X1,X2,X3, file=here("simulations","covariates.RData"))
+load(file=here("simulations","covariates.RData"))
+cor(cbind(X1,X2,X3))
+
+# create dir
+dir.create (here ("simulations", "output"))
+
+# start simulations ---------------------------------
+
+n.sims <- 50
+my.seeds <- floor(runif (n.sims,0,5000))
+
+# run
+lapply (seq(1,n.sims), function (s) {
+  
+        # set seed
+        set.seed(my.seeds[s])
+        
+        # Origination probability
+        intercept_gamma <- qlogis(0.5)  
+        gamma <- intercept_gamma+beta_gamma1+X1+
+                                  beta_gamma2+X2+
+                                  beta_gamma3+X3
+        gamma <- plogis(gamma) # back to prob scale
+        
+        # Extinction probability
+        intercept_phi <- qlogis(0.5)  
+        phi <- intercept_phi+beta_phi1+X1+
+                                    beta_phi2+X2+
+                                    beta_phi3+X3
+        phi <- plogis(phi) # back to prob scale
+        
+        # Detection probability
+        p <- 0.2  
+        
+        # Simulate occupancy states
+        z <- array(0, dim = c(n_spp, n_years))
+        z[, 1] <- rbinom(n_spp, 1, initial_psi)
+        
+        for (t in 2:n_years) {
+          for (i in 1:n_spp) {
+            z[i, t] <- rbinom(1, 1, z[i, t - 1] * (1 - phi[t-1]) + (1 - z[i, t - 1]) * gamma[t-1])
+          }
+        }
+        
+        # Simulate detections
+        y <- array(0, dim = c(n_spp, n_years))
+        for (i in 1:n_spp) {
+          for (t in 1:n_years) {
+            
+              y[i, t] <- rbinom(1, n_surveys, z[i, t] * p)
+            
+          }
+        }
+        
+        # Prepare data for JAGS
+        jags_data <- list(
+          y = y,
+          n_spp = n_spp,
+          n_years = n_years,
+          n_surveys = rep(n_surveys,n_years),
+          X1=X1,
+          X2=X2,
+          X3=X3
+        )
+        
+        # Initial values for the latent states
+        init_values <- function() {
+          list(z = matrix(1, n_spp, n_years))
+        }
+        
+        # Parameters to monitor
+        parameters <- c("intercept.phi","beta_phi1",
+                          "beta_phi2","beta_phi3",
+                        "intercept.gamma","beta_gamma1",
+                        "beta_gamma2","beta_gamma3",
+                        "initial_psi", "gamma", "phi", "p", "muZ")
+        
+        # Run JAGS model
+        jags_model <- jags.model(textConnection(model_string), data = jags_data, inits = init_values, n.chains = 3, n.adapt = 500)
+        update(jags_model, n.iter = 500)
+        samples <- coda.samples(jags_model, variable.names = parameters, n.iter = 1000, thin = 2)
+        samples <- do.call(rbind,samples)
+        point_estimates <- apply(samples,2,mean)
+        save (point_estimates, file = here ("simulations", "output", paste0("sims_run", s,".RData")))
+
+})
+
+# end of the simulations
