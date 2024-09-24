@@ -1,7 +1,8 @@
 # load packages
 library(here);
 #library(rgeos);
-library(rgdal);library(sp);library(raster); library(openxlsx)
+#library(rgdal);
+library(sp);library(raster); library(openxlsx)
 # data processing
 library(ggplot2);library(gridExtra); library(rasterVis); library(viridis); library(dplyr); library(magick); library(reshape)
 library (purrr); library(janitor); library(knitr); library(kableExtra);library(tidyverse)
@@ -15,7 +16,7 @@ library(deeptime)
 library(jagsUI)
 library(R2WinBUGS) 
 #devtools::install_github("mikemeredith/saveJAGS")
-require(saveJAGS)
+#require(saveJAGS)
 require(bayestestR)
 
 # load paleoDEM dataset
@@ -32,4 +33,5 @@ library(sf)
 require(rnaturalearth)
 require(ggplot2)
 require(ggrepel)
+require(ggbreak)
 
