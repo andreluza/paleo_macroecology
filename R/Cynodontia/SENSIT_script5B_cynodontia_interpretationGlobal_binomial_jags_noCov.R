@@ -8,9 +8,9 @@
 
 # ------------------------------------------------------------
 # load packages
+rm(list=ls())
 source("R/packages.R")
 source("R/functions.R")
-require(ggbreak)
 
 # load output
 load (here ("output","No_covariate_model",
@@ -72,7 +72,7 @@ geom_histogram(aes(y = ..density..),
                alpha=0.5) +
   theme_classic()+
   scale_fill_manual(values = cols)+
-  scale_x_break(c(450, 700), expand=T,scales="fixed")+
+  scale_x_break(c(450, 1000), expand=T,scales="fixed")+
   #scale_y_break(c(0.06, 0.1), expand=T,scales="fixed")+
   theme(legend.position = "none",legend.direction = "vertical") + 
   
@@ -106,17 +106,10 @@ dat_diversity %>%
 
 
 p_div
+
 ggsave (here ("output","No_covariate_model", "density_Div.pdf"),
         p_div,
         width=8,height =3)
-
-
-# total N of genera in the z matrix
-
-
-sum(apply(cynodonts_output$mean$z,1,max))
-sum(apply(mammaliaformes_output$mean$z,1,max))
-sum(apply(mammalia_output$mean$z,1,max))
 
 
 # omega
@@ -143,7 +136,6 @@ par (mfrow=c(1,1))
 # --------------------------------------------------
 
 # plot of averages of gamma, phi, and p
-
 
 # show metacommunity size
 
@@ -206,9 +198,7 @@ ggsave (here ("output","No_covariate_model", "p_rates.pdf"),
         width=10,height =5)
 
 
-
 # --------------------------------------------------
-
 
 
 # plot covariates
@@ -276,7 +266,7 @@ stages_mamm <- (function_stages (x = array_genus_bin[which(clades %in% "Mammalia
 dat <-   rbind (
   
   
-  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_cyn,],
+  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_cyn[-length(stages_cyn)],],
               Taxon = "Non-mammaliaform cynodonts",
               var= "Origination probability",
               model = "Binomial",
@@ -285,7 +275,7 @@ dat <-   rbind (
               up=apply (cynodonts_output$sims.list$gamma,2,quantile, c(0.025,0.975),na.rm=T)[2,]),
   
   
-  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_cyn,],
+  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_cyn[-length(stages_cyn)],],
               Taxon = "Non-mammaliaform cynodonts",
               var= "Extinction probability",
               model = "Binomial",
@@ -293,7 +283,7 @@ dat <-   rbind (
               lw=1-apply (cynodonts_output$sims.list$phi,2,quantile, c(0.025,0.975),na.rm=T)[1,],
               up=1-apply (cynodonts_output$sims.list$phi,2,quantile, c(0.025,0.975),na.rm=T)[2,]),
   
-  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf,],
+  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf[-length(stages_mammaf)],],
               Taxon = "Non-mammalian Mammaliaformes",
               var= "Origination probability",
               model = "Binomial",
@@ -301,7 +291,7 @@ dat <-   rbind (
               lw= apply (mammaliaformes_output$sims.list$gamma,2,quantile, c(0.025,0.975),na.rm=T)[1,],
               up=apply (mammaliaformes_output$sims.list$gamma,2,quantile, c(0.025,0.975),na.rm=T)[2,]),
   
-  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf,],
+  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf[-length(stages_mammaf)],],
               Taxon = "Non-mammalian Mammaliaformes",
               var= "Extinction probability",
               model = "Binomial",
@@ -309,7 +299,7 @@ dat <-   rbind (
               lw=1-apply (mammaliaformes_output$sims.list$phi,2,quantile, c(0.025,0.975),na.rm=T)[1,],
               up=1-apply (mammaliaformes_output$sims.list$phi,2,quantile, c(0.025,0.975),na.rm=T)[2,]),
   
-  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mamm,],
+  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mamm[-length(stages_mamm)],],
               Taxon = "Mammalia",
               var= "Origination probability",
               model = "Binomial",
@@ -317,7 +307,7 @@ dat <-   rbind (
               lw= apply (mammalia_output$sims.list$gamma,2,quantile, c(0.025,0.975),na.rm=T)[1,],
               up=apply (mammalia_output$sims.list$gamma,2,quantile, c(0.025,0.975),na.rm=T)[2,]),
   
-  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mamm,],
+  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mamm[-length(stages_mamm)],],
               Taxon = "Mammalia",
               var= "Extinction probability",
               model = "Binomial",
@@ -355,7 +345,7 @@ plot2 <- ggplot (data = dat ,
                 alpha=0.2) + 
       # other settings
     
-  facet_wrap(~Taxon,scales = "fixed")+
+  facet_wrap(~var+Taxon,scales = "fixed",ncol=3)+
   theme_bw()+
   ylab ("Probability")+
     geom_line()+
@@ -382,11 +372,10 @@ plot2 <- ggplot (data = dat ,
   scale_fill_manual(values = cols_strip)
 
 
-  
 plot2
 
 
-# plot of species richness
+# plot of species richness -------------------------------------------
 
 dat1 <- rbind (
   
@@ -689,30 +678,30 @@ ggsave (here ("output", "No_covariate_model", "comparison.pdf"),
 
 # convergence dynamic params
 dat_rhat <- rbind (
-  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_cyn,],
+  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_cyn[-length(stages_cyn)],],
               Taxon = "Non-mammaliaform cynodonts", 
               rhat = melt(cynodonts_output$Rhat$gamma),
               par = "Origination"),
-  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_cyn,],
+  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_cyn[-length(stages_cyn)],],
               Taxon = "Non-mammaliaform cynodonts", 
               rhat = melt(cynodonts_output$Rhat$phi),
               par = "Persistence"),
   
-  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf,],
+  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf[-length(stages_mammaf)],],
               Taxon = "Non-mammalian Mammaliaformes", 
               rhat = melt(mammaliaformes_output$Rhat$gamma),
               par = "Origination"),
   
-  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf,],
+  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf[-length(stages_mammaf)],],
               Taxon = "Non-mammalian Mammaliaformes", 
               rhat = melt(mammaliaformes_output$Rhat$phi),
               par = "Persistence"),
   
-  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mamm,],
+  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mamm[-length(stages_mamm)],],
               Taxon = "Mammalia",
               rhat = melt(mammalia_output$Rhat$gamma),
               par = "Origination"),
-  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mamm,],
+  data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mamm[-length(stages_mamm)],],
               Taxon = "Mammalia",
               rhat = melt(mammalia_output$Rhat$gamma),
               par = "Persistence")
@@ -938,22 +927,22 @@ div_mammals <- div_fc (mammalia_output)
 # bind data to plot
 dat_div <- rbind (
   
-  data.frame ('average' = t(apply (div_cyn$R0,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,2],
-              'lci' = t(apply (div_cyn$R0,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,1],
-              'uci' = t(apply (div_cyn$R0,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,3],
+  data.frame ('average' = t(apply (div_cyn$RER,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,2],
+              'lci' = t(apply (div_cyn$RER,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,1],
+              'uci' = t(apply (div_cyn$RER,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,3],
               "Taxon" = "Non-mammaliaform cynodonts",
-              bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_cyn,]),
-  data.frame ('average' = t(apply (div_mammaliaforms$R0,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,2],
-              'lci' = t(apply (div_mammaliaforms$R0,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,1],
-              'uci' = t(apply (div_mammaliaforms$R0,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,3],
+              bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_cyn[-length(stages_cyn)],]),
+  data.frame ('average' = t(apply (div_mammaliaforms$RER,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,2],
+              'lci' = t(apply (div_mammaliaforms$RER,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,1],
+              'uci' = t(apply (div_mammaliaforms$RER,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,3],
               "Taxon" = "Non-mammalian Mammaliaformes",
-              bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf,])
+              bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf[-length(stages_mammaf)],])
   ,
-  data.frame ('average' = t(apply (div_mammals$R0,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,2],
-              'lci' = t(apply (div_mammals$R0,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,1],
-              'uci' = t(apply (div_mammals$R0,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,3],
+  data.frame ('average' = t(apply (div_mammals$RER,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,2],
+              'lci' = t(apply (div_mammals$RER,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,1],
+              'uci' = t(apply (div_mammals$RER,2,quantile,c(0.025,0.5,0.975),na.rm=T))[,3],
               "Taxon" = "Mammalia",
-              bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mamm,])
+              bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mamm[-length(stages_mamm)],])
 )
 
 # order of groups
@@ -985,7 +974,8 @@ plot_div <- ggplot (data = dat_div,
   coord_geo(
     dat = list("stages", "periods"), 
     xlim = c( 66,270), 
-    ylim = c(-1,.2),
+    #ylim = c(-1,.2), # R0
+    ylim = c(0,1000),
     pos = list("b", "b"),
     rot=90,
     size = list(2, 4),
@@ -1000,7 +990,6 @@ plot_div <- ggplot (data = dat_div,
             col=NA,
             alpha = 0.2)+
   scale_fill_manual(values = cols_strip)
-
 
 
 plot_div

@@ -32,24 +32,26 @@ load(here ("processed_data","CMR_data_observation_cov.RData"))
 # load results
 # load model binomial output 
 
+
 # load output
 load (here ("output","global",
-            "CMR_global_binomial_800spp_Mammalia.RData"))
+            "CMR_global_binomial1000sp_Mammalia.RData"))
+
 # mammalia output
 mammalia_output <- samples_paleo_cynodontia_binomial
 
 # load output
 load (here ("output","global",
-            "CMR_global_binomial_Non-mammalian Mammaliaformes.RData"))
+            "CMR_global_binomial1000sp_Non-mammalian Mammaliaformes.RData"))
 
 # mammaliaformes output
 mammaliaformes_output <- samples_paleo_cynodontia_binomial
 
 # load output
 load (here ("output","global",
-            "CMR_global_binomial_500spp_Non-mammaliaform cynodonts.RData"))
+            "CMR_global_binomial1000sp_Non-mammaliaform cynodonts.RData"))
 
-# mammalia output
+# cynodonts output
 cynodonts_output <- samples_paleo_cynodontia_binomial
 
 
@@ -68,12 +70,12 @@ tax_list <- c("Non-mammaliaform cynodonts",
 
 # list coefs
 coefs <- c("intercept.gamma",
-  "beta.gamma.prec",
+  #"beta.gamma.prec",
   "beta.gamma.temp",
   "beta.gamma.area",
   "beta.gamma.area.t",
-  "beta.gamma.coast",
-  "beta.gamma.coast.t",
+  #"beta.gamma.coast",
+  #"beta.gamma.coast.t",
   "intercept.phi",
   "beta.phi.prec",
   "beta.phi.temp",
@@ -123,7 +125,7 @@ table_coeff$taxon <- factor (table_coeff$taxon ,
 #kable(., format = "pipe", padding = 2,align="c") 
 
 # type of parameter
-table_coeff$par <- c(rep("Origination",7),
+table_coeff$par <- c(rep("Origination",4),
   rep("Persistence",7),
   rep ("Detection",5))
 
@@ -131,12 +133,12 @@ table_coeff$par <- c(rep("Origination",7),
 table_coeff<-table_coeff %>%
   mutate (var2 = recode (var, 
                          "intercept.gamma" = "Intercept",
-                         "beta.gamma.prec" = "Precipitation",
+                         #"beta.gamma.prec" = "Precipitation",
                          "beta.gamma.temp" = "Temperature",
                          "beta.gamma.area" = "Area",
                          "beta.gamma.area.t" = "Tr. area",
-                         "beta.gamma.coast" = "Fragmentation",
-                         "beta.gamma.coast.t" = "Tr. fragmentation",
+                         #"beta.gamma.coast" = "Fragmentation",
+                         #"beta.gamma.coast.t" = "Tr. fragmentation",
                          "intercept.phi" = "Intercept",
                          "beta.phi.prec" = "Precipitation",
                          "beta.phi.temp" = "Temperature",
@@ -171,12 +173,12 @@ table_coeff$par <- factor (table_coeff$par,
                             levels = c("Origination", "Persistence", "Detection"))
 
 # intercepts
-kable (data.frame (taxon = table_coeff [grep("logit",table_coeff$var),"taxon"],
-                   par = table_coeff [grep("logit",table_coeff$var),"par"],
+kable (data.frame (taxon = table_coeff [grep("intercept",table_coeff$var),"taxon"],
+                   par = table_coeff [grep("intercept",table_coeff$var),"par"],
                    #var = table_coeff [grep("logit",table_coeff$var),"var"],
-                   mean_prob = round (plogis(table_coeff [grep("logit",table_coeff$var),"mean"]),3),
-                   lci_prob = round (plogis(table_coeff [grep("logit",table_coeff$var),"lci"]),3),
-                   uci_prob = round (plogis(table_coeff [grep("logit",table_coeff$var),"uci"]),3)),
+                   mean_prob = round (plogis(table_coeff [grep("intercept",table_coeff$var),"mean"]),3),
+                   lci_prob = round (plogis(table_coeff [grep("intercept",table_coeff$var),"lci"]),3),
+                   uci_prob = round (plogis(table_coeff [grep("intercept",table_coeff$var),"uci"]),3)),
        format = "pipe", padding = 2,align="c")
 
 
@@ -187,8 +189,8 @@ ggplot(data= table_coeff %>%
   facet_wrap(~taxon+par,scales="free")+
   geom_errorbar(width=.1, aes(ymin=lci, ymax=uci,col=taxon)) +
   geom_point(aes (col=taxon,fill=taxon),alpha=0.5,shape=21, size=3) +
-  scale_colour_manual(values = cols)+
-  scale_fill_manual(values = cols)+
+  #scale_colour_manual(values = cols)+
+  #scale_fill_manual(values = cols)+
   geom_hline(yintercept = 0, linewidth=1,alpha=0.3)+
   ylab ("Coefficient value")+
   xlab ("Model parameter")+
@@ -252,12 +254,12 @@ dat_rhat$Taxon <- factor (dat_rhat$Taxon,
                                      "Mammalia"))
 # adjust names
 dat_rhat$par <-  c("Intercept.gamma",
-                   "Beta.gamma.prec",
+                   #"Beta.gamma.prec",
                    "Beta.gamma.temp",
                    "Beta.gamma.area",
                    "Beta.gamma.areaTr",
-                   "Beta.gamma.fragm",
-                   "Beta.gamma.fragmTr",
+                  # "Beta.gamma.fragm",
+                   #"Beta.gamma.fragmTr",
                    
                    "Intercept.phi",
                    "Beta.phi.prec",
@@ -298,7 +300,6 @@ ggsave (here ("output", "figures","convergence_global_coef_params.png"),width =1
 # ------------------------------------
 
 # compare the magnitude of effect
-
 
 
 magnitude_check <-lapply (tax_list, function (i)
