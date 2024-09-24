@@ -12,20 +12,17 @@
 require(jagsUI)
 
 # number of interactions for a global-scale analyses
-na <- 15000; nb <- 30000; ni <- 50000; nc <- 3; nt <- 20
+na <- 40000; nb <- 60000; ni <- 80000; nc <- 3; nt <- 20
 
 ## short form for tests
-na <- 600; nb <- 700; ni <- 1000; nc <- 3; nt <- 1
-#na <- 40; nb <- 70; ni <- 100; nc <- 3; nt <- 1
+na <- 6000; nb <- 7000; ni <- 10000; nc <- 3; nt <- 10
+# na <- 40; nb <- 70; ni <- 100; nc <- 3; nt <- 1
 
 # load packages
 source("R/packages.R")
 
 # load data
 load(here ("processed_data","CMR_data_observation_cov.RData"))
-
-# load environmental data
-load (here ("processed_data", "site_covs.RData"))
 
 
 # find the period of first and last detection
@@ -66,7 +63,6 @@ sink("global_CMRmodel_matrix_no_covariates.txt")
 cat("
    
     
-   
      model {
     
     
@@ -251,5 +247,5 @@ no_cov_samples_paleo_cynodontia_binomial_run <- lapply (c ("Non-mammaliaform cyn
               })
 
 
-
+rm(list=ls())
 # end

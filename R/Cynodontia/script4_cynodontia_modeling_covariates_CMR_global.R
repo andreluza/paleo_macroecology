@@ -1,7 +1,7 @@
 # --------------------------------------
 
-# 2 . modeling (GLOBAL SCALE)
-
+# simulations
+# 2 hours per run
 
 # conditional on the first and last detection of the taxon
 
@@ -14,10 +14,10 @@
 require(jagsUI)
 
 # number of interactions for a global-scale analyses
-na <- 15000; nb <- 30000; ni <- 50000; nc <- 3; nt <- 20
+na <- 40000; nb <- 60000; ni <- 80000; nc <- 3; nt <- 20
 
 ## short form for tests
-na <- 600; nb <- 700; ni <- 1000; nc <- 3; nt <- 1
+# na <- 6000; nb <- 7000; ni <- 10000; nc <- 3; nt <- 10
 #na <- 40; nb <- 70; ni <- 100; nc <- 3; nt <- 1
 
 # load packages
@@ -135,12 +135,12 @@ cat("
         
              # speciation
              logit(gamma[t]) <-  intercept.gamma + 
-                                   #beta.gamma.prec*precipitation[t]+
+                                   beta.gamma.prec*precipitation[t]+
                                    beta.gamma.temp*temperature[t]+
                                    beta.gamma.area*area[t]+
-                                   #beta.gamma.coast*coast[t]+
-                                   beta.gamma.area.t*area.t[t]#+
-                                   #beta.gamma.coast.t*coast.t[t]
+                                   beta.gamma.coast*coast[t]+
+                                   beta.gamma.area.t*area.t[t]+
+                                   beta.gamma.coast.t*coast.t[t]
                                    
                                    
                                          
@@ -392,7 +392,7 @@ samples_paleo_cynodontia_binomial_run <- lapply (c ("Non-mammaliaform cynodonts"
                                                              n.iter = ni, 
                                                              n.burnin = nb, 
                                                              DIC = T,  
-                                                             n.cores=nc,
+                                                             #n.cores=nc,
                                                              parallel=F
                    )
                    
@@ -402,3 +402,5 @@ samples_paleo_cynodontia_binomial_run <- lapply (c ("Non-mammaliaform cynodonts"
                  })
 
 
+# end
+rm(list=ls())
