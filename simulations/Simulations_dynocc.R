@@ -27,7 +27,6 @@ model {
         # regression coeff
         beta_gamma1 ~ dunif(-20,20)
         beta_gamma2 ~ dunif(-20,20)
-        beta_gamma3 ~ dunif(-20,20)
         
         # ----------------------
         #     Phi (persistence)
@@ -38,7 +37,6 @@ model {
         # regression coeff
         beta_phi1 ~ dunif(-20,20)
         beta_phi2 ~ dunif(-20,20)
-        beta_phi3 ~ dunif(-20,20)
         
         
         ## set initial conditions for occupancy of each genus
@@ -55,14 +53,12 @@ model {
              # speciation
              logit(gamma[t]) <-  intercept.gamma + 
                                    beta_gamma1*X1[t]+
-                                   beta_gamma2*X2[t]+
-                                   beta_gamma3*X3[t]
+                                   beta_gamma2*X2[t]
                                    
               # persistence
               logit(phi[t]) <-  intercept.phi + 
                                   beta_phi1*X1[t]+
-                                  beta_phi2*X2[t]+
-                                  beta_phi3*X3[t]
+                                  beta_phi2*X2[t]
                                   
                                   
         }
@@ -122,25 +118,23 @@ model {
 
 
 # Load necessary libraries
-library(rjags)
+library(jagsUI)
 library(here)
 
 # Set parameters
 set.seed(42)
-n_spp <- 500  # Number of sites
+n_spp <- 200  # Number of sites
 n_years <- 30   # Number of time bins
 n_surveys <- 6  # Number of surveys (geological formations) per time bin
 initial_psi <- 0.6  # Initial occupancy probability
 
 # covariate effect on origination
 beta_gamma1 <- 0.5
-beta_gamma2 <- 2
-beta_gamma3 <- -0.5
+beta_gamma2 <- 1
 
 # covariate effect on extinction
 beta_phi1 <- 0.5
-beta_phi2 <- 2
-beta_phi3 <- -0.5
+beta_phi2 <- -1
 
 # covariates
 # PS: we repeated the generation of variables up to a point in which one correlation was of intermediate strength rho ~ 0.5
@@ -157,11 +151,11 @@ dir.create (here ("simulations", "output"))
 
 # start simulations ---------------------------------
 
-n.sims <- 50
+n.sims <- 20
 my.seeds <- floor(runif (n.sims,0,5000))
 
 # run
-lapply (seq(1,n.sims), function (s) {
+lapply (seq(2,n.sims), function (s) {
   
         # set seed
         set.seed(my.seeds[s])
@@ -169,15 +163,13 @@ lapply (seq(1,n.sims), function (s) {
         # Origination probability
         intercept_gamma <- qlogis(0.5)  
         gamma <- intercept_gamma+beta_gamma1+X1+
-                                  beta_gamma2+X2+
-                                  beta_gamma3+X3
+                                  beta_gamma2+X2
         gamma <- plogis(gamma) # back to prob scale
         
         # Extinction probability
         intercept_phi <- qlogis(0.5)  
         phi <- intercept_phi+beta_phi1+X1+
-                                    beta_phi2+X2+
-                                    beta_phi3+X3
+                              beta_phi2+X2
         phi <- plogis(phi) # back to prob scale
         
         # Detection probability
@@ -210,8 +202,7 @@ lapply (seq(1,n.sims), function (s) {
           n_years = n_years,
           n_surveys = rep(n_surveys,n_years),
           X1=X1,
-          X2=X2,
-          X3=X3
+          X2=X2
         )
         
         # Initial values for the latent states
@@ -221,19 +212,36 @@ lapply (seq(1,n.sims), function (s) {
         
         # Parameters to monitor
         parameters <- c("intercept.phi","beta_phi1",
-                          "beta_phi2","beta_phi3",
-                        "intercept.gamma","beta_gamma1",
-                        "beta_gamma2","beta_gamma3",
+                          "beta_phi2",
+                        "intercept.gamma",
+                        "beta_gamma2",
                         "initial_psi", "gamma", "phi", "p", "muZ")
         
         # Run JAGS model
-        jags_model <- jags.model(textConnection(model_string), data = jags_data, inits = init_values, n.chains = 3, n.adapt = 500)
-        update(jags_model, n.iter = 500)
-        samples <- coda.samples(jags_model, variable.names = parameters, n.iter = 1000, thin = 2)
-        samples <- do.call(rbind,samples)
-        point_estimates <- apply(samples,2,mean)
+        ## MCMC runs
+        samples <-jags (data = jags_data, 
+                                                  parameters.to.save = parameters, 
+                                                  model.file = textConnection(model_string), 
+                                                  inits = init_values, 
+                                                  n.chains = 3, 
+                                                  n.thin = 5, 
+                                                  n.iter = 5000,
+                                                  n.adapt = 2000,
+                                                  n.burnin = 3000, 
+                                                  DIC = T,  
+                                                  n.cores=3,
+                                                  parallel=T
+        )
+        
+        # extract summary
+        point_estimates <- samples$summary
+        #save
         save (point_estimates, file = here ("simulations", "output", paste0("sims_run", s,".RData")))
-
+        
+        
+        
+        
+        
 })
 
 # end of the simulations
