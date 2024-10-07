@@ -36,7 +36,7 @@ of genera that ever existed in the end Paleozoic - end Mesozoic Eras)
 following Dorazio & Royle (2005)
 (<http://dx.doi.org/10.1198/016214505000000015>), and used the detection
 model described in Schaub & Kery (2012). More specifically, our data
-$y_{gt$ consist of counts of the number of geological formations in
+$y_{gt}$ consist of counts of the number of geological formations in
 which each genus $g$ was detected in each time bin $t$. The complete
 model can be summarized as:
 
@@ -69,7 +69,7 @@ Bayesian state-space formulation of dynamic occupancy models. Ecology.
 important that this model is able to estimate the dynamics as well the
 relevant parameters in the models. As such, we focused our simulations
 on this portion of the model. Interesting simulations of the community
-size $\OMEGA$ can be found in Tingley et al. (2020, DOI:
+size $\Omega$ can be found in Tingley et al. (2020, DOI:
 10.1111/2041-210X.13378) and Guillera-Arroita et al. (2018, DOI:
 10.1002/ece3.4821).
 
@@ -94,10 +94,10 @@ overlap of covariates (probably the best situation).
 We found that in all the three situations the model can recover the true
 values of $\gamma_t$, $\phi_t$ and $p_t$ used to generate the data
 (Figs. 1-3). However, in rarely the true values of the intercepts
-($\beta_{\gamma~0}$ and $\beta_{\phi~0}$) and regression coefficients
-were recovered by the models ($\beta_{\gamma~1}$ and $\beta_{\phi~1}$
-depicting the effect of the covariate $X1_t$, and $\beta_{\gamma~2}$ and
-$\beta_{\phi~2}$ depicting the effect of the covariate $X2_t$).
+($\beta_{\gamma_ _0}$ and $\beta_{\phi 0}$) and regression coefficients
+were recovered by the models ($\beta_{\gamma_1}$ and $\beta_{\phi_1}$
+depicting the effect of the covariate $X_{1t}$, and $\beta_{\gamma_2}$
+and $\beta_{\phi_2}$ depicting the effect of the covariate $X2_t$).
 
     ## Carregando pacotes exigidos: here
 
