@@ -9,14 +9,13 @@
 # ----------------------------------------
 rm(list=ls())
 require(here)
-# create dir
-dir.create (here ("simulations", "output"))
+dir.create (here ("simulations", "output3"))
 
 # Write the JAGS model
 model_string <- "
 model {
   
-      #  Occupancy Dynamics (Priors)
+      # Site Occupancy Dynamics (Priors)
        
        
         # ----------------------
@@ -26,10 +25,8 @@ model {
         # intercepts
         gamma.u ~ dunif(0,1) # range origination
         intercept.gamma <- logit(gamma.u) # intercept origination
-        
         # regression coeff
         beta_gamma1 ~ dunif(-20,20)
-        beta_gamma2 ~ dunif(-20,20)
         
         # ----------------------
         #     Phi (persistence)
@@ -37,14 +34,14 @@ model {
         # intercepts
         phi.u ~ dunif(0,1) # range persistence
         intercept.phi <- logit(phi.u) # intercept persistence
-        
         # regression coeff
-        beta_phi1 ~ dunif(-20,20)
         beta_phi2 ~ dunif(-20,20)
-       
+        
+        
         ## set initial conditions for occupancy of each genus
         initial_psi ~ dunif(0,1)
-      
+        
+           
        ############      Model       #############
        
        # model for phi and gamma
@@ -54,18 +51,18 @@ model {
       
              # speciation
              logit(gamma[t]) <-  intercept.gamma + 
-                                   beta_gamma1*X1[t]+
-                                   beta_gamma2*X2[t]
+                                   beta_gamma1*X1[t]
                                    
               # persistence
               logit(phi[t]) <-  intercept.phi + 
-                                  beta_phi1*X1[t]+
                                   beta_phi2*X2[t]
                                   
                                   
         }
         
-        # Occupancy dynamics ---------------------
+       
+                       
+      # occupancy dynamics
        
         for (g in 1:n_spp) {
          
@@ -96,13 +93,13 @@ model {
     ###  detection intercept
     # intercept    
     for (t in 1:n_bins) {
-      p[t] ~ dunif(0,1) 
+      p[t] ~ dunif(0,1) # constant detection
     }
     
     # observation submodel
-    for (g in 1:n_spp) { ## loop over genera 
+    for (g in 1:n_spp) { ## loop over observations 
       
-      for (t in 1:n_bins) { ## loop over time bins 
+      for (t in 1:n_bins) { ## loop over observations 
     
           # observation
           # Specify the binomial observation model conditional on occupancy state
@@ -124,7 +121,7 @@ library(here)
 
 # Set parameters
 set.seed(42)
-n_spp <- 200  # Number of genera
+n_spp <- 200  # Number of sites
 n_bins <- 30   # Number of time bins
 n_surveys <- 10  # Number of surveys (geological formations) per time bin
 
@@ -137,24 +134,18 @@ p <- runif(n_bins,0,1)
 # covariate effect on origination
 intercept_gamma <- qlogis(0.2) 
 beta_gamma1 <- 0.5
-beta_gamma2 <- 1
 
 # covariate effect on persistence
 intercept_phi <- qlogis(0.3)  
-beta_phi1 <- 1
 beta_phi2 <- -1
 
-# covariates (generate just once and save to be used in the other two simulation sets)
-X1 <- runif (n_bins-1, -2, 2) 
-X2 <- runif (n_bins-1, -2, 2)  
-save(X1,X2, file=here("simulations","covariates.RData"))
-# load(file=here("simulations","covariates.RData")) # activate after the creation
+# covariates
+load(file=here("simulations","covariates.RData"))
 cor(cbind(X1,X2))
 
-# scale covariates
+# scale
 X1<-scale(X1)[,1]
 X2<-scale(X2)[,1]
-
 
 # start simulations ---------------------------------
 
@@ -174,11 +165,10 @@ lapply (seq(1,n.sims), function (s) {
         for(t in 1:(n_bins-1)){
           
             # origination 
-            gamma[t] <- plogis(intercept_gamma+beta_gamma1+X1[t]+
-                                      beta_gamma2+X2[t])
+            gamma[t] <- plogis(intercept_gamma+beta_gamma1+X1[t])
             
             # persistence probability
-            phi[t] <- plogis(intercept_phi+beta_phi1+X1[t]+
+            phi[t] <- plogis(intercept_phi+
                                     beta_phi2+X2[t])# back to prob scale
             
             
@@ -208,7 +198,7 @@ lapply (seq(1,n.sims), function (s) {
         }
         
         #save data
-        save (y,z ,muZ,p, phi,gamma, file = here ("simulations", "output", paste0("data_", s,".RData")))
+        save (y,z ,muZ,p, phi,gamma, file = here ("simulations", "output3", paste0("data_", s,".RData")))
         
         # Prepare data for JAGS
         jags_data <- list(
@@ -231,11 +221,9 @@ lapply (seq(1,n.sims), function (s) {
         
         # Parameters to monitor
         parameters <- c("intercept.phi",
-                        "beta_phi1",
                         "beta_phi2",
                         "intercept.gamma",
                         "beta_gamma1",
-                        "beta_gamma2",
                         "initial_psi", 
                         "gamma",
                         "phi",
@@ -261,7 +249,7 @@ lapply (seq(1,n.sims), function (s) {
         point_estimates <- samples$summary
         
         #save
-        save (point_estimates, file = here ("simulations", "output", paste0("sims_run", s,".RData")))
+        save (point_estimates, file = here ("simulations", "output3", paste0("sims_run", s,".RData")))
         
         
 })
