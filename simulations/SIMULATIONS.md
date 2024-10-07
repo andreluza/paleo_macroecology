@@ -104,7 +104,11 @@ overlap of covariates (probably the best situation).
 We found that in all the three situations the model can recover the true
 values of $\gamma_t$, $\phi_t$ and $p_t$ used to generate the data
 (Figs. 1-3). However, in rarely the true values of the intercepts
+<<<<<<< HEAD
 ($\beta_{\gamma_0}$ and $\beta_{\phi_0}$) and regression coefficients
+=======
+($\beta_{\gamma_ _0}$ and $\beta_{\phi 0}$) and regression coefficients
+>>>>>>> 15edeaf6ec9ec51edae47c91757154f8b33e8024
 were recovered by the models ($\beta_{\gamma_1}$ and $\beta_{\phi_1}$
 depicting the effect of the covariate $X_{1t}$, and $\beta_{\gamma_2}$
 and $\beta_{\phi_2}$ depicting the effect of the covariate $X2_t$).
