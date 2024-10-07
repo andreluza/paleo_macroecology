@@ -70,12 +70,12 @@ tax_list <- c("Non-mammaliaform cynodonts",
 
 # list coefs
 coefs <- c("intercept.gamma",
-  #"beta.gamma.prec",
+  "beta.gamma.prec",
   "beta.gamma.temp",
   "beta.gamma.area",
   "beta.gamma.area.t",
-  #"beta.gamma.coast",
-  #"beta.gamma.coast.t",
+  "beta.gamma.coast",
+  "beta.gamma.coast.t",
   "intercept.phi",
   "beta.phi.prec",
   "beta.phi.temp",
@@ -125,7 +125,7 @@ table_coeff$taxon <- factor (table_coeff$taxon ,
 #kable(., format = "pipe", padding = 2,align="c") 
 
 # type of parameter
-table_coeff$par <- c(rep("Origination",4),
+table_coeff$par <- c(rep("Origination",7),
   rep("Persistence",7),
   rep ("Detection",5))
 
@@ -133,12 +133,12 @@ table_coeff$par <- c(rep("Origination",4),
 table_coeff<-table_coeff %>%
   mutate (var2 = recode (var, 
                          "intercept.gamma" = "Intercept",
-                         #"beta.gamma.prec" = "Precipitation",
+                         "beta.gamma.prec" = "Precipitation",
                          "beta.gamma.temp" = "Temperature",
                          "beta.gamma.area" = "Area",
                          "beta.gamma.area.t" = "Tr. area",
-                         #"beta.gamma.coast" = "Fragmentation",
-                         #"beta.gamma.coast.t" = "Tr. fragmentation",
+                         "beta.gamma.coast" = "Fragmentation",
+                         "beta.gamma.coast.t" = "Tr. fragmentation",
                          "intercept.phi" = "Intercept",
                          "beta.phi.prec" = "Precipitation",
                          "beta.phi.temp" = "Temperature",
@@ -254,12 +254,12 @@ dat_rhat$Taxon <- factor (dat_rhat$Taxon,
                                      "Mammalia"))
 # adjust names
 dat_rhat$par <-  c("Intercept.gamma",
-                   #"Beta.gamma.prec",
+                   "Beta.gamma.prec",
                    "Beta.gamma.temp",
                    "Beta.gamma.area",
                    "Beta.gamma.areaTr",
-                  # "Beta.gamma.fragm",
-                   #"Beta.gamma.fragmTr",
+                   "Beta.gamma.fragm",
+                   "Beta.gamma.fragmTr",
                    
                    "Intercept.phi",
                    "Beta.phi.prec",

@@ -29,8 +29,9 @@ mammaliaformes_output <- samples_paleo_cynodontia_binomial
 #load (here ("output","global",
 #            "CMR_global_binomial1000sp_Non-mammaliaform cynodonts.RData"))
 # load output
-load (here ("output","No_covariate_model",
-            "CMR_global_binomial_no_covNon-mammaliaform cynodonts.RData"))
+load (here ("output","global",
+            "CMR_global_binomial1000sp_Non-mammaliaform cynodonts.RData"))
+            #"CMR_global_binomial_no_covNon-mammaliaform cynodonts.RData"))
 
 # mammalia output
 cynodonts_output <- samples_paleo_cynodontia_binomial
@@ -41,6 +42,7 @@ cynodonts_output <- samples_paleo_cynodontia_binomial
 cols <- c("Non-mammaliaform cynodonts" = "red",
           "Non-mammalian Mammaliaformes" = "blue", 
           "Mammalia" = "darkgreen")
+
 
 # ------------------------------------------------------------
 
@@ -323,6 +325,7 @@ dat <-   rbind (
               lw=1-apply (cynodonts_output$sims.list$phi,2,quantile, c(0.025,0.975),na.rm=T)[1,],
               up=1-apply (cynodonts_output$sims.list$phi,2,quantile, c(0.025,0.975),na.rm=T)[2,]),
   
+  
   data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf[-length(stages_mammaf)],],
               Taxon = "Non-mammalian Mammaliaformes",
               var= "Origination probability",
@@ -331,6 +334,7 @@ dat <-   rbind (
               lw= apply (mammaliaformes_output$sims.list$gamma,2,quantile, c(0.025,0.975),na.rm=T)[1,],
               up=apply (mammaliaformes_output$sims.list$gamma,2,quantile, c(0.025,0.975),na.rm=T)[2,]),
   
+  
   data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mammaf[-length(stages_mammaf)],],
               Taxon = "Non-mammalian Mammaliaformes",
               var= "Extinction probability",
@@ -338,6 +342,8 @@ dat <-   rbind (
               average = 1-apply (mammaliaformes_output$sims.list$phi,2,median),
               lw=1-apply (mammaliaformes_output$sims.list$phi,2,quantile, c(0.025,0.975),na.rm=T)[1,],
               up=1-apply (mammaliaformes_output$sims.list$phi,2,quantile, c(0.025,0.975),na.rm=T)[2,]),
+  
+  
   
   data.frame (bins[-c(1:6),c("interval_name","mid_ma","max_ma", "min_ma", "cols_strip")][stages_mamm[-length(stages_mamm)],],
               Taxon = "Mammalia",
@@ -564,6 +570,7 @@ plot3 <-  ggplot (dat1,
   scale_fill_manual(values = cols_strip)
   
 plot3
+
 
 # comparison
 a<-ggplot (dat1 %>%
@@ -1038,7 +1045,6 @@ plot_div <- ggplot (data = dat_div,
 
 
 plot_div
-
 
 # relationship between diversification and change
 rel_div_change <-dat_div %>%

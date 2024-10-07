@@ -122,8 +122,7 @@ cf_out <- cf_outl(coll_occ_taxa_perm_cret, taxon = "accepted_name", lat = "lat.x
 coll_occ_taxa_perm_cret<-coll_occ_taxa_perm_cret[cf_out==T,] # filter
 
 # result of data filtering
-3904 - dim (coll_occ_taxa_perm_cret)[1]
-3872 - dim (coll_occ_taxa_perm_cret)[1]
+nrow((coll_occ_taxa)) - dim (coll_occ_taxa_perm_cret)[1]
 
 # --------------------------------------------------------------------
 
@@ -271,7 +270,6 @@ sp2$paleolat2 <- rotate_sp2$p_lat
 sp2$paleolng2 <- rotate_sp2$p_lng
 
 # bind these occurrences to the dataset
-
 coll_occ_taxa_perm_cret <- rbind (coll_occ_taxa_perm_cret,
                                   sp1,sp2)
 
@@ -281,15 +279,12 @@ coll_occ_taxa_perm_cret <- rbind (coll_occ_taxa_perm_cret,
 # --------------------------------------------------------------------
 
 # bin occurrences spatially into spatial bins
-
-
 coll_occ_taxa_perm_cret <- bin_space(occdf = coll_occ_taxa_perm_cret %>%
                                        filter (is.na(paleolat2) != T),
                                      lng = 'paleolng2',
                                      lat = 'paleolat2',
                                      spacing = 2000,
                                      plot=T,return=T)
-
 
 # object with the grid
 grid_info <- coll_occ_taxa_perm_cret [2:4]
