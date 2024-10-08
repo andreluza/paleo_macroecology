@@ -40,18 +40,23 @@ $y_{gt}$ consist of counts of the number of geological formations in
 which each genus $g$ was detected in each time bin $t$. The complete
 model can be summarized as:
 
-<center>
-$$ y_{gt}|z_{gt} \sim Binomial (p_t, N_t)$$
-</center>
-  
-<center>
-$$ z_{gt} \sim Bernoulli (\psi_{gt} \times \omega_g)$$
-</center>
-  
-<center>
-$$ \omega_{g} \sim Bernoulli (\Omega)$$
-</center>
+<br>
+<br>
 
+<center> $$ y_{gt}|z_{gt} \sim Binomial (p_t, N_t)$$</center>\
+
+<br>
+<br>
+  
+<center>$$ z_{gt} \sim Bernoulli (\psi_{gt} \times \omega_g)$$</center>\
+
+<br>
+<br>
+  
+<center>$$ \omega_{g} \sim Bernoulli (\Omega)$$</center>\
+
+<br>
+<br>
   
 In the first level, the counts of formations in which each genus was
 detected is the realization of a Binomial distribution moderated by the
