@@ -3,7 +3,7 @@ origination and persistence of early mammalian lineages in the Mesozoic
 ================
 AL Luza, MG Bender, CS Dambros, F Pretto, L Kerber - Departamento de
 Ecologia e Evolução, Universidade Federal de Santa Maria
-2024-10-03
+2024-10-08
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <!-- badges: start -->
@@ -13,84 +13,150 @@ Ecologia e Evolução, Universidade Federal de Santa Maria
 
 <!-- https://rdrr.io/cran/AHMbook/src/R/simDynocc_AHM2_3_Simulate_dynamic_occupancy.R -->
 
-We made a simulation study to test whether the CMR model (Liow & Nichols 2010) we
+We made a simulation study to test whether the CMR model like we
 implemented can effectively estimate origination $\gamma_t$, persistence
 $\phi_t$, and detection probability $p_t$ at each time bin $t$, as well
-as whether it can estimate (recover the truth about) the regression
+as whether it can estimate (recover the true) the regression
 coefficients. The simulations were based on simulations of the dynamic
 model described in Schaub & Kery 2012, and also functions from the AHM
-Book 2nd edition/associated package.
+Book 2nd edition.
 
-Basically we are using data from the Paleobiology Database to estimate
+Basically we’re using data from the Paleobiology Database to estimate
 taxonomic diversity, origination, persistence, and detection probability
-of three taxonomic groups of mammalian precursors that existed from the late Permian to the end of
-the Mesozoic Era (end Cretaceous). We are using the approach described in Liow and
+of three groups of mammal precursors from the late Permian to the end of
+the Mesozoic era (Cretaceous). We’re using the approach of Liow and
 Nichols (2010, Estimating Rates and Probabilities of Origination and
 Extinction Using Taxonomic Occurrence Data: Capture-Mark-Recapture (CMR)
 Approaches. Paleontol. Soc. Pap. 16, 81–94) to analyze these data, where
-“genera” are considered the “sites”, and “time bins/geological periods” are
-considered the “seasons”; thus, the model is estimating dynamics of genera occurrence/incidence across geological periods. As required by the approach, we conditioned the data of each
-taxonomic group to the period before its first appearance in the fossil record. We
-added to the CMR model an estimator of taxonomic diversity to quantify the number
-of genera that ever existed in the end Paleozoic - end Mesozoic Eras
+“genera” are considered “sites”, and “time bins/geological periods” are
+considered “seasons”. To run the approach we condition the data of each
+group to the period before its first appearance in the fossil record. We
+added to this approach/model an estimator of taxonomic diversity (number
+of genera that ever existed in the end Paleozoic - end Mesozoic Eras)
 following Dorazio & Royle (2005)
-(<http://dx.doi.org/10.1198/016214505000000015>), and used the Binomial detection
+(<http://dx.doi.org/10.1198/016214505000000015>), and used the detection
 model described in Schaub & Kery (2012). More specifically, our data
 $y_{gt}$ consist of counts of the number of geological formations in
 which each genus $g$ was detected in each time bin $t$. The complete
 model can be summarized as:
 
-<br>
-<br>
-
-<center> $$ y_{gt}|N_{t}, p_{t}, z_{gt} \sim Binomial (z_{gt} \times p_t, N_t)$$</center>\
-
-<br>
-<br>
+<center>
+$$ y_{gt}|z_{gt} \sim Binomial (p_t, N_t)$$
+</center>
   
-<center>$$ z_{gt} | \psi_{gt}, \omega_g  \sim Bernoulli (\psi_{gt} \times \omega_g)$$</center>\
-
-<br>
-<br>
+<center>
+$$ z_{gt} \sim Bernoulli (\omega_g \times \psi_{gt})$$
+</center>
   
-<center>$$ \omega_{g} \sim Bernoulli (\Omega)$$</center>\
-
-<br>
-<br>
+<center>
+$$ \omega_{g} \sim Bernoulli (\Omega)$$
+</center>
   
+<center>
+$$ \psi_{gt} = z_{g,t-1} \times \phi_{t-1} + (1-z_{g,t-1}) \times \gamma_{t-1} $$
+</center>
+  
+<center>
+$$ logit(\gamma_{t},\phi_{t}) = \beta_{0x} + \beta_{1x} \times X_{1t} + \beta_{2x} \times X_{2t}$$
+</center>
+
+  
+
 In the first level, the counts of formations in which each genus was
 detected is the realization of a Binomial distribution moderated by the
 probability of detection $p_t$ in time bin $t$ (representing
 preservation probability $\times$ sampling probability) and the total
-number of formations found in each period $N_t$. In the second
+number of formations recovered in each period $N_t$. In the second
 level, the true occurrence of genus $g$ in time $t$ is the realization
-of Bernoulli distribution moderated by 1) the probability of
-‘occupancy/incidence’ $\psi_{it}$ of time bin $t$ by the genus $g$ and 2) the
-probability of each genus $g$ in an augmented data set to belong to the
+of Bernoulli distribution moderated by the probability of
+‘occupancy/incidence’ of time bin $t$ by the genus $g$ and the
+probability of each genus $g$ in an augmented data set to belong the
 community, depicted as $\omega_g$. Finally, this $\omega_g$ is the
 realization of another Bernoulli distribution moderated by $\Omega$ that
-will inform the proportion of genera in the augmented data set
+will inform about the proportion of the genus in an augmented data set
 that actually belongs to the community (see also Iknayan et al. (2014)
-DOI: 10.1016/j.tree.2013.10.012).
+DOI: 10.1016/j.tree.2013.10.012). Remember that the estimation of
+$\omega_g$ and $\Omega$ were not evaluated in the simulations.
 
-Core to this model is the estimation of $\psi_{gt}$, which depicts the
+Core to this model is the estimate of $\psi_{gt}$, which depicts the
 dynamics of genus occurrence over time bins as the result of origination
 $\gamma_t$ and $\phi_t$ persistence probabilities between consecutive
-time bins. Each $\gamma_t$ and $\phi_t$ has its own GLM (logit link function) with one intercept and regression coefficients. These parameters (probabilities, intercepts and regression coefficients) were estimated using the Bayesian state-space formulation of the dynamic model depicted in Royle & Kery (2007, A Bayesian state-space formulation of dynamic occupancy models. Ecology.
-2007 Jul;88(7):1813-23. doi: 10.1890/06-0669.1. PMID: 17645027.). Regarding our application to paleontological data, it is of major importance that this model is able to estimate the parameters depicting genus dynamics over time. As such, we focused our simulations on $\psi_{it}$ and $p_t$. Interesting simulations regarding community size $\Omega$ and Bayesian richness estimators can be found in Tingley et al. (2020, DOI: 10.1111/2041-210X.13378) and Guillera-Arroita et al. (2018, DOI: 10.1002/ece3.4821).
+time bins. These parameters can be estimated using the state-space
+formulation of the dynamic model depicted in Royle & Kery (2007, A
+Bayesian state-space formulation of dynamic occupancy models. Ecology.
+2007 Jul;88(7):1813-23. doi: 10.1890/06-0669.1. PMID: 17645027.). It is
+important that this model is able to estimate the dynamics as well the
+relevant parameters in the models. As such, we focused our simulations
+on this portion of the model. Interesting simulations of the community
+size $\Omega$ can be found in Tingley et al. (2020, DOI:
+10.1111/2041-210X.13378) and Guillera-Arroita et al. (2018, DOI:
+10.1002/ece3.4821).
 
-We made these simulations because we found some counter intuitive results. For instance, there was a negative effect of land area on persistence, and a positive effect on origination, while these effects were expected to be positive due to the expectations of the theory of island biogeography of higher origination and persistence in larger islands/areas. Furthermore, literature show that a complete overlap of covariates in different model levels might challenge identifiability and parameter estimability of hierarchical models (e.g. Lele et al. 2012, Dorazio 2012). As such, in our first simulation round we built expectations of origination $\gamma_t$ and persistence $\phi_t$ as the result of the same set of covariates, $X_{1t}$ and $X_{2t}$ (gathered from an Uniform distribution, correlation between them was $\rho=0.25$), thus the overlap of covariates in the models was complete. In our second simulation round, we removed $X_{1t}$ from the model of $\phi_t$,
-producing a partial overlap of covariates. In our final simulation run, we removed $X_{2t}$ from the model of $\gamma_t$, resulting in no overlap of covariates (probably the best situation for the model).
+We made these simulations because there was an total overlap of
+covariates in the models of origination $\gamma_t$ and persistence
+$\phi_t$ fitted to empirical data, and this overlap might impose
+challenges to the identifiability and parameter estimability of
+hierarchical models (e.g. Lele et al. 2012, Dorazio 2012). Also, we
+found some counter intuitive results (negative effect of land area on
+persistence, positive effect on origination (when the coefficients
+should be positive for both parameters considering the theory of island
+biogeography of higher origination and persistence in larger islands)).
 
-We found that in all the three situations the model can recover the true values of $\gamma_t$, $\phi_t$ and $p_t$ used to generate the data, which is good (Figs. 1-3). However, rarely the true values of the intercepts ($\beta_{\gamma_0}$ and $\beta_{\phi_0}$) and regression coefficients
-were recovered by the models ($\beta_{\gamma_1}$ and $\beta_{\phi_1}$ depicting the effect of the covariate $X_{1t}$, and $\beta_{\gamma_2}$ and $\beta_{\phi_2}$ depicting the effect of the covariate $X2_t$). 
+In our first simulation round, we make origination $\gamma_t$ and
+persistence $\phi_t$ as the result of the same covariates, $X_{1t}$ and
+$X_{2t}$, thus the overlap of covariates in the models was total. In our
+second simulation round, we removed $X_{1t}$ from the model of $\phi_t$,
+producing a partial overlap of covariates. In our final simulation run,
+we removed $X_{2t}$ from the model of $\gamma_t$, resulting in no
+overlap of covariates (probably the best situation).
+
+We found that in all the three situations the model can recover the true
+values of $\gamma_t$, $\phi_t$ and $p_t$ used to generate the data
+(Figs. 1-3). However, in rarely the true values of the intercepts
+($\beta_{\gamma_0}$ and $\beta_{\phi_0}$) and regression coefficients
+were recovered by the models ($\beta_{\gamma_1}$ and $\beta_{\phi_1}$
+depicting the effect of the covariate $X_{1t}$, and $\beta_{\gamma_2}$
+and $\beta_{\phi_2}$ depicting the effect of the covariate $X2_t$).
+
+After these results, we went beyond and tried a simpler autologistic
+model, thinking that the intercepts and regression coefficients are
+biased because $\gamma_t$ and $\phi$ can be redundant in the model
+(Gimenez et al. 2004, Cole 2020). As such, we used the autologistic
+model intending to summarize the temporal dependence/autocorrelation of
+the realized occurrence $z_{gt}$ between adjacent time bins $t$ and
+$t+1$ through a single coefficient, which we called $\delta_t$. In this
+model, $\psi_{gt}$ is obtained through the model:
+
+<center>
+$$ logit(\psi_{gt}) = \beta_{0\psi} + \beta_1 \times X_1 + \beta_2 \times X_2 + \delta_t * z_{g,t-1}$$
+</center>
+
+  
+
+Then the $\psi_{gt}$ enters in the Bernoulli distribution of $z_{gt}$ as
+follows:
+
+<center>
+$$ z_{gt} \sim Bernoulli (\psi_{gt})$$
+</center>
+
+  
+
+We did not find improvement using this model formulation (Fig. 4). The
+detection probability $\hat{p_t}$ was again recovered, the
+$\hat{\delta_t}$ was estimated with some bias, the occupancy probability
+also not so biased but variance in estimates was high, and the intercept
+and regression coefficients were severely biased (Fig. 4). We did some
+tests with the coverage of the Credible Intervals, and the biased all
+estimates did not touch the true values.
 
     ## Carregando pacotes exigidos: here
 
     ## here() starts at D:/Pos_Doc_Paleonto_Macroecology/modeling/paleo_macroecology
 
 <img src="figs/sc1.png" width="75%" height="75%" style="display: block; margin: auto;" />
-Fig. 1: Relationship between the truth and the estimates of the dynamic model under complete covariate overlap. In (A), we show the true values of
+Fig. 1: Results depicting the performance of the model front to the
+total overlap of covariates. In (A), we show the true values of
 $\gamma_t$ per time bin in the X axis, and the estimated values in the Y
 axis. In (B), we show the true values of $\phi_t$ per time bin in the X
 axis, and the estimated values in the Y axis.In (C), we show the true
@@ -103,7 +169,8 @@ the intercepts and regression coefficients. The black points depict the
 true values.
 
 <img src="figs/sc2.png" width="75%" height="75%" style="display: block; margin: auto;" />
-Fig. 2: Relationship between the truth and the estimates of the dynamic model under partial covariate overlap. In (A), we show the true values of
+Fig. 2: Results depicting the performance of the model front to the
+partial overlap of covariates. In (A), we show the true values of
 $\gamma_t$ per time bin in the X axis, and the estimated values in the Y
 axis. In (B), we show the true values of $\phi_t$ per time bin in the X
 axis, and the estimated values in the Y axis.In (C), we show the true
@@ -116,7 +183,21 @@ the intercepts and regression coefficients. The black points depict the
 true values.
 
 <img src="figs/sc3.png" width="75%" height="75%" style="display: block; margin: auto;" />
-Fig. 3: Relationship between the truth and the estimates of the dynamic model without covariate overlap. In (A), we show the true values of $\gamma_t$ per
+Fig. 3: Results depicting the performance of the model front to no
+overlap of covariates. In (A), we show the true values of $\gamma_t$ per
+time bin in the X axis, and the estimated values in the Y axis. In (B),
+we show the true values of $\phi_t$ per time bin in the X axis, and the
+estimated values in the Y axis.In (C), we show the true values of $\p_t$
+per time bin in the X axis, and the estimated values in the Y axis. In
+A-C, the red line depicts the 1:1 relationship of a perfect matching
+between the truth and the estimated values. One truth-estimate
+relationship is shown per simulated data set (n=20). In (D), we show
+violin plots (produced by the 20 simulated data setes) of the intercepts
+and regression coefficients. The black points depict the true values.
+
+<img src="figs/sc4.png" width="75%" height="75%" style="display: block; margin: auto;" />
+Fig. 4: Results depicting the performance of the model front to no
+overlap of covariates. In (A), we show the true values of $\gamma_t$ per
 time bin in the X axis, and the estimated values in the Y axis. In (B),
 we show the true values of $\phi_t$ per time bin in the X axis, and the
 estimated values in the Y axis.In (C), we show the true values of $\p_t$
@@ -1371,6 +1452,367 @@ cbind (df_res [grepl("\\intercept.phi\\b$", ignore.case = T, rownames(df_res)),c
 require(gridExtra)
 png(file = here("simulations", "figs", "sc3.png"),width = 20,height = 20,units = "cm",res=300)
 grid.arrange (p_gamma, p_phi,
+              plot_p,coef_plot,ncol=2)
+
+dev.off()
+
+# end
+```
+
+## You can reproduce the autologistic model with the following code:
+
+``` r
+# ----------------------------------------
+
+
+# Simulation study
+
+# using a simplified autologistic model in which dynamics on psi_gt accounts for the realized incidence in the previous time t-1
+
+# ----------------------------------------
+rm(list=ls())
+require(here)
+
+# create dir
+dir.create (here ("simulations","output_autolog"))
+
+# Write the JAGS model
+model_string <- "
+model {
+  
+      #  Occupancy Dynamics (Priors)
+       
+       
+        # ----------------------
+        #     Gamma (origination)
+        # ----------------------
+        
+        # intercepts
+        psi.u ~ dunif(0,1) # range origination
+        intercept.psi <- logit(psi.u) # intercept origination
+        
+        # regression coeff
+        beta1 ~ dunif(-20,20)
+        beta2 ~ dunif(-20,20)
+        for (t in 2:n_bins){
+          phi[t] ~ dunif(-20,20)
+        }
+        
+        ## set initial conditions for occupancy of each genus
+        initial_psi ~ dunif(0,1)
+      
+       ############      Model       #############
+        
+        # Occupancy dynamics ---------------------
+       
+        for (g in 1:n_spp) {
+         
+            z[g,1]~dbern(initial_psi) # occupancy status initialization
+      
+                for (t in 2:n_bins){
+              
+                 # model likelihood
+                 logit(muZ[g,t]) <-  intercept.psi + 
+                                     beta1*X1[t]+
+                                     beta2*X2[t]+
+                                     phi[t]*z[g,t-1]
+                                       
+                  
+                 # realized occurrence
+                 z[g,t] ~ dbern(muZ[g,t])
+              
+          }#t
+        
+        } #g
+  
+  
+    #############################################################
+    #                                                           #
+    #         Observation process across formations             #
+    #                                                           #
+    #############################################################
+    
+    ###  detection intercept
+    # intercept    
+    for (t in 1:n_bins) {
+      p[t] ~ dunif(0,1) 
+    }
+    
+    # observation submodel
+    for (g in 1:n_spp) { ## loop over genera 
+      
+      for (t in 1:n_bins) { ## loop over time bins 
+    
+          # observation
+          # Specify the binomial observation model conditional on occupancy state
+          y[g,t] ~ dbin(muY[g,t], n_surveys[t])
+          muY[g,t] <- z[g,t]*p[t]
+                  
+        }
+      
+    }
+      
+
+}
+
+"
+
+# Load necessary libraries
+library(jagsUI)
+library(here)
+
+# Set parameters
+set.seed(42)
+n_spp <- 200  # Number of genera
+n_bins <- 30   # Number of time bins
+n_surveys <- 10  # Number of surveys (geological formations) per time bin
+
+# Initial occupancy probability
+initial_psi <- 0.3
+
+# Detection probability
+p <- runif(n_bins,0,1)  
+
+# Autologistic term
+phi <- runif (n_bins, -5,5)
+plot(phi,type="b")
+
+# covariate effect on origination
+intercept.psi <- qlogis(0.2) 
+beta1 <- 0.5
+beta2 <- -1
+
+# covariates (generate just once and save to be used in the other two simulation sets)
+X1 <- runif (n_bins, -2, 2) 
+X2 <- runif (n_bins, -2, 2)  
+# save(X1,X2, file=here("covariates.RData"))
+# load(file=here("simulations","covariates.RData")) # activate after the creation
+cor(cbind(X1,X2))
+
+# scale covariates
+X1<-scale(X1)[,1]
+X2<-scale(X2)[,1]
+
+
+# start simulations ---------------------------------
+
+n.sims <- 20
+my.seeds <- floor(runif (n.sims,0,5000))
+
+# run
+lapply (seq(1,n.sims), function (s) {
+  
+  # set seed
+  set.seed(my.seeds[s])
+  
+  # Simulate occupancy states
+  z <- array(NA, dim = c(n_spp, n_bins))
+  muZ <- array(NA, dim = c(n_spp, n_bins))
+  z[, 1] <- rbinom(n_spp, 1, initial_psi)
+  
+  # true incidence
+  for (i in 1:n_spp) {
+    for (t in 2:n_bins) {
+      # dynamics
+      muZ[i,t] <- plogis(intercept.psi+
+                           beta1+X1[t]+
+                           beta2+X2[t]+ 
+                           phi[t]*z[i,t-1])
+      z[i, t] <- rbinom(1, 1, muZ[i,t])
+    }
+  }
+  
+  # Simulate detections
+  y <- array(NA, dim = c(n_spp, n_bins))
+  for (i in 1:n_spp) {
+    for (t in 1:n_bins) {
+      
+      y[i, t] <- rbinom(1, rep(n_surveys,n_bins), z[i, t] * p[t])
+      
+    }
+  }
+  
+  #save data
+  save (y,z ,muZ,p, phi,gamma, file = here ("simulations","output_autolog", paste0("data_", s,".RData")))
+  
+  # Prepare data for JAGS
+  jags_data <- list(
+    y = y,
+    n_spp = n_spp,
+    n_bins = n_bins,
+    n_surveys = rep(n_surveys,n_bins),
+    X1=X1,
+    X2=X2
+  )
+  
+  # Initial values for the latent states
+  init_values <- function() {
+    list(z = ifelse(y>0,1,0),
+         psi.u = 0.2
+         
+    )
+  }
+  
+  # Parameters to monitor
+  parameters <- c("intercept.psi",
+                  "beta1",
+                  "beta2",
+                  "psi.u",
+                  "phi",
+                  "initial_psi", 
+                  "p", 
+                  "muZ")
+  
+  # Run JAGS model
+  ## MCMC runs
+  samples <-jags (data = jags_data, 
+                  parameters.to.save = parameters, 
+                  model.file = textConnection(model_string), 
+                  inits = init_values, 
+                  n.chains = 3, 
+                  n.thin = 1, 
+                  n.iter = 500,
+                  n.adapt = 200,
+                  n.burnin = 400, 
+                  DIC = T,  
+                  parallel=F
+  )
+  
+  # extract summary
+  point_estimates <- samples$summary
+  
+  #save
+  save (point_estimates, file = here ("simulations","output_autolog", paste0("sims_run", s,".RData")))
+  
+  
+})
+
+# end
+```
+
+You can generate the plots using:
+
+``` r
+# ----------------------------------------
+
+# Load necessary libraries --------------------------------------
+rm(list=ls())
+library(rjags)
+library(here)
+
+# load output ---------------------------------
+# results
+filenames <- list.files(here ("simulations", "output_autolog"), full.names=T, pattern = "sims_run")
+results <- sapply(filenames, function(x) mget(load(x)), simplify = TRUE)
+
+# simulated data
+filenames <- list.files(here ("simulations", "output_autolog"), full.names=T,pattern = "data")
+simdata <- sapply(filenames, function(x) mget(load(x)), simplify = F)
+
+# bind
+df_res <- do.call(rbind,results)
+
+# plot
+require(reshape)
+require(dplyr)
+require(ggplot2)
+
+my_theme <- theme(legend.position = 'bottom', 
+                  strip.text = element_text(size=12),
+                  strip.text.y = element_text(color = 'black'),
+                  strip.text.x = element_text(color = 'black'), 
+                  #text = element_text(family="LM Roman 10"),
+                  panel.grid.major = element_blank(),
+                  panel.grid.minor = element_blank(),
+                  axis.text.x = element_text(angle = 0, hjust = 1, size = 10), 
+                  axis.text.y = element_text(size = 10),
+                  axis.title = element_text(size=15))
+
+# plot phi  --------------------------------------------
+
+# phi ----------
+hat_phi <- df_res [grep("phi\\[", rownames(df_res)),]
+
+# plot
+p_phi<-data.frame (hat_phi = melt(matrix(hat_phi[,"mean"],ncol=20,byrow=F)),
+                   true_phi = melt(sapply (simdata, "[[","phi" )[-1,])[,3]) %>%
+  ggplot() +
+  theme_light(base_size = 16) +
+  geom_point(aes(x = true_phi, y = hat_phi.value,group=hat_phi.X2),alpha=0.5,col="gray20",size=4)+
+  geom_smooth(aes(x = true_phi, y = hat_phi.value,group=hat_phi.X2), col = 'black', alpha = 1, se = F, 
+              lineend = 'round', lwd = 0.25) +
+  geom_abline(slope = 1, intercept = 0, col = 'red', lty = 2,linewidth=1) +
+  labs(y=bquote("Estimated autologistic factor "*(hat(delta[t]))*""),
+       x=bquote("True autologistic factor "*(delta[t])*""))+
+  ggtitle ("A")+my_theme
+
+
+# psi ----------
+hat_psi <- df_res [grep("muZ\\[", rownames(df_res)),]
+
+# plot
+p_psi<-data.frame (hat_psi = melt(matrix(hat_psi[,"mean"],ncol=20,byrow=F)),
+                   true_psi = melt(sapply (simdata, "[[","muZ" )[-c(1:200),])[,3]) %>%
+  ggplot() +
+  theme_light(base_size = 16) +
+  geom_point(aes(x = true_psi, y = hat_psi.value,group=hat_psi.X2),alpha=0.5,col="gray20",size=4)+
+  geom_smooth(aes(x = true_psi, y = hat_psi.value,group=hat_psi.X2), col = 'black', alpha = 1, se = F, 
+              lineend = 'round', lwd = 0.25) +
+  geom_abline(slope = 1, intercept = 0, col = 'red', lty = 2,linewidth=1) +
+  labs(y=bquote("Estimated occurrence probability "*(hat(psi[gt]))*""),
+       x=bquote("True occurrence probability "*(psi[gt])*""))+
+  ggtitle ("B")+my_theme
+
+
+
+# plot p --------------
+
+plot_p <- data.frame (p_est = melt(matrix(df_res [grepl("p\\[", ignore.case = T, rownames(df_res)),"mean"],nrow=30,byrow=F)),
+                      lab_p=as.character(expression(paste(p))),
+                      p_true = melt(sapply (simdata, "[[","p" ))[,3]) %>%
+  ggplot() +
+  theme_light(base_size = 16) +
+  geom_point(aes(x = p_true, y = p_est.value,group=p_est.X2),alpha=0.5,col="gray20",size=4)+
+  geom_smooth(aes(x = p_true, y = p_est.value,group=p_est.X2), col = 'black', alpha = 1, se = F, 
+              lineend = 'round', lwd = 0.25) +
+  geom_abline(slope = 1, intercept = 0, col = 'red', lty = 2,linewidth=1) +
+  labs(y=bquote("Estimated detection probability "*(hat(p[t]))*""),
+       x=bquote("True detection probability "*(p[t])*""))+
+  ggtitle ("C")+my_theme
+
+
+# reegression coefs ---------------------------------
+
+coef_plot <- data.frame (
+            intercept.psi = (df_res [grepl("\\intercept.psi\\b$", ignore.case = T, rownames(df_res)),"mean"]),
+            beta_phi1 = df_res [grepl("\\bbeta1\\b$", ignore.case = T, rownames(df_res)),"mean"],
+            beta_phi2 = df_res [grepl("\\bbeta2\\b$", ignore.case = T, rownames(df_res)),"mean"]
+            ) %>%
+  melt () %>%
+  ggplot (aes (y=value, x=variable)) +
+  scale_x_discrete(labels=c(expression(paste(hat(beta), " "[0])),
+                            expression(paste(hat(beta), " "[1])),
+                            expression(paste(hat(beta), " "[2]))
+                            ))+
+  labs(y="Coefficient value (logistical scale)", x="Parameter")+
+  geom_violin() +
+  geom_point (aes(x=1, y=qlogis(0.2)))+
+  geom_point (aes(x=2, y=0.5))+
+  geom_point (aes(x=3, y=-1))+
+  ggtitle ("D")+my_theme
+
+# coverage
+# gamma
+cbind (df_res [grepl("\\intercept.psi\\b$", ignore.case = T, rownames(df_res)),c("2.5%", "97.5%")],
+       qlogis(0.2) ) %>%
+  data.frame () %>%
+  mutate(is_in_range = qlogis(0.2) > X2.5. & qlogis(0.2) < X97.5.) %>% # Create TRUE/FALSE column
+  summarise(total_TRUEs = sum(is_in_range)) # Sum number of TRUEs
+
+# arrange plot
+require(gridExtra)
+png(file = here("simulations", "figs", "sc4.png"),width = 20,height = 20,units = "cm",res=300)
+grid.arrange (p_phi,p_psi,
               plot_p,coef_plot,ncol=2)
 
 dev.off()

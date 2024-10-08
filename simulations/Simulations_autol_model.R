@@ -3,16 +3,14 @@
 
 # Simulation study
 
-# Can the same set of covarites be included in the origination and extinction models??
-# global - scale analysis ( so the genera are in the rows of the detection table )
-
 # using a simplified autologistic model in which dynamics on psi_gt accounts for the realized incidence in the previous time t-1
 
 # ----------------------------------------
 rm(list=ls())
 require(here)
+
 # create dir
-dir.create (here ("output"))
+dir.create (here ("simulations","output_autolog"))
 
 # Write the JAGS model
 model_string <- "
@@ -112,7 +110,7 @@ initial_psi <- 0.3
 p <- runif(n_bins,0,1)  
 
 # Autologistic term
-phi <- runif (n_bins, -20,20)
+phi <- runif (n_bins, -5,5)
 plot(phi,type="b")
 
 # covariate effect on origination
@@ -123,8 +121,8 @@ beta2 <- -1
 # covariates (generate just once and save to be used in the other two simulation sets)
 X1 <- runif (n_bins, -2, 2) 
 X2 <- runif (n_bins, -2, 2)  
-save(X1,X2, file=here("covariates.RData"))
-#load(file=here("simulations","covariates.RData")) # activate after the creation
+# save(X1,X2, file=here("covariates.RData"))
+# load(file=here("simulations","covariates.RData")) # activate after the creation
 cor(cbind(X1,X2))
 
 # scale covariates
@@ -171,7 +169,7 @@ lapply (seq(1,n.sims), function (s) {
   }
   
   #save data
-  save (y,z ,muZ,p, phi,gamma, file = here ("output", paste0("data_", s,".RData")))
+  save (y,z ,muZ,p, phi,gamma, file = here ("simulations","output_autolog", paste0("data_", s,".RData")))
   
   # Prepare data for JAGS
   jags_data <- list(
@@ -220,12 +218,9 @@ lapply (seq(1,n.sims), function (s) {
   point_estimates <- samples$summary
   
   #save
-  save (point_estimates, file = here ("simulations", "output", paste0("sims_run", s,".RData")))
+  save (point_estimates, file = here ("simulations","output_autolog", paste0("sims_run", s,".RData")))
   
   
 })
 
 # end
-
-samples$mean$beta1
-samples$mean$beta2
