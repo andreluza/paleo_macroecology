@@ -43,12 +43,12 @@ model can be summarized as:
 <br>
 <br>
 
-<center> $$ y_{gt}|z_{gt} \sim Binomial (z_{gt} \times p_t, N_t)$$</center>\
+<center> $$ y_{gt}|N_{t}, p_{t}, z_{gt} \sim Binomial (z_{gt} \times p_t, N_t)$$</center>\
 
 <br>
 <br>
   
-<center>$$ z_{gt} \sim Bernoulli (\psi_{gt} \times \omega_g)$$</center>\
+<center>$$ z_{gt} | \psi_{gt}, \omega_g  \sim Bernoulli (\psi_{gt} \times \omega_g)$$</center>\
 
 <br>
 <br>
