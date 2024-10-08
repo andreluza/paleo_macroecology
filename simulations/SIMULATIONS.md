@@ -43,7 +43,7 @@ model can be summarized as:
 <br>
 <br>
 
-<center> $$ y_{gt}|z_{gt} \sim Binomial (p_t, N_t)$$</center>\
+<center> $$ y_{gt}|z_{gt} \sim Binomial (z_{gt} \times p_t, N_t)$$</center>\
 
 <br>
 <br>
