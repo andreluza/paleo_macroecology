@@ -1063,5 +1063,94 @@ ret_panel <-gridExtra::grid.arrange (plot3,
                                      nrow=3)
 dev.off()
 
-# end script
-rm(list=ls())
+
+# diversification based on the z_it matrix
+
+cynodonts_output$sims.list$z[1,,1] %>%
+             data.frame () %>%
+             filter (. == 1)
+cynodonts_output$sims.list$z[1,,2] %>%
+  data.frame () %>%
+  filter (. == 1)
+
+require(divDyn)
+data(stages) # open data with stage information
+
+# edit matrix
+# calculate the taxa origination and becoming extinct
+
+divDynEstimate <- lapply (seq(1,nrow(cynodonts_output$sims.list$z)), function (i) {
+  
+  # use only observed taxa
+  tab_divdyn <- cynodonts_output$sims.list$z[i,1:(dim(cynodonts_output$sims.list$z)[2]-1000),] # -1000 because of imputed taxa
+  rownames(tab_divdyn) <- rownames(array_genus_bin)[which(clades ==  "Non-mammaliaform cynodonts" )]
+  colnames(tab_divdyn) <- bins[time_bins[stages_cyn],"interval_name"]
+    
+  # melt
+  tab_divdyn <- melt(tab_divdyn,as.is=T)
+  colnames(tab_divdyn) <- c("genus", "stg", "value")
+  
+  # bind stage n
+  tab_divdyn$stage <- stages[match(tab_divdyn$stg, stages$stage),"stg"]
+  tab_divdyn$age <- stages[match(tab_divdyn$stg, stages$stage),"mid"]
+  
+  #divDyn(tab_divdyn%>%filter(value==1), tax="genus", age="age",breaks=seq(250,0,-10))
+  divDynEstimate <- divDyn(tab_divdyn%>%filter(value==1), tax="genus", bin="stg")
+  divDynEstimate <- cbind (divDynEstimate,
+                           bins [match (divDynEstimate$stg,bins$interval_name), c("max_ma", "mid_ma", "min_ma","cols_strip")])
+  
+  # output I want
+  divDynEstimate <- divDynEstimate [,c("max_ma", "mid_ma", "min_ma", "tOri", "tExt")]
+  
+  ; 
+  divDynEstimate
+})
+  
+  
+# plot
+ggplot(data = divDynEstimate,
+    aes(x=mid_ma,
+        y=tOri, 
+        col="red"))+
+      geom_point(size=3) +
+      geom_line()+
+  
+      #  scale_fill_viridis_d(option="magma",begin=0.3,end=0.7)+
+      #scale_colour_viridis_d(option="magma",begin=0.1,end=1)+
+      #scale_fill_viridis_d(option="magma",begin=0.1,end=1)+
+      #scale_colour_manual(values = cols[1])+
+      #scale_fill_manual(values = cols[1])+
+      
+      #geom_errorbar(aes(x = mid_ma, ymin = lw, ymax = up,col=var),
+      #              width=0.1,size=1,position = position_jitter(width=0.1))+
+      #
+      #geom_ribbon(aes(x=mid_ma, y=average, ymax=up, ymin=lw,fill=Taxon), 
+      #            alpha=0.2) + 
+      # other settings
+      
+      #facet_wrap(~var+Taxon,scales = "fixed",ncol=3)+
+      theme_bw()+
+      ylab ("Probability")+
+     
+      scale_x_reverse("Age (Ma)") +
+      theme (legend.position = c(0.8,0.9))+
+      coord_geo(
+        dat = list("stages", "periods"), 
+        xlim = c( 66,270), 
+        #ylim = c(0, 2),
+        pos = list("b", "b"),
+        rot=90,
+        size = list(2, 4),
+        abbrv = list(TRUE, T)
+      ) +
+      
+      geom_rect(aes(xmin = max_ma, 
+                    xmax = min_ma, 
+                    ymin = -Inf, 
+                    ymax = Inf, 
+                    fill = cols_strip), 
+                
+                col=NA,
+                alpha = 0.2)+
+      scale_fill_manual(values = cols_strip)
+

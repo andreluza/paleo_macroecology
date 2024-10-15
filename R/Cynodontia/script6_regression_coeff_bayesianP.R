@@ -61,7 +61,6 @@ output_list <- list(cynodonts_output$summary,
                     mammalia_output$summary)
 
 
-
 # taxon list
 tax_list <- c("Non-mammaliaform cynodonts",
               "Non-mammalian Mammaliaformes",

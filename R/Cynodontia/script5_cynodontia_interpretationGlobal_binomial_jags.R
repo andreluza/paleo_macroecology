@@ -29,9 +29,9 @@ mammaliaformes_output <- samples_paleo_cynodontia_binomial
 #load (here ("output","global",
 #            "CMR_global_binomial1000sp_Non-mammaliaform cynodonts.RData"))
 # load output
-load (here ("output","global",
-            "CMR_global_binomial1000sp_Non-mammaliaform cynodonts.RData"))
-            #"CMR_global_binomial_no_covNon-mammaliaform cynodonts.RData"))
+load (here ("output","No_covariate_model",
+            #"CMR_global_binomial1000sp_Non-mammaliaform cynodonts.RData"))
+            "CMR_global_binomial_no_covNon-mammaliaform cynodonts.RData"))
 
 # mammalia output
 cynodonts_output <- samples_paleo_cynodontia_binomial
@@ -79,7 +79,7 @@ geom_histogram(aes(y = ..density..),
                bins = 100) +
   theme_classic()+
   scale_fill_manual(values = cols)+
-  #scale_x_break(c(650, 1050), expand=T,scales="fixed")+
+  #scale_x_break(c(450, 1050), expand=T,scales="fixed")+
   #scale_y_break(c(0.06, 0.1), expand=T,scales="fixed")+
   theme(legend.position = "none",legend.direction = "vertical") + 
   
@@ -92,7 +92,7 @@ geom_histogram(aes(y = ..density..),
               linetype="dashed") +
   geom_vline (data =dat_diversity %>%
                 filter (Taxon == "Non-mammalian Mammaliaformes"),  
-              aes (xintercept=median(Diversity)),
+              aes (xintercept=mean(Diversity)),
               color= cols[2],
               size=1,
               linetype="dashed") +
@@ -139,8 +139,8 @@ dev.off()
 
 dat_rates<-rbind (
   data.frame (Taxon = "Non-mammaliaform cynodonts", 
-              Origination = cynodonts_output$sims.list$gamma.u,
-              Extinction = 1-cynodonts_output$sims.list$phi.u,
+              Origination = cynodonts_output$sims.list$gamma,
+              Extinction = 1-cynodonts_output$sims.list$phi,
               Detection = cynodonts_output$sims.list$p.u),
   data.frame (Taxon = "Non-mammalian Mammaliaformes", 
               Origination = mammaliaformes_output$sims.list$gamma.u,
@@ -259,7 +259,8 @@ stages_mamm <- (function_stages (x = array_genus_bin[which(clades %in% "Mammalia
 plot1 <- ggplot (data = time_covariates %>%
                   cbind (group = 1,
                           bins[-c(1:6),c("mid_ma","max_ma", "min_ma", "cols_strip")]) %>%
-                   select("temperature", "precipitation", 
+                  
+                   dplyr::select("temperature", "precipitation", 
                           "area", "coastalLine", "trop_area", 
                           "trop_coast", "stage", "group", "mid_ma",
                           "max_ma","min_ma","cols_strip")%>%
@@ -888,6 +889,7 @@ dat_change$Taxon <- factor (dat_change$Taxon,
                      levels = c("Non-mammaliaform cynodonts",
                                 "Non-mammalian Mammaliaformes",
                                 "Mammalia"))
+
 # replacing inf by NA (all will be zero)
 #dat_change[is.infinite(dat_change$average),c("average","lci","uci")] <- NA
 
