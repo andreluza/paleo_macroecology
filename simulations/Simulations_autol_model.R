@@ -132,7 +132,7 @@ X2<-scale(X2)[,1]
 
 # start simulations ---------------------------------
 
-n.sims <- 20
+n.sims <- 50
 my.seeds <- floor(runif (n.sims,0,5000))
 
 # run
@@ -151,8 +151,8 @@ lapply (seq(1,n.sims), function (s) {
     for (t in 2:n_bins) {
       # dynamics
       muZ[i,t] <- plogis(intercept.psi+
-                           beta1+X1[t]+
-                           beta2+X2[t]+ 
+                           beta1*X1[t]+
+                           beta2*X2[t]+ 
                            phi[t]*z[i,t-1])
       z[i, t] <- rbinom(1, 1, muZ[i,t])
     }

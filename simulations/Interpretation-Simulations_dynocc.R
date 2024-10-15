@@ -43,7 +43,7 @@ my_theme <- theme(legend.position = 'bottom',
 
 # plot phi and gamma --------------------------------------------
 
-p_gamma<-data.frame (hat_gamma = melt(matrix(hat_gamma[,"mean"],ncol=20,byrow=F)),
+p_gamma<-data.frame (hat_gamma = melt(matrix(hat_gamma[,"mean"],ncol=50,byrow=F)),
             true_gamma = melt(sapply (simdata, "[[","gamma" ))[,3]) %>%
   ggplot() +
   theme_light(base_size = 16) +
@@ -61,7 +61,7 @@ hat_phi <- hat_phi [-grep("intercept",rownames(hat_phi)),] # remove intercept
 hat_phi <- hat_phi [-grep("beta",rownames(hat_phi)),] # remove coeffs
 
 # plot
-p_phi<-data.frame (hat_phi = melt(matrix(hat_phi[,"mean"],ncol=20,byrow=F)),
+p_phi<-data.frame (hat_phi = melt(matrix(hat_phi[,"mean"],ncol=50,byrow=F)),
                    true_phi = melt(sapply (simdata, "[[","phi" ))[,3]) %>%
   ggplot() +
   theme_light(base_size = 16) +

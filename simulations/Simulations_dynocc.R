@@ -158,7 +158,7 @@ X2<-scale(X2)[,1]
 
 # start simulations ---------------------------------
 
-n.sims <- 20
+n.sims <- 50
 my.seeds <- floor(runif (n.sims,0,5000))
 
 # run
@@ -174,12 +174,12 @@ lapply (seq(1,n.sims), function (s) {
         for(t in 1:(n_bins-1)){
           
             # origination 
-            gamma[t] <- plogis(intercept_gamma+beta_gamma1+X1[t]+
-                                      beta_gamma2+X2[t])
+            gamma[t] <- plogis(intercept_gamma+beta_gamma1*X1[t]+
+                                      beta_gamma2*X2[t])
             
             # persistence probability
-            phi[t] <- plogis(intercept_phi+beta_phi1+X1[t]+
-                                    beta_phi2+X2[t])# back to prob scale
+            phi[t] <- plogis(intercept_phi+beta_phi1*X1[t]+
+                                    beta_phi2*X2[t])# back to prob scale
             
             
         }

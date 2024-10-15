@@ -39,7 +39,7 @@ my_theme <- theme(legend.position = 'bottom',
 hat_phi <- df_res [grep("phi\\[", rownames(df_res)),]
 
 # plot
-p_phi<-data.frame (hat_phi = melt(matrix(hat_phi[,"mean"],ncol=20,byrow=F)),
+p_phi<-data.frame (hat_phi = melt(matrix(hat_phi[,"mean"],ncol=50,byrow=F)),
                    true_phi = melt(sapply (simdata, "[[","phi" )[-1,])[,3]) %>%
   ggplot() +
   theme_light(base_size = 16) +
@@ -56,7 +56,7 @@ p_phi<-data.frame (hat_phi = melt(matrix(hat_phi[,"mean"],ncol=20,byrow=F)),
 hat_psi <- df_res [grep("muZ\\[", rownames(df_res)),]
 
 # plot
-p_psi<-data.frame (hat_psi = melt(matrix(hat_psi[,"mean"],ncol=20,byrow=F)),
+p_psi<-data.frame (hat_psi = melt(matrix(hat_psi[,"mean"],ncol=50,byrow=F)),
                    true_psi = melt(sapply (simdata, "[[","muZ" )[-c(1:200),])[,3]) %>%
   ggplot() +
   theme_light(base_size = 16) +

@@ -40,17 +40,7 @@ We made these simulations because there was an total overlap of covariates in th
 
 In our first simulation round, we make origination $\gamma_t$ and persistence $\phi_t$ as the result of the same covariates, $X_{1t}$ and $X_{2t}$, thus the overlap of covariates in the models was total. In our second simulation round, we removed $X_{1t}$ from the model of $\phi_t$, producing a partial overlap of covariates. In our final simulation run, we removed $X_{2t}$ from the model of $\gamma_t$, resulting in no overlap of covariates (probably the best situation).
 
-We found that in all the three situations the model can recover the true values of $\gamma_t$, $\phi_t$ and $p_t$ used to generate the data (Figs. 1-3). However, in rarely the true values of the intercepts ($\beta_{\gamma_0}$ and $\beta_{\phi_0}$) and regression coefficients were recovered by the models ($\beta_{\gamma_1}$ and $\beta_{\phi_1}$ depicting the effect of the covariate $X_{1t}$, and $\beta_{\gamma_2}$ and $\beta_{\phi_2}$ depicting the effect of the covariate $X2_t$).
-
-After these results, we went beyond and tried a simpler autologistic model, thinking that the intercepts and regression coefficients are biased because $\gamma_t$ and $\phi$ can be redundant in the model (Gimenez et al. 2004, Cole 2020). As such, we used the autologistic model intending to summarize the temporal dependence/autocorrelation of the realized occurrence $z_{gt}$ between adjacent time bins $t$ and $t+1$ through a single coefficient, which we called $\delta_t$. In this model, $\psi_{gt}$ is obtained through the model:
-
-<center>$$ logit(\psi_{gt}) = \beta_{0\psi} + \beta_1 \times X_1 + \beta_2 \times X_2 + \delta_t * z_{g,t-1}$$</center>\
-
-Then the $\psi_{gt}$ enters in the Bernoulli distribution of $z_{gt}$ as follows:
-
-<center>$$ z_{gt} \sim Bernoulli (\psi_{gt})$$</center>\
-
-We did not find improvement using this model formulation (Fig. 4). The detection probability $\hat{p_t}$ was again recovered, the $\hat{\delta_t}$ was estimated with some bias, the occupancy probability also not so biased but variance in estimates was high, and the intercept and regression coefficients were severely biased (Fig. 4). We did some tests with the coverage of the Credible Intervals, and the biased all estimates did not touch the true values.
+We did not find any issue with the model, as it performed well with total, partial, and not overlap of covariates. Overall, trends on $\gamma_t$, $\phi_t$ and $p_t$ were recovered (Figs. 1-3). The intercept and regression coefficients were also recovered. Thus no bias and lack of precision was detected under these simulated conditions.
 
 ```{r include=T,echo=F, warning=F, fig.align='center', out.width="75%",out.height="75%"}
 # All defaults
@@ -78,13 +68,6 @@ knitr::include_graphics(here ("simulations","figs","sc3.png"))
 ```
 Fig. 3: Results depicting the performance of the model front to no overlap of covariates. In (A), we show the true values of $\gamma_t$ per time bin in the X axis, and the estimated values in the Y axis. In (B), we show the true values of $\phi_t$ per time bin in the X axis, and the estimated values in the Y axis.In (C), we show the true values of $\p_t$ per time bin in the X axis, and the estimated values in the Y axis. In A-C, the red line depicts the 1:1 relationship of a perfect matching between the truth and the estimated values. One truth-estimate relationship is shown per simulated data set (n=20). In (D), we show violin plots (produced by the 20 simulated data setes) of the intercepts and regression coefficients. The black points depict the true values. 
 
-```{r include=T,echo=F, warning=F, fig.align='center', out.width="75%",out.height="75%"}
-# All defaults
-require(here)
-knitr::include_graphics(here ("simulations","figs","sc4.png"))
-
-```
-Fig. 4: Results depicting the performance of the model front to no overlap of covariates. In (A), we show the true values of $\gamma_t$ per time bin in the X axis, and the estimated values in the Y axis. In (B), we show the true values of $\phi_t$ per time bin in the X axis, and the estimated values in the Y axis.In (C), we show the true values of $\p_t$ per time bin in the X axis, and the estimated values in the Y axis. In A-C, the red line depicts the 1:1 relationship of a perfect matching between the truth and the estimated values. One truth-estimate relationship is shown per simulated data set (n=20). In (D), we show violin plots (produced by the 20 simulated data setes) of the intercepts and regression coefficients. The black points depict the true values. 
 
 ## You can reproduce the first simulation study using:
 
@@ -269,12 +252,12 @@ lapply (seq(1,n.sims), function (s) {
         for(t in 1:(n_bins-1)){
           
             # origination 
-            gamma[t] <- plogis(intercept_gamma+beta_gamma1+X1[t]+
-                                      beta_gamma2+X2[t])
+            gamma[t] <- plogis(intercept_gamma+beta_gamma1*X1[t]+
+                                      beta_gamma2*X2[t])
             
             # persistence probability
-            phi[t] <- plogis(intercept_phi+beta_phi1+X1[t]+
-                                    beta_phi2+X2[t])# back to prob scale
+            phi[t] <- plogis(intercept_phi+beta_phi1*X1[t]+
+                                    beta_phi2*X2[t])# back to prob scale
             
             
         }
@@ -696,12 +679,12 @@ lapply (seq(1,n.sims), function (s) {
         for(t in 1:(n_bins-1)){
           
             # origination 
-            gamma[t] <- plogis(intercept_gamma+beta_gamma1+X1[t]+
-                               beta_gamma2+X2[t])
+            gamma[t] <- plogis(intercept_gamma+beta_gamma1*X1[t]+
+                               beta_gamma2*X2[t])
             
             # persistence probability
             phi[t] <- plogis(intercept_phi+
-                             beta_phi2+X2[t])# back to prob scale
+                             beta_phi2*X2[t])# back to prob scale
             
             
         }
@@ -1116,11 +1099,11 @@ lapply (seq(1,n.sims), function (s) {
         for(t in 1:(n_bins-1)){
           
             # origination 
-            gamma[t] <- plogis(intercept_gamma+beta_gamma1+X1[t])
+            gamma[t] <- plogis(intercept_gamma+beta_gamma1*X1[t])
             
             # persistence probability
             phi[t] <- plogis(intercept_phi+
-                                    beta_phi2+X2[t])# back to prob scale
+                                    beta_phi2*X2[t])# back to prob scale
             
             
         }
@@ -1356,112 +1339,20 @@ dev.off()
 
 ```
 
-## You can reproduce the autologistic model with the following code:
+## I also added here the Nimble Code kindly provided by Qing Zhao (Google Group "Hierarchical Modeling in Ecology"). Using Nimble enables to speed up the analysis.
 
 
 ```{r, eval=F, echo=T}
+#===============
+# Code kindly provided by Qing Zhao (Hierarchical Modeling in Ecology Google Group)
+#===============
 
-# ----------------------------------------
 
+#===============
+# Simulate data
+#===============
+library(boot)
 
-# Simulation study
-
-# using a simplified autologistic model in which dynamics on psi_gt accounts for the realized incidence in the previous time t-1
-
-# ----------------------------------------
-rm(list=ls())
-require(here)
-
-# create dir
-dir.create (here ("simulations","output_autolog"))
-
-# Write the JAGS model
-model_string <- "
-model {
-  
-      #  Occupancy Dynamics (Priors)
-       
-       
-        # ----------------------
-        #     Gamma (origination)
-        # ----------------------
-        
-        # intercepts
-        psi.u ~ dunif(0,1) # range origination
-        intercept.psi <- logit(psi.u) # intercept origination
-        
-        # regression coeff
-        beta1 ~ dunif(-20,20)
-        beta2 ~ dunif(-20,20)
-        for (t in 2:n_bins){
-          phi[t] ~ dunif(-20,20)
-        }
-        
-        ## set initial conditions for occupancy of each genus
-        initial_psi ~ dunif(0,1)
-      
-       ############      Model       #############
-        
-        # Occupancy dynamics ---------------------
-       
-        for (g in 1:n_spp) {
-         
-            z[g,1]~dbern(initial_psi) # occupancy status initialization
-      
-                for (t in 2:n_bins){
-              
-                 # model likelihood
-                 logit(muZ[g,t]) <-  intercept.psi + 
-                                     beta1*X1[t]+
-                                     beta2*X2[t]+
-                                     phi[t]*z[g,t-1]
-                                       
-                  
-                 # realized occurrence
-                 z[g,t] ~ dbern(muZ[g,t])
-              
-          }#t
-        
-        } #g
-  
-  
-    #############################################################
-    #                                                           #
-    #         Observation process across formations             #
-    #                                                           #
-    #############################################################
-    
-    ###  detection intercept
-    # intercept    
-    for (t in 1:n_bins) {
-      p[t] ~ dunif(0,1) 
-    }
-    
-    # observation submodel
-    for (g in 1:n_spp) { ## loop over genera 
-      
-      for (t in 1:n_bins) { ## loop over time bins 
-    
-          # observation
-          # Specify the binomial observation model conditional on occupancy state
-          y[g,t] ~ dbin(muY[g,t], n_surveys[t])
-          muY[g,t] <- z[g,t]*p[t]
-                  
-        }
-      
-    }
-      
-
-}
-
-"
-
-# Load necessary libraries
-library(jagsUI)
-library(here)
-
-# Set parameters
-set.seed(42)
 n_spp <- 200  # Number of genera
 n_bins <- 30   # Number of time bins
 n_surveys <- 10  # Number of surveys (geological formations) per time bin
@@ -1472,258 +1363,175 @@ initial_psi <- 0.3
 # Detection probability
 p <- runif(n_bins,0,1)  
 
-# Autologistic term
-phi <- runif (n_bins, -5,5)
-plot(phi,type="b")
-
 # covariate effect on origination
-intercept.psi <- qlogis(0.2) 
-beta1 <- 0.5
-beta2 <- -1
+intercept_gamma <- logit(0.2)
+beta_gamma1 <- 0.5
+beta_gamma2 <- 1
+
+# covariate effect on persistence
+intercept_phi <- logit(0.3)  
+beta_phi1 <- 1
+beta_phi2 <- -1
 
 # covariates (generate just once and save to be used in the other two simulation sets)
-X1 <- runif (n_bins, -2, 2) 
-X2 <- runif (n_bins, -2, 2)  
-# save(X1,X2, file=here("covariates.RData"))
-# load(file=here("simulations","covariates.RData")) # activate after the creation
-cor(cbind(X1,X2))
+X1 <- runif (n_bins-1, -2, 2)
+X2 <- runif (n_bins-1, -2, 2)  
 
-# scale covariates
-X1<-scale(X1)[,1]
-X2<-scale(X2)[,1]
-
-
-# start simulations ---------------------------------
-
-n.sims <- 20
-my.seeds <- floor(runif (n.sims,0,5000))
-
-# run
-lapply (seq(1,n.sims), function (s) {
-  
-  # set seed
-  set.seed(my.seeds[s])
-  
-  # Simulate occupancy states
-  z <- array(NA, dim = c(n_spp, n_bins))
-  muZ <- array(NA, dim = c(n_spp, n_bins))
-  z[, 1] <- rbinom(n_spp, 1, initial_psi)
-  
-  # true incidence
-  for (i in 1:n_spp) {
-    for (t in 2:n_bins) {
-      # dynamics
-      muZ[i,t] <- plogis(intercept.psi+
-                           beta1+X1[t]+
-                           beta2+X2[t]+ 
-                           phi[t]*z[i,t-1])
-      z[i, t] <- rbinom(1, 1, muZ[i,t])
-    }
-  }
-  
-  # Simulate detections
-  y <- array(NA, dim = c(n_spp, n_bins))
-  for (i in 1:n_spp) {
-    for (t in 1:n_bins) {
-      
-      y[i, t] <- rbinom(1, rep(n_surveys,n_bins), z[i, t] * p[t])
-      
-    }
-  }
-  
-  #save data
-  save (y,z ,muZ,p, phi,gamma, file = here ("simulations","output_autolog", paste0("data_", s,".RData")))
-  
-  # Prepare data for JAGS
-  jags_data <- list(
-    y = y,
-    n_spp = n_spp,
-    n_bins = n_bins,
-    n_surveys = rep(n_surveys,n_bins),
-    X1=X1,
-    X2=X2
-  )
-  
-  # Initial values for the latent states
-  init_values <- function() {
-    list(z = ifelse(y>0,1,0),
-         psi.u = 0.2
+phi <- gamma <- array(NA, dim = (n_bins-1)) # persistence, colonisation
          
-    )
+# produce transition probs
+for(t in 1:(n_bins-1)){
+         
+  # origination
+  gamma[t] <- inv.logit(intercept_gamma + beta_gamma1 * X1[t] + beta_gamma2 * X2[t])
+           
+  # persistence probability
+  phi[t] <- inv.logit(intercept_phi + beta_phi1 * X1[t] + beta_phi2 * X2[t])
+           
+} # t
+       
+# Simulate occupancy states
+z <- array(NA, dim = c(n_spp, n_bins))
+muZ <- array(NA, dim = c(n_spp, n_bins-1))
+z[,1] <- rbinom(n_spp, 1, initial_psi)
+       
+# true incidence
+for (i in 1:n_spp) {
+  for (t in 2:n_bins) {
+    muZ[i,t-1] <- z[i,t-1] * phi[t-1] + (1 - z[i,t-1]) * gamma[t-1]
+    z[i,t] <- rbinom(1, 1, muZ[i,t-1])
+  } # t
+} # i
+       
+# Simulate detections
+y <- array(NA, dim = c(n_spp, n_bins))
+for (i in 1:n_spp) {
+  for (t in 1:n_bins) {
+           
+    y[i,t] <- rbinom(1, n_surveys, z[i,t] * p[t])
+           
+  } # t
+} # i
+
+#========================
+# Define model in Nimble
+#========================
+library(nimble)
+
+code <- nimbleCode({
+     
+  # Priors
+  initial_psi ~ dunif(0,1)
+  intercept_gamma ~ dnorm(0, sd=10)
+  beta_gamma1 ~ dnorm(0, sd=10)
+  beta_gamma2 ~ dnorm(0, sd=10)
+  intercept_phi ~ dnorm(0, sd=10)
+  beta_phi1 ~ dnorm(0, sd=10)
+  beta_phi2 ~ dnorm(0, sd=10)
+  for (t in 1:n_bins) {
+    p[t] ~ dunif(0,1)
   }
-  
-  # Parameters to monitor
-  parameters <- c("intercept.psi",
-                  "beta1",
-                  "beta2",
-                  "psi.u",
-                  "phi",
-                  "initial_psi", 
-                  "p", 
-                  "muZ")
-  
-  # Run JAGS model
-  ## MCMC runs
-  samples <-jags (data = jags_data, 
-                  parameters.to.save = parameters, 
-                  model.file = textConnection(model_string), 
-                  inits = init_values, 
-                  n.chains = 3, 
-                  n.thin = 1, 
-                  n.iter = 500,
-                  n.adapt = 200,
-                  n.burnin = 400, 
-                  DIC = T,  
-                  parallel=F
-  )
-  
-  # extract summary
-  point_estimates <- samples$summary
-  
-  #save
-  save (point_estimates, file = here ("simulations","output_autolog", paste0("sims_run", s,".RData")))
-  
-  
-})
 
-# end
+  # Process
+  for (t in 1:(n_bins-1)){
+     
+    # speciation
+    logit(gamma[t]) <-  intercept_gamma +
+                        beta_gamma1 * X1[t]+
+                        beta_gamma2 * X2[t]
+                                   
+    # persistence
+    logit(phi[t]) <-  intercept_phi +
+                      beta_phi1 * X1[t]+
+                      beta_phi2 * X2[t]
 
+  } # t
 
-```
+  for (g in 1:n_spp) {
+         
+    z[g,1] ~ dbern(initial_psi) # occupancy status initialization
+     
+    for (t in 2:n_bins){
+             
+      muZ[g,t-1] <- z[g,t-1] * phi[t-1] + (1 - z[g,t-1]) * gamma[t-1]
+      z[g,t] ~ dbern(muZ[g,t-1])
+             
+    }#t
+       
+  } #g
 
-You can generate the plots using:
+  # Observation
+  for (g in 1:n_spp) { ## loop over genera
+     
+    for (t in 1:n_bins) { ## loop over time bins
+   
+      y[g,t] ~ dbin(z[g,t] * p[t], n_surveys)
+                 
+    } # t
+     
+  } # g
 
+}) # nimbleCode
 
-```{r, eval=F, echo=T}
+#============
+# Run Nimble
+#============
+# Data
+constants <- list(
+  n_spp=n_spp, n_bins=n_bins, n_surveys=n_surveys,
+  X1=X1, X2=X2
+)
 
-# ----------------------------------------
+data <- list(
+  y=y
+)
 
-# Load necessary libraries --------------------------------------
-rm(list=ls())
-library(rjags)
-library(here)
+# Initial values
+inits <- list(initial_psi=0.5,
+              intercept_gamma=0, beta_gamma1=0, beta_gamma2=0,
+              intercept_phi=0, beta_phi1=0, beta_phi2=0,
+              p=rep(0.5,n_bins), z=ifelse(y==0,0,1)
+)
 
-# load output ---------------------------------
-# results
-filenames <- list.files(here ("simulations", "output_autolog"), full.names=T, pattern = "sims_run")
-results <- sapply(filenames, function(x) mget(load(x)), simplify = TRUE)
+start_time <- Sys.time() # start time of computing
 
-# simulated data
-filenames <- list.files(here ("simulations", "output_autolog"), full.names=T,pattern = "data")
-simdata <- sapply(filenames, function(x) mget(load(x)), simplify = F)
+model <- nimbleModel(code, constants=constants, data=data, inits=inits)
+mcmcConf <- configureMCMC(model)
+mcmcConf$printSamplers()
 
-# bind
-df_res <- do.call(rbind,results)
+mcmc <- buildMCMC(mcmcConf)
+compiled <- compileNimble(model, mcmc)
 
-# plot
-require(reshape)
-require(dplyr)
-require(ggplot2)
+fit <- runMCMC(compiled$mcmc, nchains = 3, niter = 5000, nburnin = 0)
 
-my_theme <- theme(legend.position = 'bottom', 
-                  strip.text = element_text(size=12),
-                  strip.text.y = element_text(color = 'black'),
-                  strip.text.x = element_text(color = 'black'), 
-                  #text = element_text(family="LM Roman 10"),
-                  panel.grid.major = element_blank(),
-                  panel.grid.minor = element_blank(),
-                  axis.text.x = element_text(angle = 0, hjust = 1, size = 10), 
-                  axis.text.y = element_text(size = 10),
-                  axis.title = element_text(size=15))
+end_time <- Sys.time() # end time of computing
+time_taken <- end_time - start_time # computing time
+time_taken
 
-# plot phi  --------------------------------------------
+#===============
+# Check results
+#===============
+parms <- c('initial_psi', 'intercept_gamma', 'beta_gamma1', 'beta_gamma2', 'intercept_phi', 'beta_phi1', 'beta_phi2')
+parm_values <- c(initial_psi, intercept_gamma, beta_gamma1, beta_gamma2, intercept_phi, beta_phi1, beta_phi2)
+fitnms <- colnames(fit$chain1)
 
-# phi ----------
-hat_phi <- df_res [grep("phi\\[", rownames(df_res)),]
+library(rstan)
 
-# plot
-p_phi<-data.frame (hat_phi = melt(matrix(hat_phi[,"mean"],ncol=20,byrow=F)),
-                   true_phi = melt(sapply (simdata, "[[","phi" )[-1,])[,3]) %>%
-  ggplot() +
-  theme_light(base_size = 16) +
-  geom_point(aes(x = true_phi, y = hat_phi.value,group=hat_phi.X2),alpha=0.5,col="gray20",size=4)+
-  geom_smooth(aes(x = true_phi, y = hat_phi.value,group=hat_phi.X2), col = 'black', alpha = 1, se = F, 
-              lineend = 'round', lwd = 0.25) +
-  geom_abline(slope = 1, intercept = 0, col = 'red', lty = 2,linewidth=1) +
-  labs(y=bquote("Estimated autologistic factor "*(hat(delta[t]))*""),
-       x=bquote("True autologistic factor "*(delta[t])*""))+
-  ggtitle ("A")+my_theme
-
-
-# psi ----------
-hat_psi <- df_res [grep("muZ\\[", rownames(df_res)),]
-
-# plot
-p_psi<-data.frame (hat_psi = melt(matrix(hat_psi[,"mean"],ncol=20,byrow=F)),
-                   true_psi = melt(sapply (simdata, "[[","muZ" )[-c(1:200),])[,3]) %>%
-  ggplot() +
-  theme_light(base_size = 16) +
-  geom_point(aes(x = true_psi, y = hat_psi.value,group=hat_psi.X2),alpha=0.5,col="gray20",size=4)+
-  geom_smooth(aes(x = true_psi, y = hat_psi.value,group=hat_psi.X2), col = 'black', alpha = 1, se = F, 
-              lineend = 'round', lwd = 0.25) +
-  geom_abline(slope = 1, intercept = 0, col = 'red', lty = 2,linewidth=1) +
-  labs(y=bquote("Estimated occurrence probability "*(hat(psi[gt]))*""),
-       x=bquote("True occurrence probability "*(psi[gt])*""))+
-  ggtitle ("B")+my_theme
-
-
-
-# plot p --------------
-
-plot_p <- data.frame (p_est = melt(matrix(df_res [grepl("p\\[", ignore.case = T, rownames(df_res)),"mean"],nrow=30,byrow=F)),
-                      lab_p=as.character(expression(paste(p))),
-                      p_true = melt(sapply (simdata, "[[","p" ))[,3]) %>%
-  ggplot() +
-  theme_light(base_size = 16) +
-  geom_point(aes(x = p_true, y = p_est.value,group=p_est.X2),alpha=0.5,col="gray20",size=4)+
-  geom_smooth(aes(x = p_true, y = p_est.value,group=p_est.X2), col = 'black', alpha = 1, se = F, 
-              lineend = 'round', lwd = 0.25) +
-  geom_abline(slope = 1, intercept = 0, col = 'red', lty = 2,linewidth=1) +
-  labs(y=bquote("Estimated detection probability "*(hat(p[t]))*""),
-       x=bquote("True detection probability "*(p[t])*""))+
-  ggtitle ("C")+my_theme
-
-
-# reegression coefs ---------------------------------
-
-coef_plot <- data.frame (
-            intercept.psi = (df_res [grepl("\\intercept.psi\\b$", ignore.case = T, rownames(df_res)),"mean"]),
-            beta_phi1 = df_res [grepl("\\bbeta1\\b$", ignore.case = T, rownames(df_res)),"mean"],
-            beta_phi2 = df_res [grepl("\\bbeta2\\b$", ignore.case = T, rownames(df_res)),"mean"]
-            ) %>%
-  melt () %>%
-  ggplot (aes (y=value, x=variable)) +
-  scale_x_discrete(labels=c(expression(paste(hat(beta), " "[0])),
-                            expression(paste(hat(beta), " "[1])),
-                            expression(paste(hat(beta), " "[2]))
-                            ))+
-  labs(y="Coefficient value (logistical scale)", x="Parameter")+
-  geom_violin() +
-  geom_point (aes(x=1, y=qlogis(0.2)))+
-  geom_point (aes(x=2, y=0.5))+
-  geom_point (aes(x=3, y=-1))+
-  ggtitle ("D")+my_theme
-
-# coverage
-# gamma
-cbind (df_res [grepl("\\intercept.psi\\b$", ignore.case = T, rownames(df_res)),c("2.5%", "97.5%")],
-       qlogis(0.2) ) %>%
-  data.frame () %>%
-  mutate(is_in_range = qlogis(0.2) > X2.5. & qlogis(0.2) < X97.5.) %>% # Create TRUE/FALSE column
-  summarise(total_TRUEs = sum(is_in_range)) # Sum number of TRUEs
-
-# arrange plot
-require(gridExtra)
-png(file = here("simulations", "figs", "sc4.png"),width = 20,height = 20,units = "cm",res=300)
-grid.arrange (p_phi,p_psi,
-              plot_p,coef_plot,ncol=2)
-
-dev.off()
-
-# end
-
-
-
-
+par(mfrow=c(3,3))
+par(mar=c(2,2,2,1))
+for (i in 1:length(parms)) {
+  tt <- cbind(fit$chain1[,which(fitnms == parms[i])],
+              fit$chain2[,which(fitnms == parms[i])],
+              fit$chain3[,which(fitnms == parms[i])])
+  diff <- max(abs(tt[2001:5000,] - parm_values[i])) * 1.2
+  plot(1, xlim=c(1,5000), ylim=c(parm_values[i]-diff,parm_values[i]+diff),
+       type='n', xlab='', ylab='', main=parms[i])
+  for (k in 1:3) {
+    lines(tt[,k], type='l', col=k+1)
+  } # k
+  abline(h=parm_values[i], col='grey20')
+  text(x=3000, y=parm_values[i]+diff, pos=1,
+       labels=paste(c('Rhat = ', format(round(Rhat(tt[2001:5000,]), digits=2), nsmall=2)), collapse=''))
+} # i
 
 ```
